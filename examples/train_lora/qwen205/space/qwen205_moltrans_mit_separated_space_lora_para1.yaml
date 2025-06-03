@@ -1,0 +1,59 @@
+
+#lagacy name: qwen2_0_5b_molecular_transformer_mit_separated_lora_sft
+#current name: qwen205_moltrans_mit_separated_space_lora_para1
+### model
+model_name_or_path: /home/liangtao/Models/Qwen/Qwen2-0.5B
+image_max_pixels: 262144
+video_max_pixels: 16384
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 8
+lora_target: all
+
+### dataset
+dataset: alpaca_molecular_transformer_mit_separated # legacy
+template: qwen
+cutoff_len: 2048
+max_samples: 10000000000
+overwrite_cache: true
+#preprocessing_num_workers: 16
+preprocessing_num_workers: 16
+dataloader_num_workers: 8
+
+### output
+#output_dir: saves/Qwen2-0.5B-Molecular-Transformer-MIT-Separated/lora/sft # legacy
+output_dir: saves/sft_lora/qwen205_moltrans_mit_separated_space_lora_para1/ # current
+
+logging_steps: 50
+save_steps: 10000
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: tensorboard  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+
+### train
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 4
+learning_rate: 1.0e-4
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+val_size: 0.02
+per_device_eval_batch_size: 2
+eval_strategy: steps
+eval_steps: 4000
+
+
+run_name: qwen2_0_5b_molecular_transformer_mit_separated_lora_sft #legacy
+
+# legacy
+# llamafactory-cli train examples/train_lora/qwen2_0_5b_molecular_transformer_mit_separated_lora_sft.yaml | tee -a logs/qwen2_0_5b_molecular_transformer_mit_separated_lora_sft.log

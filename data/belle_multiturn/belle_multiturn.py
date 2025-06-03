@@ -19,7 +19,8 @@ import os
 import datasets
 
 
-_HF_ENDPOINT = os.getenv("HF_ENDPOINT", "https://huggingface.co")
+# _HF_ENDPOINT = os.getenv("HF_ENDPOINT", "https://huggingface.co")
+_HF_ENDPOINT = os.getenv("HF_ENDPOINT", "https://hf-mirror.com")
 
 _DESCRIPTION = "BELLE multiturn chat dataset."
 

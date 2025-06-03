@@ -1,0 +1,17 @@
+### Note: DO NOT use quantized model or quantization_bit when merging lora adapters
+
+### model
+model_name_or_path: /home/liangtao/Models/Qwen/Qwen2-0.5B
+adapter_name_or_path: saves/sft_lora/qwen205_moltrans_mit_separated_space_lora_para1/
+template: qwen
+trust_remote_code: true
+
+### export
+export_dir: output/qwen205_moltrans_mit_separated_space_lora_para1_epoch3
+export_size: 5
+export_device: cpu  # choices: [cpu, auto]
+export_legacy_format: false
+
+
+# llamafactory-cli export examples/merge_lora/qwen205/space/qwen205_moltrans_mit_separated_space_lora_para1.yaml
+

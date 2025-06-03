@@ -1,0 +1,20 @@
+### Note: DO NOT use quantized model or quantization_bit when merging lora adapters
+
+### model
+model_name_or_path: /home/liangtao/Models/Qwen/Qwen2-0.5B
+# leagcy: adapter_name_or_path: saves/qwen2_5vl-7b/lora/sft
+# adapter_name_or_path: saves/Qwen2-0.5B-Molecular-Transformer-MIT-Mixed-Augm/lora/sft/
+adapter_name_or_path: saves/sft_lora/qwen205_moltrans_mit_mixed_augm_space_lora_para1
+template: qwen
+trust_remote_code: true
+
+### export
+# leagcy: export_dir: output/qwen2_0_5b_molecular_transformer_mit_mixed_augm_lora_sft_epoch_3
+export_dir: output/qwen205_moltrans_mit_mixed_augm_space_lora_para1_epoch3
+export_size: 5
+export_device: cpu  # choices: [cpu, auto]
+export_legacy_format: false
+
+
+# leagcy: llamafactory-cli export examples/merge_lora/qwen2_0_5b_molecular_transformer_mit_mixed_augm_lora_sft_epoch_3.yaml
+

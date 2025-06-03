@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from llamafactory.train.tuner import run_exp
-
+import os
+# os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 def main():
     run_exp()
