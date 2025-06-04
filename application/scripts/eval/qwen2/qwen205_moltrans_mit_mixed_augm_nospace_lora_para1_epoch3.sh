@@ -4,15 +4,13 @@
 
 # 设置默认参数
 DEFAULT_MODEL_NAME="qwen205_moltrans_mit_mixed_augm_nospace_lora_para1_epoch3"
-DEFAULT_FILE_PREFIX="MIT_mixed_augm_test_nospace"
-#f"{sub_folder}_{split}_{format}_{str(idx + 1).zfill(9)}"
 DEFAULT_DATA_FILE="MIT_mixed_augm.json"
 DEFAULT_BATCH_LIMIT=1
 DEFAULT_BATCH_TOKEN_SIZE=400
 DEFAULT_MINMAX_GAP=20
 DEFAULT_NUM_RETURN_SEQUENCES=5
 DEFAULT_NUM_BEAMS=5
-
+FILE_PREFIX="mit_mixed_augm_space_test"
 # 基础路径设置
 BASE_DIR=$(dirname "$0")/../..
 PREDICT_SCRIPT="./application/eval/qwen2/predict.py"
@@ -25,10 +23,6 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --model_name)
             MODEL_NAME="$2"
-            shift 2
-            ;;
-        --file_prefix)
-            FILE_PREFIX="$2"
             shift 2
             ;;
         --data_file)
@@ -72,7 +66,6 @@ done
 
 # 设置默认值
 MODEL_NAME=${MODEL_NAME:-$DEFAULT_MODEL_NAME}
-FILE_PREFIX=${FILE_PREFIX:-$DEFAULT_FILE_PREFIX}
 DATA_FILE=${DATA_FILE:-$DEFAULT_DATA_FILE}
 BATCH_LIMIT=${BATCH_LIMIT:-$DEFAULT_BATCH_LIMIT}
 BATCH_TOKEN_SIZE=${BATCH_TOKEN_SIZE:-$DEFAULT_BATCH_TOKEN_SIZE}
@@ -101,7 +94,6 @@ python "$PREDICT_SCRIPT" \
     --data_file "$DATA_FILE" \
     --data_dir "$DATA_DIR" \
     --output_dir "$PREDICTION_DIR" \
-    --file_prefix "$FILE_PREFIX" \
     --finetuning_type "lora" \
     --template "qwen" \
     --num_beams "$NUM_BEAMS" \

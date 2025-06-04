@@ -104,24 +104,31 @@ def load_prediction_data(prediction_file_path):
 
 
 def main(args):
-    prediction_file_path = Path(args.prediction_dir) / f"{args.prediction_file}.json"
-    output_path = Path(args.output_dir) / f"{args.prediction_file}.txt"
-
+    file_list = []
+    if args.prediction_file == "all":
+        file_list = [p for p in Path(args.prediction_dir).rglob('*') if p.is_file()]
+    else:
+        file_list.append(args.prediction_file)
     try:
-        prediction_data = load_prediction_data(prediction_file_path)
-        results = calculate_metrics(prediction_data)
-        save_results(results, output_path, args.prediction_file)
-        print(f"Metrics calculation completed successfully. Results saved to {output_path}")
+        for file in file_list:
+            prediction_file_path = Path(file)
+            output_path = (Path(args.output_dir)/f"{prediction_file_path.parent.name}"
+                           /f"{prediction_file_path.name.replace(".json",".txt")}")
+            prediction_data = load_prediction_data(prediction_file_path)
+            results = calculate_metrics(prediction_data)
+            save_results(results, output_path, prediction_file_path)
+            print(f"Metrics calculation completed successfully. Results saved to {output_path}")
     except Exception as e:
         print(f"Error: {str(e)}")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Calculate prediction metrics")
-    parser.add_argument('--prediction_file', type=str, default='qwen205_moltrans_mit_separated_space_lora_para1_epoch3',
+    parser.add_argument('--prediction_file', type=str, default='all',
                         help="Name of the prediction file (without extension)")
     parser.add_argument('--prediction_dir', type=str,
-                        default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction",
+                        default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/"
+                                "mit_mixed_augm_nospace_test_random100",
                         help="Directory containing prediction files")
     parser.add_argument('--output_dir', type=str,
                         default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/scores",

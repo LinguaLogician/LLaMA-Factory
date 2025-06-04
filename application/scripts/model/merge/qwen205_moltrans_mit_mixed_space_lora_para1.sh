@@ -21,7 +21,7 @@ PARAM_SET_1=(
 #  regular_save
   "1"
 #  start_ckpt
-  "60000"
+  "20000"
 #  extra_checkpoints
 #  "3000 5000"
   ""

@@ -166,7 +166,7 @@ if __name__ == '__main__':
                         help='Base directory containing space and nospace folders')
     parser.add_argument('--style', type=str, default='random',
                         help='Sampling style (currently only "random" supported)')
-    parser.add_argument('--sizes', type=str, default='100,200,500,5500',
+    parser.add_argument('--sizes', type=str, default='1k',
                         help='Comma-separated list of subset sizes (e.g., "100,200,500,1k")')
     args = parser.parse_args()
 
