@@ -397,7 +397,7 @@ class HuggingfaceEngine(BaseEngine):
 
         if hasattr(generate_output, 'sequences_scores'):
             sequence_probs = torch.exp(generate_output.sequences_scores).tolist()
-        if hasattr(generate_output, 'scores'):
+        if hasattr(generate_output, 'scores') and gen_kwargs['generation_config'].num_beams > 1:
             beam_probs = compute_beam_sequence_probs(generate_output, prompt_length, messages)
         if isinstance(generate_output, tuple):
             generate_output = generate_output[1][0]  # post-process the minicpm_o output

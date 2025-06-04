@@ -1,10 +1,13 @@
 #!/bin/bash
-#
+
+# ./application/scripts/eval/qwen2/qwen205_moltrans_mit_mixed_augm_nospace_lora_para1_epoch3.yaml
+
 # 设置默认参数
-DEFAULT_MODEL_NAME="qwen205_moltrans_mit_mixed_space_lora_para1_ckpt60k"
-DEFAULT_FILE_PREFIX="MIT_mixed_test"
-DEFAULT_DATA_FILE="MIT_mixed_demo.json"
-DEFAULT_BATCH_LIMIT=4
+DEFAULT_MODEL_NAME="qwen205_moltrans_mit_mixed_augm_nospace_lora_para1_epoch3"
+DEFAULT_FILE_PREFIX="MIT_mixed_augm_test_nospace"
+#f"{sub_folder}_{split}_{format}_{str(idx + 1).zfill(9)}"
+DEFAULT_DATA_FILE="MIT_mixed_augm.json"
+DEFAULT_BATCH_LIMIT=1
 DEFAULT_BATCH_TOKEN_SIZE=400
 DEFAULT_MINMAX_GAP=20
 DEFAULT_NUM_RETURN_SEQUENCES=5

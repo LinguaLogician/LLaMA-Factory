@@ -1,0 +1,12 @@
+### Note: DO NOT use quantized model or quantization_bit when merging lora adapters
+
+### model
+model_name_or_path: /home/liangtao/Models/Qwen/Qwen2-0.5B
+adapter_name_or_path: ${adapter_path}/${checkpoint}
+template: qwen
+trust_remote_code: true
+
+export_dir: ${output_dir}/${ckpt}
+export_size: 5
+export_device: cpu  # choices: [cpu, auto]
+export_legacy_format: false

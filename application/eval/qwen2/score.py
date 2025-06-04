@@ -4,7 +4,6 @@
 # @author: Karl Wu
 # @contact: wlt1990@outlook.com
 # @time: 2025/6/3 15:01
-
 import json
 import argparse
 from pathlib import Path
@@ -12,6 +11,7 @@ from tqdm import tqdm
 
 
 def calculate_metrics(prediction_data):
+
     if not prediction_data:
         raise ValueError("Prediction data is empty")
 
@@ -118,7 +118,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Calculate prediction metrics")
-    parser.add_argument('--prediction_file', type=str, default='qwen205_moltrans_mit_mixed_space_lora_para1_ckpt_60k_ckpt60k',
+    parser.add_argument('--prediction_file', type=str, default='qwen205_moltrans_mit_separated_space_lora_para1_epoch3',
                         help="Name of the prediction file (without extension)")
     parser.add_argument('--prediction_dir', type=str,
                         default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction",

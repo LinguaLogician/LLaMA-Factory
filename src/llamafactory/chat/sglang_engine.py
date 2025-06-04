@@ -243,6 +243,14 @@ class SGLangEngine(BaseEngine):
         return results
 
     @override
+    async def chat_llm_batch(
+        self,
+        messages_batch: list[list[dict[str, str]]],
+        **input_kwargs,
+    ) -> list[list["Response"]]:
+        pass
+
+    @override
     async def stream_chat(
         self,
         messages: list[dict[str, str]],

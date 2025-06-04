@@ -197,7 +197,7 @@ if __name__ == "__main__":
 
     # Model and data parameters
     parser.add_argument("--model_name", type=str,
-                        default="qwen205_moltrans_mit_mixed_space_lora_para1_ckpt_60k_ckpt60k")
+                        default="qwen205_moltrans_mit_mixed_space_lora_para1_ckpt60k")
     parser.add_argument("--model_path", type=str, default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output")
     parser.add_argument("--data_file", type=str, default="MIT_mixed_demo.json")
     parser.add_argument("--data_dir", type=str, default="/home/liangtao/DataSets/Chemistry/MolecularTransformer/space/test")

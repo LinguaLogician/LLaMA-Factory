@@ -1,4 +1,3 @@
-
 from llamafactory.chat import ChatModel
 
 '''
@@ -20,25 +19,26 @@ generating_args:
 
 INFER_ARGS = {
     # "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B",
-    "model_name_or_path": "/home/liangtao/Development/LLMSpace/LLaMA-Factory/output/qwen2_0_5b_molecular_transformer_mit_mixed_lora_sft_epoch_3",
+    "model_name_or_path": "/home/liangtao/Development/LLMSpace/LLaMA-Factory/output/qwen205_moltrans_mit_mixed_space_lora_para1_epoch3",
     "finetuning_type": "lora",
     "template": "qwen",
     # "num_return_sequences": 5,
     # "infer_dtype": "float16",
-    "num_beams": 10,
-    "temperature": 0,
+    # "num_beams": 5,
+    "temperature": 0.95,
     # "temperature": 0,
     "max_new_tokens": 1000,
 }
 
 MESSAGES = [
-    {"role": "user", "content": "PREDICT_PRODUCT:\nC 1 C C O C 1 . Cl . O C C C N 1 C C C C C 1 . O c 1 c c c ( - c 2 n c ( C N 3 C C C C C 3 ) c o 2 ) c c 1 F . c 1 c c c ( P ( c 2 c c c c c 2 ) c 2 c c c c c 2 ) c c 1"},
+    {"role": "user", "content": "PREDICT_PRODUCT:\nC I . N N 1 C C O C C 1"},
     # {"role": "user", "content": "PREDICT_PRODUCT:\nC . C C O C ( C ) = O . C c 1 o c ( - c 2 c c c c c 2 ) n c 1 C C O c 1 c c c ( [N+] ( = O ) [O-] ) c n 1 . [Pd]"},
 ]
 
 def chat():
+    # torch.manual_seed(int(time.time()))
     chat_model = ChatModel(INFER_ARGS)
-    responses = chat_model.chat(MESSAGES, num_return_sequences=10, output_scores=True, return_dict_in_generate=True,
+    responses = chat_model.chat(MESSAGES, num_return_sequences=1, output_scores=True, return_dict_in_generate=True,
                                 do_sample=True,)
     # responses = chat_model.chat(MESSAGES, num_return_sequences=5)
     print(responses)
