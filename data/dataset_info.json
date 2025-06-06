@@ -1,4 +1,7 @@
 {
+  "alpaca_en_demo": {
+    "file_name": "alpaca_en_demo.json"
+  },
   "alpaca_moltrans_mit_mixed_space_train": {
     "file_name": "/home/liangtao/DataSets/Chemistry/MolecularTransformer/space/train/MIT_mixed.json"
   },

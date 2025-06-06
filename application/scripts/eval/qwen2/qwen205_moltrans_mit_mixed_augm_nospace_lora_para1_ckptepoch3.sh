@@ -1,14 +1,14 @@
 #!/bin/bash
 
 MODEL_NAME="qwen205_moltrans_mit_mixed_augm_nospace_lora_para1"
+CHECKPOINTS="ckptlast"
 MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
 DATA_FILE="MIT_mixed_augm.json"
-FILE_PREFIX="mit_mixed_augm_nospace_test_random1k"
-DATA_DIR="/home/liangtao/DataSets/Chemistry/MolecularTransformer/nospace/test/random1k/"
+FILE_PREFIX="mit_mixed_augm_nospace_test"
+DATA_DIR="/home/liangtao/DataSets/Chemistry/MolecularTransformer/nospace/test/"
 PREDICTION_DIR="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
-PREDICTION_FILE="all"  # 不含.json后缀
 
-BATCH_LIMIT=1
+BATCH_LIMIT=5
 BATCH_TOKEN_SIZE=400
 MINMAX_GAP=20
 NUM_RETURN_SEQUENCES=5
@@ -40,6 +40,7 @@ echo "Starting prediction at $(date)" | tee -a "$LOG_FILE"
 python "$PREDICT_SCRIPT" \
     --model_name "$MODEL_NAME" \
     --model_path "$MODEL_PATH" \
+    --checkpoints "$CHECKPOINTS" \
     --data_file "$DATA_FILE" \
     --data_dir "$DATA_DIR" \
     --output_dir "$PREDICTION_DIR" \
@@ -63,6 +64,7 @@ fi
 echo "Prediction completed successfully at $(date)" | tee -a "$LOG_FILE"
 
 # 执行评分脚本
+PREDICTION_FILE="${MODEL_NAME}"  # 不含.json后缀
 
 echo "Starting scoring at $(date)" | tee -a "$LOG_FILE"
 python "$SCORE_SCRIPT" \
