@@ -55,6 +55,10 @@ class DataArguments:
         default=False,
         metadata={"help": "Whether or not to mask the history and train on the last turn only."},
     )
+    data_sort_by: Optional[str] = field(
+        default=None,
+        metadata={"help": "Sort the data by prompt_length, msg_length."},
+    )
     streaming: bool = field(
         default=False,
         metadata={"help": "Enable dataset streaming."},
@@ -110,6 +114,10 @@ class DataArguments:
     neat_packing: bool = field(
         default=False,
         metadata={"help": "Enable sequence packing without cross-attention."},
+    )
+    shuffle: bool = field(
+        default=True,
+        metadata={"help": "Shuffle the dataset."},
     )
     tool_format: Optional[str] = field(
         default=None,

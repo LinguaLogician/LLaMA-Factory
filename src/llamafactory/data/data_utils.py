@@ -93,15 +93,14 @@ def split_dataset(
     if dataset is not None:
         if data_args.streaming:
             dataset = dataset.shuffle(buffer_size=data_args.buffer_size, seed=seed)
-
         if data_args.val_size > 1e-6:
             if data_args.streaming:
                 dataset_dict["validation"] = dataset.take(int(data_args.val_size))
                 dataset_dict["train"] = dataset.skip(int(data_args.val_size))
             else:
                 val_size = int(data_args.val_size) if data_args.val_size > 1 else data_args.val_size
-                dataset_dict = dataset.train_test_split(test_size=val_size, seed=seed)
-                dataset = dataset.train_test_split(test_size=val_size, seed=seed)
+                # dataset_dict = dataset.train_test_split(test_size=val_size, seed=seed)
+                dataset = dataset.train_test_split(test_size=val_size, seed=seed, shuffle=data_args.shuffle)
                 dataset_dict = {"train": dataset["train"], "validation": dataset["test"]}
         else:
             dataset_dict["train"] = dataset
