@@ -238,14 +238,14 @@ if __name__ == "__main__":
                         default="saves/sft_lora/qwen205_moltrans_mit_mixed_space_lora_para1",
                         help="Path to adapter checkpoints")
     parser.add_argument("--output_dir", type=str,
-                        default="output/qwen205_moltrans_mit_mixed_space_lora_para1",
+                        default="output/qwen205_moltrans_mit_mixed_space_lora_para1_demo",
                         help="Output directory for exported models")
 
     # Processing parameters
     parser.add_argument("--merge_interval", type=int, default=20000,
                         help="Interval between checkpoints to process")
     parser.add_argument("--save_last",
-                        default=True,
+                        default=False,
                         # action="store_true",
                         help="Whether to save the last checkpoint")
     parser.add_argument("--extra_checkpoints", type=int, nargs="*",
@@ -253,7 +253,7 @@ if __name__ == "__main__":
                         help="Extra checkpoint steps to process")
     parser.add_argument("--regular_save",
                         # action="store_true",
-                        default=True,
+                        default=False,
                         help="Whether to save checkpoints at regular intervals")
     parser.add_argument("--start_ckpt", type=int, default=80000,
                         help="Starting checkpoint step for regular processing")
