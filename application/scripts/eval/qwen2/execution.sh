@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # 定义路径
-model_path="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output/qwen205_moltrans_mit_mixed_augm_nospace_full_para1"
-script_path="application/scripts/eval/qwen2/qwen205_moltrans_mit_mixed_augm_nospace_full_para1_test2.sh"
+model_path="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output/qwen205_moltrans_stereo_mixed_nospace_full_para1"
+script_path="application/scripts/eval/qwen2/qwen205_moltrans_stereo_mixed_nospace_full_para1_test1.sh"
 
 # 目标检查点
-target_checkpoint="checkpoint-300639"
+target_checkpoint="checkpoint-331698"
 
 # 日志函数
 log() {

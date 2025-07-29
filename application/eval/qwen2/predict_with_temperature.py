@@ -4,18 +4,18 @@
 # @author: Karl Wu
 # @contact: wlt1990@outlook.com
 # @time: 2025/6/3 15:01
-import gc
 import os
 import json
 import argparse
 from pathlib import Path
 
 import torch
-from torch.utils.checkpoint import checkpoint
 from tqdm import tqdm
 from rdkit import Chem
 from typing import List, Dict, Any
 from torch.utils.data import Dataset
+from transformers import AutoTokenizer
+
 from llamafactory.chat import ChatModel
 
 '''
@@ -139,42 +139,30 @@ def process_responses(responses: List, reference: str) -> List[Dict]:
 
 
 def main(args):
-    checkpoints = []
-    if not args.checkpoints:
-        checkpoints.append(Path(args.model_path) / args.model_name)
-    elif args.checkpoints == "all":
-        checkpoints = [p for p in (Path(args.model_path) / args.model_name).rglob('*')
-                       if p.is_dir() and 'ckpt' in p.name]
+    if not args.checkpoint:
+        checkpoint = Path(args.model_path) / args.model_name
     else:
-        checkpoints = [(Path(args.model_path) / args.model_name / ckpt.strip())
-                       for ckpt in args.checkpoints.split(',')]
+        checkpoint = Path(args.model_path) / args.model_name / args.checkpoint.strip()
 
     infer_args = {
-        "model_name_or_path": str(checkpoints[0]),
+        "model_name_or_path": str(checkpoint),
         "finetuning_type": args.finetuning_type,
         "template": args.template,
         "num_beams": args.num_beams,
-        "do_sample": args.do_sample,
+        "do_sample": True,
         "max_new_tokens": args.max_new_tokens,
     }
-    chat_model = ChatModel(infer_args)
-    tokenizer = chat_model.engine.tokenizer
-    # Load dataset once (outside the loop)
+
+    tokenizer = AutoTokenizer.from_pretrained(str(checkpoint))
+
     data_path = os.path.join(args.data_dir, args.data_file)
     dataset = DynamicBatchDataset(str(data_path), tokenizer)
     batches = dataset.create_batches(args.batch_limit, args.batch_token_size, args.minmax_gap)
 
-    for ckpt in checkpoints:
-        if 'chat_model' in locals():
-            del chat_model
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-        gc.collect()
-        infer_args.update(model_name_or_path=str(ckpt))
-        # try:
+    temperatures = [float(t.strip()) for t in args.temperatures.split(",")]
+    for temperature in temperatures:
+        infer_args.update(temperature=temperature)
         chat_model = ChatModel(infer_args)
-        tokenizer = chat_model.engine.tokenizer
-
         results = [None] * len(dataset)
         for batch in tqdm(batches, desc="Processing batches"):
             messages = [[{
@@ -201,18 +189,12 @@ def main(args):
                 }
 
         results = [r for r in results if r is not None]
-        ckpt_name = ckpt.name if ckpt.name.startswith("ckpt") else "ckptlast"
-        output_path = os.path.join(args.output_dir, f"{args.model_name}_{ckpt_name}.json")
+        ckpt_name = checkpoint.name if checkpoint.name.startswith("ckpt") else "ckptlast"
+        output_path = os.path.join(args.output_dir, f"{args.model_name}_{ckpt_name}_{temperature}.json")
         os.makedirs(args.output_dir, exist_ok=True)
         with open(output_path, 'w') as f:
             json.dump(results, f, indent=2)
-        print(f"Prediction completed for {args.model_name} - {ckpt_name}. Results saved to {output_path}")
-        # finally:
-        #     if 'chat_model' in locals():
-        #         del chat_model
-        #         if torch.cuda.is_available():
-        #             torch.cuda.empty_cache()
-        #     gc.collect()
+        print(f"Prediction completed for {args.model_name} - {ckpt_name}, temperature={temperature}. Results saved to {output_path}")
 
 
 if __name__ == "__main__":
@@ -221,19 +203,19 @@ if __name__ == "__main__":
     parser.add_argument("--model_path", type=str,
                         default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output")
     parser.add_argument("--model_name", type=str,
-                        default="qwen205_moltrans_mit_mixed_space_lora_para1")
-    parser.add_argument("--checkpoints", type=str, default="all") # or "ckpt20k,ckpt40k"
-    parser.add_argument("--data_file", type=str, default="MIT_mixed.json")
+                        default="qwen205_moltrans_mit_separated_nospace_full_para1")
+    parser.add_argument("--checkpoint", type=str, default=None) # or "ckpt20k,ckpt40k"
+    parser.add_argument("--data_file", type=str, default="MIT_separated.json")
     parser.add_argument("--data_dir", type=str,
-                        default="/home/liangtao/DataSets/Chemistry/MolecularTransformer/space/test/random100")
+                        default="/home/liangtao/DataSets/Chemistry/MolecularTransformer/nospace/test/random100")
     parser.add_argument("--output_dir", type=str,
                         default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/"
-                                "mit_mixed_space_test_random100")
+                                "mit_separated_nospace_test_random100")
     # Inference parameters
-    parser.add_argument("--finetuning_type", type=str, default="lora")
+    parser.add_argument("--finetuning_type", type=str, default="full")
     parser.add_argument("--template", type=str, default="qwen")
+    parser.add_argument("--temperatures", type=str, default="0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3")
     parser.add_argument("--num_beams", type=int, default=5)
-    parser.add_argument("--do_sample", action="store_true", default=True)
     parser.add_argument("--max_new_tokens", type=int, default=1000)
     parser.add_argument("--num_return_sequences", type=int, default=5)
     parser.add_argument("--output_scores", action="store_true", default=True)
@@ -247,4 +229,3 @@ if __name__ == "__main__":
     parser.add_argument("--minmax_gap", type=int, default=20,
                         help="Maximum allowed length difference within a batch")
     main(parser.parse_args())
-# python ./application/eval/qwen2/predict.py 2>&1 | tee -a logs/predict/qwen2_0_5b_molecular_transformer_mit_mixed_lora_sft_ckpt60k.log

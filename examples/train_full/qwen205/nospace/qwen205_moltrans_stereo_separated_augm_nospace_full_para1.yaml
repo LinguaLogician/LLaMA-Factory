@@ -9,7 +9,7 @@ finetuning_type: full
 deepspeed: examples/deepspeed/ds_z2_config.json
 
 ### dataset
-dataset: alpaca_moltrans_mit_separated_nospace_train
+dataset: alpaca_moltrans_stereo_separated_augm_nospace_train
 template: qwen
 cutoff_len: 2048
 max_samples: 100000000000
@@ -18,7 +18,7 @@ preprocessing_num_workers: 1
 dataloader_num_workers: 4
 
 ### output
-output_dir: output/qwen205_moltrans_mit_separated_nospace_full_para1
+output_dir: output/qwen205_moltrans_stereo_separated_augm_nospace_full_para1
 logging_steps: 100
 save_steps: 10000
 plot_loss: true
@@ -35,7 +35,7 @@ lr_scheduler_type: cosine
 warmup_ratio: 0.1
 bf16: true
 ddp_timeout: 180000000
-resume_from_checkpoint: output/qwen205_moltrans_mit_separated_nospace_full_para1/checkpoint-120000
+resume_from_checkpoint: null
 
 ### eval
 val_size: 0.02
@@ -44,7 +44,8 @@ eval_strategy: steps
 eval_steps: 2000
 
 
-run_name: qwen205_moltrans_mit_separated_nospace_full_para1
+run_name: qwen205_moltrans_stereo_separated_augm_nospace_full_para1
 
-# FORCE_TORCHRUN=1 llamafactory-cli train examples/train_full/qwen205/nospace/qwen205_moltrans_mit_separated_nospace_full_para1.yaml 2>&1 | tee -a logs/qwen205_moltrans_mit_separated_nospace_full_para1.log
-# FORCE_TORCHRUN=1 accelerate launch --config_file examples/accelerate/fsdp_config_offload.yaml src/train.py examples/train_lora/qwen205/nospace/qwen205_moltrans_mit_separated_nospace_full_para1.yaml 2>&1 | tee -a logs/qwen205_moltrans_mit_separated_nospace_full_para1.log
+# FORCE_TORCHRUN=1 llamafactory-cli train examples/train_full/qwen205/nospace/qwen205_moltrans_stereo_separated_augm_nospace_full_para1.yaml 2>&1 | tee -a logs/qwen205_moltrans_stereo_separated_augm_nospace_full_para1.log
+
+# FORCE_TORCHRUN=1 accelerate launch --config_file examples/accelerate/fsdp_config_offload.yaml src/train.py examples/train_lora/qwen205/nospace/qwen205_moltrans_stereo_separated_augm_nospace_full_para1.yaml 2>&1 | tee -a logs/qwen205_moltrans_stereo_separated_augm_nospace_full_para1.log

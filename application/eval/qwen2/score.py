@@ -125,11 +125,11 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Calculate prediction metrics")
     parser.add_argument('--prediction_file', type=str,
-                        default='qwen205_moltrans_mit_mixed_augm_nospace_full_para1_ckptlast',
+                        default='all',
                         help="Name of the prediction file (without extension)")
     parser.add_argument('--prediction_dir', type=str,
                         default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/"
-                                "mit_mixed_augm_nospace_test",
+                                "mit_separated_nospace_test",
                                 # "mit_mixed_augm_nospace_test_random100",
                         help="Directory containing prediction files")
     parser.add_argument('--output_dir', type=str,
