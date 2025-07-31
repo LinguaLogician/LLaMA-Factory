@@ -16,11 +16,12 @@ import asyncio
 import os
 from collections.abc import AsyncGenerator
 from threading import Thread
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union, Tuple, List
 
 import torch
 from transformers import GenerationConfig, TextIteratorStreamer
 from typing_extensions import override
+import torch.nn.functional as F
 
 from ..data import get_template_and_fix_tokenizer
 from ..extras import logging
@@ -126,6 +127,8 @@ class HuggingfaceEngine(BaseEngine):
         top_p: Optional[float] = input_kwargs.pop("top_p", None)
         top_k: Optional[float] = input_kwargs.pop("top_k", None)
         num_return_sequences: int = input_kwargs.pop("num_return_sequences", 1)
+        return_dict_in_generate: bool = input_kwargs.pop("return_dict_in_generate", False)
+        output_scores: bool = input_kwargs.pop("output_scores", False)
         repetition_penalty: Optional[float] = input_kwargs.pop("repetition_penalty", None)
         length_penalty: Optional[float] = input_kwargs.pop("length_penalty", None)
         skip_special_tokens: Optional[bool] = input_kwargs.pop("skip_special_tokens", None)
@@ -144,6 +147,8 @@ class HuggingfaceEngine(BaseEngine):
                 top_p=top_p if top_p is not None else generating_args["top_p"],
                 top_k=top_k if top_k is not None else generating_args["top_k"],
                 num_return_sequences=num_return_sequences,
+                return_dict_in_generate=return_dict_in_generate,
+                output_scores=output_scores,
                 repetition_penalty=repetition_penalty
                 if repetition_penalty is not None
                 else generating_args["repetition_penalty"],
@@ -156,9 +161,9 @@ class HuggingfaceEngine(BaseEngine):
             )
         )
 
-        if isinstance(num_return_sequences, int) and num_return_sequences > 1:  # do_sample needs temperature > 0
-            generating_args["do_sample"] = True
-            generating_args["temperature"] = generating_args["temperature"] or 1.0
+        # if isinstance(num_return_sequences, int) and num_return_sequences > 1:  # do_sample needs temperature > 0
+        #     generating_args["do_sample"] = True
+        #     generating_args["temperature"] = generating_args["temperature"] or 1.0
 
         if not generating_args["temperature"]:
             generating_args["do_sample"] = False
@@ -210,6 +215,100 @@ class HuggingfaceEngine(BaseEngine):
 
         return gen_kwargs, prompt_length
 
+
+    @staticmethod
+    def _process_llm_args(
+        model: "PreTrainedModel",
+        tokenizer: "PreTrainedTokenizer",
+        template: "Template",
+        generating_args: dict[str, Any],
+        messages_batch: list[list[dict[str, str]]],
+        input_kwargs: Optional[dict[str, Any]] = {},
+    ) -> tuple[dict[str, Any], list[int]]:
+
+        prompt_ids_list = []
+        prompt_length_list = []
+        for messages in messages_batch:
+            paired_messages = messages + [{"role": "assistant", "content": ""}]
+            prompt_ids, _ = template.encode_oneturn(tokenizer, paired_messages)
+            prompt_length_list.append(len(prompt_ids))
+            prompt_ids_list.append(prompt_ids)
+        inputs = tokenizer.pad(
+            {"input_ids": prompt_ids_list},
+            padding="longest",
+            return_tensors="pt"
+        ).to(model.device)
+
+        inputs=inputs["input_ids"]
+        # inputs = torch.tensor(prompt_ids_list, device=model.device)
+        attention_mask = torch.ones_like(inputs, dtype=torch.long)
+
+        do_sample: Optional[bool] = input_kwargs.pop("do_sample", None)
+        temperature: Optional[float] = input_kwargs.pop("temperature", None)
+        top_p: Optional[float] = input_kwargs.pop("top_p", None)
+        top_k: Optional[float] = input_kwargs.pop("top_k", None)
+        num_return_sequences: int = input_kwargs.pop("num_return_sequences", 1)
+        return_dict_in_generate: bool = input_kwargs.pop("return_dict_in_generate", False)
+        output_scores: bool = input_kwargs.pop("output_scores", False)
+        repetition_penalty: Optional[float] = input_kwargs.pop("repetition_penalty", None)
+        length_penalty: Optional[float] = input_kwargs.pop("length_penalty", None)
+        skip_special_tokens: Optional[bool] = input_kwargs.pop("skip_special_tokens", None)
+        max_length: Optional[int] = input_kwargs.pop("max_length", None)
+        max_new_tokens: Optional[int] = input_kwargs.pop("max_new_tokens", None)
+        stop: Optional[Union[str, list[str]]] = input_kwargs.pop("stop", None)
+
+        if stop is not None:
+            logger.warning_rank0("Stop parameter is not supported by the huggingface engine yet.")
+
+        generating_args = generating_args.copy()
+        generating_args.update(
+            dict(
+                do_sample=do_sample if do_sample is not None else generating_args["do_sample"],
+                temperature=temperature if temperature is not None else generating_args["temperature"],
+                top_p=top_p if top_p is not None else generating_args["top_p"],
+                top_k=top_k if top_k is not None else generating_args["top_k"],
+                num_return_sequences=num_return_sequences,
+                return_dict_in_generate=return_dict_in_generate,
+                output_scores=output_scores,
+                repetition_penalty=repetition_penalty
+                if repetition_penalty is not None
+                else generating_args["repetition_penalty"],
+                length_penalty=length_penalty if length_penalty is not None else generating_args["length_penalty"],
+                skip_special_tokens=skip_special_tokens
+                if skip_special_tokens is not None
+                else generating_args["skip_special_tokens"],
+                eos_token_id=template.get_stop_token_ids(tokenizer),
+                pad_token_id=tokenizer.pad_token_id,
+            )
+        )
+
+        if isinstance(num_return_sequences, int) and num_return_sequences > 1:  # do_sample needs temperature > 0
+            generating_args["do_sample"] = True
+            generating_args["temperature"] = generating_args["temperature"] or 1.0
+
+        if not generating_args["temperature"]:
+            generating_args["do_sample"] = False
+
+        if not generating_args["do_sample"]:
+            generating_args.pop("temperature", None)
+            generating_args.pop("top_p", None)
+
+        if max_length:
+            generating_args.pop("max_new_tokens", None)
+            generating_args["max_length"] = max_length
+
+        if max_new_tokens:
+            generating_args.pop("max_length", None)
+            generating_args["max_new_tokens"] = max_new_tokens
+
+        gen_kwargs = dict(
+            inputs=inputs,
+            attention_mask=attention_mask,
+            generation_config=GenerationConfig(**generating_args),
+        )
+        return gen_kwargs, prompt_length_list
+
+
     @staticmethod
     @torch.inference_mode()
     def _chat(
@@ -226,6 +325,58 @@ class HuggingfaceEngine(BaseEngine):
         audios: Optional[list["AudioInput"]] = None,
         input_kwargs: Optional[dict[str, Any]] = {},
     ) -> list["Response"]:
+        import math
+
+        def are_all_inf_at_end(step_logprobs):
+            first_inf_index = None
+            for i, val in enumerate(step_logprobs):
+                if math.isinf(val) and val < 0:
+                    first_inf_index = i
+                    break
+            if first_inf_index is None:
+                return True
+            for val in step_logprobs[first_inf_index:]:
+                if not (math.isinf(val) and val < 0):
+                    return False
+            return True
+
+        def compute_beam_sequence_probs(output, prompt_length, messages=[]):
+            sequences = output.sequences  # [num_return_sequences, total_length]
+            scores = output.scores  # List of [num_beams, vocab_size] tensors (length: max_new_tokens)
+            beam_indices = output.beam_indices  # [num_return_sequences, max_new_tokens]
+            results = []
+            num_return_sequences, total_seq_len = sequences.shape
+            for beam_id in range(num_return_sequences):
+                generated_token_ids = sequences[beam_id][prompt_length:]
+                beam_path = beam_indices[beam_id]
+
+                logprob_sum = 0.0
+                step_logprobs = []
+
+                for step, (token_id, beam_idx_at_step) in enumerate(zip(generated_token_ids, beam_path)):
+                    step_scores = scores[step]  # [num_beams, vocab_size]
+                    step_log_probs = F.log_softmax(step_scores, dim=-1)
+                    token_logprob = step_log_probs[beam_idx_at_step, token_id].item()
+                    if token_logprob != float('-inf'):
+                        logprob_sum += token_logprob
+                    step_logprobs.append(token_logprob)
+                    if tokenizer.eos_token_id==token_id:
+                        break
+                all_inf_at_tail = are_all_inf_at_end(step_logprobs)
+                prob = torch.exp(torch.tensor(logprob_sum)).item()
+                if not all_inf_at_tail:
+                    logger.info(f"Warning: -inf error for {messages}, with step_logprobs: {step_logprobs}, "
+                                f"with prob: {prob}")
+                results.append({
+                    "beam_id": beam_id,
+                    "logprob_sum": logprob_sum,
+                    "prob": prob,
+                    "token_ids": sequences[beam_id].tolist(),
+                    "step_logprobs": step_logprobs
+                })
+
+            return results
+
         gen_kwargs, prompt_length = HuggingfaceEngine._process_args(
             model,
             tokenizer,
@@ -241,9 +392,17 @@ class HuggingfaceEngine(BaseEngine):
             input_kwargs,
         )
         generate_output = model.generate(**gen_kwargs)
+
+        beam_probs = []
+
+        if hasattr(generate_output, 'sequences_scores'):
+            sequence_probs = torch.exp(generate_output.sequences_scores).tolist()
+        if hasattr(generate_output, 'scores') and gen_kwargs['generation_config'].num_beams > 1:
+            beam_probs = compute_beam_sequence_probs(generate_output, prompt_length, messages)
         if isinstance(generate_output, tuple):
             generate_output = generate_output[1][0]  # post-process the minicpm_o output
-
+        if isinstance(generate_output, dict):
+            generate_output = generate_output['sequences']
         response_ids = generate_output[:, prompt_length:]
         response = tokenizer.batch_decode(
             response_ids,
@@ -251,6 +410,7 @@ class HuggingfaceEngine(BaseEngine):
             clean_up_tokenization_spaces=True,
         )
         results = []
+
         for i in range(len(response)):
             eos_index = (response_ids[i] == tokenizer.eos_token_id).nonzero()
             response_length = (eos_index[0].item() + 1) if len(eos_index) else len(response_ids[i])
@@ -258,12 +418,124 @@ class HuggingfaceEngine(BaseEngine):
                 Response(
                     response_text=response[i],
                     response_length=response_length,
+                    sequence_score=beam_probs[i]['prob'] if beam_probs and i < len(beam_probs) else None,
                     prompt_length=prompt_length,
                     finish_reason="stop" if len(eos_index) else "length",
                 )
             )
 
         return results
+
+
+    @staticmethod
+    @torch.inference_mode()
+    def _batch_chat(
+        model: "PreTrainedModel",
+        tokenizer: "PreTrainedTokenizer",
+        template: "Template",
+        generating_args: dict[str, Any],
+        messages_batch: list[list[dict[str, str]]],
+        input_kwargs: Optional[dict[str, Any]] = {},
+    ) -> list[list["Response"]]:
+        import math
+
+        def are_all_inf_at_end(step_logprobs):
+            first_inf_index = None
+            for i, val in enumerate(step_logprobs):
+                if math.isinf(val) and val < 0:
+                    first_inf_index = i
+                    break
+            if first_inf_index is None:
+                return True
+            for val in step_logprobs[first_inf_index:]:
+                if not (math.isinf(val) and val < 0):
+                    return False
+            return True
+
+        def compute_beam_sequence_probs(output, prompt_length, num_return_sequences, messages_batch=[]):
+            sequences = output.sequences  # [num_return_sequences*batch_size, total_length]
+            scores = output.scores  # List of [num_return_sequences*batch_size, vocab_size] tensors (length: max_new_tokens)
+            beam_indices = output.beam_indices  # [num_return_sequences*batch_size, max_new_tokens]
+            results = []
+            num_return_sequences_with_batch, total_seq_len = sequences.shape
+            for beam_id in range(num_return_sequences_with_batch):
+                generated_token_ids = sequences[beam_id][prompt_length:]
+                beam_path = beam_indices[beam_id]
+
+                logprob_sum = 0.0
+                step_logprobs = []
+
+                for step, (token_id, beam_idx_at_step) in enumerate(zip(generated_token_ids, beam_path)):
+                    step_scores = scores[step]  # [num_beams, vocab_size]
+                    step_log_probs = F.log_softmax(step_scores, dim=-1)
+                    token_logprob = step_log_probs[beam_idx_at_step, token_id].item()
+                    if token_logprob != float('-inf'):
+                        logprob_sum += token_logprob
+                    step_logprobs.append(token_logprob)
+                    if tokenizer.eos_token_id==token_id:
+                        break
+                all_inf_at_tail = are_all_inf_at_end(step_logprobs)
+                prob = torch.exp(torch.tensor(logprob_sum)).item()
+                if not all_inf_at_tail:
+                    messages_id = beam_id//num_return_sequences
+                    logger.info(f"Warning: -inf error for {messages_batch[messages_id]}, with step_logprobs: {step_logprobs}, "
+                                f"with prob: {prob}")
+                results.append({
+                    "beam_id": beam_id,
+                    "logprob_sum": logprob_sum,
+                    "prob": prob,
+                    "token_ids": sequences[beam_id].tolist(),
+                    "step_logprobs": step_logprobs
+                })
+
+            return results
+
+        gen_kwargs, prompt_length_list = HuggingfaceEngine._process_llm_args(
+            model,
+            tokenizer,
+            template,
+            generating_args,
+            messages_batch,
+            input_kwargs,
+        )
+        generate_output = model.generate(**gen_kwargs)
+        num_return_sequences = gen_kwargs['generation_config'].num_return_sequences
+        beam_probs = []
+        if hasattr(generate_output, 'sequences_scores'):
+            sequence_probs = torch.exp(generate_output.sequences_scores).tolist()
+        if hasattr(generate_output, 'scores'):
+            beam_probs = compute_beam_sequence_probs(generate_output, max(prompt_length_list), num_return_sequences,
+                                                     messages_batch)
+        if isinstance(generate_output, tuple):
+            generate_output = generate_output[1][0]  # post-process the minicpm_o output
+        if isinstance(generate_output, dict):
+            generate_output = generate_output['sequences']
+        response_ids = generate_output[:, max(prompt_length_list):]
+        response = tokenizer.batch_decode(
+            response_ids,
+            skip_special_tokens=getattr(gen_kwargs["generation_config"], "skip_special_tokens", True),
+            clean_up_tokenization_spaces=True,
+        )
+
+        response_batch = []
+        for i in range(len(messages_batch)):
+            response_beam = []
+            for j in range(num_return_sequences):
+                idx = i * num_return_sequences + j
+                eos_index = (response_ids[idx] == tokenizer.eos_token_id).nonzero()
+                response_length = (eos_index[0].item() + 1) if len(eos_index) else len(response_ids[idx])
+                response_beam.append(
+                    Response(
+                    response_text=response[idx],
+                    response_length=response_length,
+                    sequence_score=beam_probs[idx]['prob'] if beam_probs and idx < len(beam_probs) else None,
+                    prompt_length=prompt_length_list[i],
+                    finish_reason="stop" if len(eos_index) else "length",
+                ))
+            response_batch.append(response_beam)
+
+        return response_batch
+
 
     @staticmethod
     @torch.inference_mode()
@@ -364,6 +636,28 @@ class HuggingfaceEngine(BaseEngine):
         )
         async with self.semaphore:
             return await asyncio.to_thread(self._chat, *input_args)
+
+    @override
+    async def chat_llm_batch(
+        self,
+        messages_batch: list[list[dict[str, str]]],
+        **input_kwargs,
+    ) -> list[list["Response"]]:
+
+        if not self.can_generate:
+            raise ValueError("The current model does not support `chat`.")
+
+        input_args = (
+            self.model,
+            self.tokenizer,
+            self.template,
+            self.generating_args,
+            messages_batch,
+            input_kwargs,
+        )
+
+        async with self.semaphore:
+            return await asyncio.to_thread(self._batch_chat, *input_args)
 
     @override
     async def stream_chat(

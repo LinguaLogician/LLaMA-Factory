@@ -88,6 +88,29 @@ class SupervisedDatasetProcessor(DatasetProcessor):
     def preprocess_dataset(self, examples: dict[str, list[Any]]) -> dict[str, list[Any]]:
         # build inputs with format `<bos> X Y <eos>` and labels with format `<ignore> ... <ignore> Y <eos>`
         # for multiturn examples, we only mask the prompt part in each prompt-response pair.
+
+        def sort_by_key(model_inputs, func):
+            paired_data = sorted(
+                zip(
+                    model_inputs["input_ids"],
+                    model_inputs["attention_mask"],
+                    model_inputs["labels"],
+                    model_inputs["images"],
+                    model_inputs["videos"],
+                    model_inputs["audios"]
+                ),
+                key=func
+            )
+
+            model_inputs["input_ids"] = [x[0] for x in paired_data]
+            model_inputs["attention_mask"] = [x[1] for x in paired_data]
+            model_inputs["labels"] = [x[2] for x in paired_data]
+            model_inputs["images"] = [x[3] for x in paired_data]
+            model_inputs["videos"] = [x[4] for x in paired_data]
+            model_inputs["audios"] = [x[5] for x in paired_data]
+            return model_inputs
+
+
         model_inputs = defaultdict(list)
         for i in range(len(examples["_prompt"])):
             if len(examples["_prompt"][i]) % 2 != 1 or len(examples["_response"][i]) != 1:
@@ -112,6 +135,18 @@ class SupervisedDatasetProcessor(DatasetProcessor):
             model_inputs["videos"].append(examples["_videos"][i])
             model_inputs["audios"].append(examples["_audios"][i])
 
+        def get_no1_prompt_length(labels_row, IGNORE_INDEX=-100):
+            length = 0
+            for token_id in labels_row:
+                if token_id == IGNORE_INDEX:
+                    length += 1
+                else:
+                    break
+            return length
+        if self.data_args.data_sort_by == "msg_length":
+            return sort_by_key(model_inputs, lambda x: len(x[0]))
+        elif self.data_args.data_sort_by == "prompt_length":
+            return sort_by_key(model_inputs, lambda x: get_no1_prompt_length(x[2], IGNORE_INDEX))
         return model_inputs
 
     def print_data_example(self, example: dict[str, list[int]]) -> None:

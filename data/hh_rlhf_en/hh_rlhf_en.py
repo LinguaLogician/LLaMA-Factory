@@ -19,7 +19,8 @@ import os
 import datasets
 
 
-_HF_ENDPOINT = os.getenv("HF_ENDPOINT", "https://huggingface.co")
+# _HF_ENDPOINT = os.getenv("HF_ENDPOINT", "https://huggingface.co")
+_HF_ENDPOINT = os.getenv("HF_ENDPOINT", "https://hf-mirror.com")
 _DESCRIPTION = "Human preference data about helpfulness and harmlessness."
 _CITATION = ""
 _HOMEPAGE = f"{_HF_ENDPOINT}/datasets/Anthropic/hh-rlhf"

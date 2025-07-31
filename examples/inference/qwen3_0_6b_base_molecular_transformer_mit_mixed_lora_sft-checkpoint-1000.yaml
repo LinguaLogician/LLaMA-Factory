@@ -1,0 +1,9 @@
+#model_name_or_path: /home/liangtao/Models/Qwen/Qwen3-0.6B-Base
+model_name_or_path: output/qwen3_0_6b_base_molecular_transformer_mit_mixed_lora_sft-checkpoint-1000
+template: qwen3
+infer_backend: huggingface  # choices: [huggingface, vllm, sglang]
+trust_remote_code: true
+enable_thinking: false
+
+
+#llamafactory-cli chat examples/inference/qwen3_0_6b_base_molecular_transformer_mit_mixed_lora_sft-checkpoint-1000.yaml

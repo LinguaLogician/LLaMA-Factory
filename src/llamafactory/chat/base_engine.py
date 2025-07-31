@@ -14,7 +14,7 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 
@@ -33,7 +33,9 @@ class Response:
     response_text: str
     response_length: int
     prompt_length: int
-    finish_reason: Literal["stop", "length"]
+    sequence_score: Optional[float] = None
+    finish_reason: Literal["stop", "length"] = "stop"
+
 
 
 class BaseEngine(ABC):
@@ -73,6 +75,16 @@ class BaseEngine(ABC):
     ) -> list["Response"]:
         r"""Get a list of responses of the chat model."""
         ...
+
+    @abstractmethod
+    async def chat_llm_batch(
+        self,
+        messages_batch: list[list[dict[str, str]]],
+        **input_kwargs,
+    ) -> list[list["Response"]]:
+        r"""Get a list of responses of the chat model."""
+        ...
+
 
     @abstractmethod
     async def stream_chat(

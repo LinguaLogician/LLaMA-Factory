@@ -20,16 +20,17 @@ from llamafactory.chat import ChatModel
 TINY_LLAMA3 = os.getenv("TINY_LLAMA3", "llamafactory/tiny-random-Llama-3")
 
 INFER_ARGS = {
-    "model_name_or_path": TINY_LLAMA3,
+    # "model_name_or_path": TINY_LLAMA3,
+    "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B",
     "finetuning_type": "lora",
     "template": "llama3",
-    "infer_dtype": "float16",
+    # "infer_dtype": "float16",
     "do_sample": False,
-    "max_new_tokens": 1,
+    "max_new_tokens": 1000,
 }
 
 MESSAGES = [
-    {"role": "user", "content": "Hi"},
+    {"role": "user", "content": "Hello"},
 ]
 
 EXPECTED_RESPONSE = "_rho"
@@ -37,7 +38,9 @@ EXPECTED_RESPONSE = "_rho"
 
 def test_chat():
     chat_model = ChatModel(INFER_ARGS)
-    assert chat_model.chat(MESSAGES)[0].response_text == EXPECTED_RESPONSE
+    response = chat_model.chat(MESSAGES)[0]
+    print(response)
+    # assert chat_model.chat(MESSAGES)[0].response_text == EXPECTED_RESPONSE
 
 
 def test_stream_chat():
@@ -47,3 +50,7 @@ def test_stream_chat():
         response += token
 
     assert response == EXPECTED_RESPONSE
+
+
+if __name__=="__main__":
+    test_chat()

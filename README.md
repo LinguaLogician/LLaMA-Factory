@@ -505,6 +505,8 @@ Run LLaMA-Factory in the isolated environment:
 uv run --prerelease=allow llamafactory-cli train examples/train_lora/llama3_lora_pretrain.yaml
 ```
 
+
+
 </details>
 
 <details><summary>For Windows users</summary>
@@ -620,6 +622,7 @@ Use the following 3 commands to run LoRA **fine-tuning**, **inference** and **me
 
 ```bash
 llamafactory-cli train examples/train_lora/llama3_lora_sft.yaml
+train.py examples/train_lora/qwen3_0_6b_lora_sft.yaml
 llamafactory-cli chat examples/inference/llama3_lora_sft.yaml
 llamafactory-cli export examples/merge_lora/llama3_lora_sft.yaml
 ```

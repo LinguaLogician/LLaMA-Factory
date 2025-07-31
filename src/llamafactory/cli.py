@@ -19,6 +19,10 @@ from copy import deepcopy
 from functools import partial
 
 
+# huggingface 镜像地址
+os.environ['HF_ENDPOINT'] = "https://hf-mirror.com"
+
+
 USAGE = (
     "-" * 70
     + "\n"
