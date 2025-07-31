@@ -1,0 +1,51 @@
+### model
+model_name_or_path: /home/vipuser/Models/Qwen/Qwen2-0.5B
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: full
+deepspeed: examples/deepspeed/ds_z2_config.json
+
+### dataset
+dataset: alpaca_moltrans_mit_mixed_nospace_train
+template: qwen
+cutoff_len: 2048
+max_samples: 100000000000
+overwrite_cache: true
+preprocessing_num_workers: 1
+dataloader_num_workers: 4
+
+### output
+output_dir: output/qwen205_moltrans_mit_mixed_nospace_full_para3
+logging_steps: 100
+save_steps: 1000000000
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: tensorboard  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+
+### train
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 4
+learning_rate: 1.0e-5
+num_train_epochs: 5.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+val_size: 0.02
+per_device_eval_batch_size: 2
+eval_strategy: steps
+eval_steps: 2000
+
+
+run_name: qwen205_moltrans_mit_mixed_nospace_full_para3
+
+# FORCE_TORCHRUN=1 llamafactory-cli train examples/train_full/qwen205/nospace/qwen205_moltrans_mit_mixed_nospace_full_para3.yaml 2>&1 | tee -a logs/qwen205_moltrans_mit_mixed_nospace_full_para3.log
+
+# FORCE_TORCHRUN=1 accelerate launch --config_file examples/accelerate/fsdp_config_offload.yaml src/train.py examples/train_lora/qwen205/nospace/qwen205_moltrans_mit_mixed_nospace_full_para3.yaml 2>&1 | tee -a logs/qwen205_moltrans_mit_mixed_nospace_full_para3.log

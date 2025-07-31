@@ -140,7 +140,7 @@ def process_responses(responses: List, reference: str) -> List[Dict]:
 
 def main(args):
     checkpoints = []
-    if not args.checkpoints:
+    if not args.checkpoints or args.checkpoints=="":
         checkpoints.append(Path(args.model_path) / args.model_name)
     elif args.checkpoints == "all":
         checkpoints = [p for p in (Path(args.model_path) / args.model_name).rglob('*')
