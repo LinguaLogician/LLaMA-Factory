@@ -35,7 +35,7 @@ CHECKPOINT_NAMES = {
 
 CHOICES = ["A", "B", "C", "D"]
 
-DATA_CONFIG = "dataset_info.json"
+DATA_CONFIG = "dataset_info_cloud.json"
 
 DEFAULT_TEMPLATE = defaultdict(str)
 

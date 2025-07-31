@@ -1,0 +1,56 @@
+{
+  "alpaca_en_demo": {
+    "file_name": "alpaca_en_demo.json"
+  },
+  "alpaca_moltrans_mit_mixed_space_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/space/train/MIT_mixed.json"
+  },
+  "alpaca_moltrans_mit_mixed_nospace_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/nospace/train/MIT_mixed.json"
+  },
+  "alpaca_moltrans_mit_mixed_augm_space_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/space/train/MIT_mixed_augm.json"
+  },
+  "alpaca_moltrans_mit_mixed_augm_nospace_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/nospace/train/MIT_mixed_augm.json"
+  },
+  "alpaca_moltrans_mit_separated_space_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/space/train/MIT_separated.json"
+  },
+  "alpaca_moltrans_mit_separated_nospace_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/nospace/train/MIT_separated.json"
+  },
+  "alpaca_moltrans_mit_separated_augm_space_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/space/train/MIT_separated_augm.json"
+  },
+  "alpaca_moltrans_mit_separated_augm_nospace_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/nospace/train/MIT_separated_augm.json"
+  },
+    "alpaca_moltrans_stereo_mixed_space_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/space/train/STEREO_mixed.json"
+  },
+  "alpaca_moltrans_stereo_mixed_nospace_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/nospace/train/STEREO_mixed.json"
+  },
+  "alpaca_moltrans_stereo_mixed_augm_space_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/space/train/STEREO_mixed_augm.json"
+  },
+  "alpaca_moltrans_stereo_mixed_augm_nospace_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/nospace/train/STEREO_mixed_augm.json"
+  },
+  "alpaca_moltrans_stereo_separated_space_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/space/train/STEREO_separated.json"
+  },
+  "alpaca_moltrans_stereo_separated_nospace_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/nospace/train/STEREO_separated.json"
+  },
+  "alpaca_moltrans_stereo_separated_augm_space_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/space/train/STEREO_separated_augm.json"
+  },
+  "alpaca_moltrans_stereo_separated_augm_nospace_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/MolecularTransformer/nospace/train/STEREO_separated_augm.json"
+  },
+  "alpaca_retrosyn_nospace_train": {
+    "file_name": "/home/vipuser/DataSets/Chemistry/RetroSynthesis/retrosynthesis_train.json"
+  }
+}
