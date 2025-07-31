@@ -62,5 +62,4 @@ def chat_batch():
 
 
 if __name__=="__main__":
-    # chat()
     chat()

@@ -171,7 +171,7 @@ def process_scores_dir(scores_dir, excels_dir):
         merge_cells(1, "Model", ["Test_Set", "Model"])
 
 if __name__ == "__main__":
-    scores_dir = "/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/scores"
+    scores_dir = "/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/scores2"
     excels_dir = "/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/excels"
     os.makedirs(excels_dir, exist_ok=True)
     process_scores_dir(scores_dir, excels_dir)
