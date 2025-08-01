@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODEL_NAME="qwen205_retrosyn_nospace_full_para11"
+MODEL_NAME="qwen205_retrosyn_nospace_full_para13"
 MODEL_PATH="/home/vipuser/Development/LLMSpace/LLaMA-Factory/output"
 DATA_FILE="retrosynthesis_test.json"
 CHECKPOINTS=""
