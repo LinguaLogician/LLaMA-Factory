@@ -129,7 +129,7 @@ if __name__ == '__main__':
                         help="Name of the prediction file (without extension)")
     parser.add_argument('--prediction_dir', type=str,
                         default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/"
-                                "mit_separated_nospace_test",
+                                "retrosyn_nospace_test",
                                 # "mit_mixed_augm_nospace_test_random100",
                         help="Directory containing prediction files")
     parser.add_argument('--output_dir', type=str,

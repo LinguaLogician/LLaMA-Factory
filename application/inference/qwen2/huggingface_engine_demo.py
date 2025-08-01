@@ -18,8 +18,8 @@ generating_args:
 '''
 
 INFER_ARGS = {
-    # "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B",
-    "model_name_or_path": "/home/liangtao/Development/LLMSpace/LLaMA-Factory/output/qwen205_moltrans_mit_mixed_space_lora_para1_epoch3",
+    "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B",
+    # "model_name_or_path": "/home/liangtao/Development/LLMSpace/LLaMA-Factory/output/qwen205_moltrans_mit_mixed_space_lora_para1_epoch3",
     "finetuning_type": "lora",
     "template": "qwen",
     # "num_return_sequences": 5,
@@ -46,8 +46,8 @@ def chat():
 
 def chat_batch():
     MESSAGES_LIST = []
-    MESSAGES_LIST.append([{"role": "user", "content": "PREDICT_PRODUCT:\nC 1 C C O C 1 . Cl . O C C C N 1 C C C C C 1 . O c 1 c c c ( - c 2 n c ( C N 3 C C C C C 3 ) c o 2 ) c c 1 F . c 1 c c c ( P ( c 2 c c c c c 2 ) c 2 c c c c c 2 ) c c 1"},])
-    MESSAGES_LIST.append([{"role": "user", "content": "PREDICT_PRODUCT:\nC . C C O C ( C ) = O . C c 1 o c ( - c 2 c c c c c 2 ) n c 1 C C O c 1 c c c ( [N+] ( = O ) [O-] ) c n 1 . [Pd]"},])
+    # MESSAGES_LIST.append([{"role": "user", "content": "PREDICT_PRODUCT:\nC 1 C C O C 1 . Cl . O C C C N 1 C C C C C 1 . O c 1 c c c ( - c 2 n c ( C N 3 C C C C C 3 ) c o 2 ) c c 1 F . c 1 c c c ( P ( c 2 c c c c c 2 ) c 2 c c c c c 2 ) c c 1"},])
+    MESSAGES_LIST.append([{"role": "user", "content": "What is the future of AI"},])
     chat_model = ChatModel(INFER_ARGS)
     responses = chat_model.batch_llm_predict(MESSAGES_LIST, num_return_sequences=10, output_scores=True, return_dict_in_generate=True)
     print(responses)
