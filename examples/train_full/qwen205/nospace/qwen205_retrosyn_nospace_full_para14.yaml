@@ -18,9 +18,9 @@ preprocessing_num_workers: 1
 dataloader_num_workers: 4
 
 ### output
-output_dir: output/qwen205_retrosyn_nospace_full_para13
+output_dir: output/qwen205_retrosyn_nospace_full_para14
 logging_steps: 100
-save_steps: 200000000
+save_steps: 5000
 plot_loss: true
 overwrite_output_dir: true
 save_only_model: false
@@ -29,7 +29,7 @@ report_to: tensorboard  # choices: [none, wandb, tensorboard, swanlab, mlflow]
 ### train
 per_device_train_batch_size: 1
 gradient_accumulation_steps: 2
-learning_rate: 4.0e-5
+learning_rate: 1.0e-5
 num_train_epochs: 3.0
 lr_scheduler_type: cosine
 warmup_ratio: 0.1
@@ -44,8 +44,8 @@ eval_strategy: steps
 eval_steps: 1000
 
 
-run_name: qwen205_retrosyn_nospace_full_para13
+run_name: qwen205_retrosyn_nospace_full_para14
 
-# FORCE_TORCHRUN=1 llamafactory-cli train examples/train_full/qwen205/nospace/qwen205_retrosyn_nospace_full_para13.yaml 2>&1 | tee -a logs/qwen205_retrosyn_nospace_full_para13.log
+# FORCE_TORCHRUN=1 llamafactory-cli train examples/train_full/qwen205/nospace/qwen205_retrosyn_nospace_full_para14.yaml 2>&1 | tee -a logs/qwen205_retrosyn_nospace_full_para14.log
 
-# FORCE_TORCHRUN=1 accelerate launch --config_file examples/accelerate/fsdp_config_offload.yaml src/train.py examples/train_lora/qwen205/nospace/qwen205_retrosyn_nospace_full_para13.yaml 2>&1 | tee -a logs/qwen205_retrosyn_nospace_full_para13.log
+# FORCE_TORCHRUN=1 accelerate launch --config_file examples/accelerate/fsdp_config_offload.yaml src/train.py examples/train_lora/qwen205/nospace/qwen205_retrosyn_nospace_full_para14.yaml 2>&1 | tee -a logs/qwen205_retrosyn_nospace_full_para14.log
