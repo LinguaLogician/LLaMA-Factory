@@ -1,14 +1,14 @@
 #!/bin/bash
 
 MODEL_NAME="qwen205_retrosyn_nospace_full_para10"
-MODEL_PATH="/home/vipuser/Development/LLMSpace/LLaMA-Factory/output"
+MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
 DATA_FILE="retrosynthesis_test.json"
 CHECKPOINTS=""
 FILE_PREFIX="retrosyn_nospace_test"
-DATA_DIR="/home/vipuser/DataSets/Chemistry/RetroSynthesis/"
-PREDICTION_BASE_DIR="/home/vipuser/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
+DATA_DIR="/home/liangtao/DataSets/Chemistry/RetroSynthesis/"
+PREDICTION_BASE_DIR="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
 
-BATCH_LIMIT=5
+BATCH_LIMIT=1
 BATCH_TOKEN_SIZE=600
 MINMAX_GAP=20
 NUM_RETURN_SEQUENCES=5

@@ -1,12 +1,12 @@
 #!/bin/bash
 
 MODEL_NAME="qwen205_retrosyn_nospace_full_para12"
-MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
+MODEL_PATH="/home/vipuser/Development/LLMSpace/LLaMA-Factory/output"
 DATA_FILE="retrosynthesis_test.json"
-CHECKPOINTS=""
+CHECKPOINTS="checkpoint-18012"
 FILE_PREFIX="retrosyn_nospace_test"
-DATA_DIR="/home/liangtao/DataSets/Chemistry/RetroSynthesis/"
-PREDICTION_BASE_DIR="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
+DATA_DIR="/home/vipuser/DataSets/Chemistry/RetroSynthesis/"
+PREDICTION_BASE_DIR="/home/vipuser/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
 
 BATCH_LIMIT=1
 BATCH_TOKEN_SIZE=600
@@ -89,7 +89,7 @@ process_checkpoint() {
 }
 
 # Process each checkpoint
-process_checkpoint ""
+process_checkpoint "checkpoint-18012"
 if [ $? -ne 0 ]; then
     echo "Error processing checkpoint $checkpoint, exiting..." | tee -a "$log_file"
     exit 1
