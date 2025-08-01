@@ -20,7 +20,7 @@ dataloader_num_workers: 4
 ### output
 output_dir: output/qwen205_moltrans_mit_mixed_nospace_full_para3
 logging_steps: 100
-save_steps: 1000000000
+save_steps: 80000
 plot_loss: true
 overwrite_output_dir: true
 save_only_model: false
