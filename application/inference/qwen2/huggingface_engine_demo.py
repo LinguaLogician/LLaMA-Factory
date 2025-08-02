@@ -31,7 +31,8 @@ INFER_ARGS = {
 }
 
 MESSAGES = [
-    {"role": "user", "content": "PREDICT_PRODUCT:\nC I . N N 1 C C O C C 1"},
+    {"role": "user", "content": "What is the future of AI"}
+    # {"role": "user", "content": "PREDICT_PRODUCT:\nC I . N N 1 C C O C C 1"},
     # {"role": "user", "content": "PREDICT_PRODUCT:\nC . C C O C ( C ) = O . C c 1 o c ( - c 2 c c c c c 2 ) n c 1 C C O c 1 c c c ( [N+] ( = O ) [O-] ) c n 1 . [Pd]"},
 ]
 
