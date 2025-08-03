@@ -1,11 +1,11 @@
 #!/bin/bash
 
-MODEL_NAME="qwen205_moltrans_mit_mixed_nospace_full_para3"
+MODEL_NAME="qwen205_retrosyn_nospace_full_para16"
 MODEL_PATH="/home/vipuser/Development/LLMSpace/LLaMA-Factory/output"
-DATA_FILE="MIT_mixed.json"
+DATA_FILE="retrosynthesis_test.json"
 CHECKPOINTS=""
-FILE_PREFIX="mit_mixed_nospace_test"
-DATA_DIR="/home/vipuser/DataSets/Chemistry/MolecularTransformer/nospace/test/"
+FILE_PREFIX="retrosyn_nospace_test"
+DATA_DIR="/home/vipuser/DataSets/Chemistry/RetroSynthesis/"
 PREDICTION_BASE_DIR="/home/vipuser/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
 
 BATCH_LIMIT=4

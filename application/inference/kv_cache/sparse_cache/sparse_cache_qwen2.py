@@ -8,7 +8,8 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
-model_name_or_path="/home/liangtao/Models/Qwen/Qwen2-7B"
+model_name_or_path="/home/liangtao/Models/Qwen/Qwen2-0.5B"
+# model_name_or_path="/home/liangtao/Models/Qwen/Qwen2-7B"
 
 model = AutoModelForCausalLM.from_pretrained(model_name_or_path)
 tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
