@@ -1,6 +1,7 @@
 from sympy.physics.units import temperature
 
-AI模型重复问题与改进方案
+from llamafactory.hparams import get_infer_args
+
 # -*- coding: utf-8 -*-
 # @project: LLaMA-Factory
 # @filename: sparse_cache.py
@@ -49,7 +50,7 @@ class SparseCacheModel:
 if __name__ == "__main__":
     model_name_or_path = "/home/liangtao/Models/Qwen/Qwen2-0.5B"
     temperature = 0.95
-    INFER_ARGS = {
+    args = {
         "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B",
         "finetuning_type": "lora",
         "template": "qwen",
@@ -63,20 +64,20 @@ if __name__ == "__main__":
     messages = [
         {"role": "user", "content": "What is the future of AI"}
     ]
-    # model = AutoModelForCausalLM.from_pretrained(model_name_or_path)
-    chat_model = ChatModel(INFER_ARGS)
-    tokenizer = chat_model.engine.tokenizer
+    model_args, data_args, finetuning_args, generating_args = get_infer_args(args)
+    engine = HuggingfaceEngine(model_args, data_args, finetuning_args, generating_args)
+    tokenizer = engine.tokenizer
     input_kwargs = {"num_return_sequences": 1, "output_scores": True, "return_dict_in_generate": True, "do_sample": True}
     gen_kwargs, prompt_length = HuggingfaceEngine._process_args(
-                chat_model.engine.model,
-                chat_model.engine.tokenizer,
-                chat_model.engine.processor,
-                chat_model.engine.template,
-                chat_model.engine.generating_args,
+                engine.model,
+                engine.tokenizer,
+                engine.processor,
+                engine.template,
+                engine.generating_args,
                 messages,
                 input_kwargs=input_kwargs,
             )
-
-    sparse_model = SparseCacheModel(chat_model.engine.model, window_size=512)
+    tokenizer.decode(gen_kwargs["inputs"][0], skip_special_tokens=False)
+    sparse_model = SparseCacheModel(engine.model, window_size=512)
     output = sparse_model.generate(gen_kwargs)
     print(output)
