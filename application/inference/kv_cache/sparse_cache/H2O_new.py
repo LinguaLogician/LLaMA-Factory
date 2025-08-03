@@ -32,6 +32,11 @@ class H2OSparseKVCache:
         self.k_cache = None  # Shape: [batch, heads, seq_len, head_dim]
         self.v_cache = None
         self.attention_accumulator = None  # 用于累计注意力分数
+        self.seen_tokens = 0  # 跟踪已见token数
+
+    def get_seq_length(self) -> int:
+        """返回当前缓存序列长度"""
+        return self.seen_tokens
 
     def prune(self, attention_scores: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """基于累计注意力分数修剪K-V Cache，保留Heavy-Hitters"""
@@ -73,11 +78,13 @@ class H2OSparseKVCache:
         if self.k_cache is None:
             self.k_cache = new_k
             self.v_cache = new_v
+            self.seen_tokens = new_k.shape[-2]
             return new_k, new_v
 
         # 拼接新K/V
         self.k_cache = torch.cat([self.k_cache, new_k], dim=-2)
         self.v_cache = torch.cat([self.v_cache, new_v], dim=-2)
+        self.seen_tokens += new_k.shape[-2]
 
         # 滑动窗口截断
         if self.k_cache.shape[-2] > self.window_size:
@@ -85,11 +92,38 @@ class H2OSparseKVCache:
             self.v_cache = self.v_cache[:, :, -self.window_size:, :]
             if self.attention_accumulator is not None:
                 self.attention_accumulator = self.attention_accumulator[:, -self.window_size:, :]
+            self.seen_tokens = self.window_size
 
         # 修剪缓存（如果提供attention_scores）
         if attention_scores is not None:
             return self.prune(attention_scores)
         return self.k_cache, self.v_cache
+
+
+class H2OCacheWrapper(Cache):
+    """包装H2O缓存以兼容transformers的Cache接口"""
+
+    def __init__(self, caches: List[H2OSparseKVCache]):
+        self.caches = caches
+
+    def update(
+            self,
+            key_states: torch.Tensor,
+            value_states: torch.Tensor,
+            layer_idx: int,
+            cache_kwargs: Optional[dict] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        attention_scores = cache_kwargs.get("attention_scores", None) if cache_kwargs else None
+        return self.caches[layer_idx].update(key_states, value_states, attention_scores)
+
+    def get_seq_length(self, layer_idx: Optional[int] = None) -> int:
+        return self.caches[0].get_seq_length()  # 所有层的序列长度相同
+
+    def __getitem__(self, layer_idx: int) -> H2OSparseKVCache:
+        return self.caches[layer_idx]
+
+    def __len__(self) -> int:
+        return len(self.caches)
 
 
 def load_model_and_tokenizer(model_name: str = "meta-llama/Llama-2-7b-chat-hf"):
@@ -114,54 +148,49 @@ def generate_with_h2o(
     """使用H2O稀疏K-V Cache生成文本"""
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
     input_ids = inputs.input_ids
-
+    model.config.use_flash_attention = False
     # 初始化H2O缓存
     config = model.config
-    cache = H2OSparseKVCache(
-        num_heads=config.num_attention_heads,
-        head_dim=config.hidden_size // config.num_attention_heads,
-        window_size=window_size,
-        heavy_hitter_ratio=heavy_hitter_ratio,
-        device=model.device
-    )
+    num_layers = config.num_hidden_layers
+    caches = [
+        H2OSparseKVCache(
+            num_heads=config.num_attention_heads,
+            head_dim=config.hidden_size // config.num_attention_heads,
+            window_size=window_size,
+            heavy_hitter_ratio=heavy_hitter_ratio,
+            device=model.device
+        ) for _ in range(num_layers)
+    ]
+    past_key_values = H2OCacheWrapper(caches)
 
     # 预填充阶段（首轮计算）
-    outputs = model(input_ids, use_cache=True)
-    past_key_values = outputs.past_key_values
+    outputs = model(
+        input_ids,
+        use_cache=True,
+        past_key_values=past_key_values,
+        output_attentions=True  # 确保返回注意力权重
+    )
     generated_ids = input_ids
 
     # 生成阶段（自回归）
     for _ in range(max_new_tokens):
-        # 获取上一步的logits和注意力分数（需模型返回）
+        # 获取上一步的logits
         next_token_logits = outputs.logits[:, -1, :]
         next_token = torch.argmax(next_token_logits, dim=-1, keepdim=True)
         generated_ids = torch.cat([generated_ids, next_token], dim=-1)
 
-        # 获取注意力分数（需自定义模型或使用钩子）
-        # 此处简化：假设能通过outputs获取最后一层的attention_probs
-        attention_scores = getattr(outputs, "attentions", None)
-        if attention_scores is not None:
-            attention_scores = attention_scores[-1][:, :, -1:, :]  # [batch, heads, 1, past_len]
+        # 获取注意力分数（从模型输出中提取）
+        attention_scores = None
+        if outputs.attentions is not None:
+            attention_scores = outputs.attentions[-1][:, :, -1:, :]  # [batch, heads, 1, past_len]
 
-        # 更新稀疏缓存
-        new_k, new_v = [], []
-        for i, (k, v) in enumerate(past_key_values):
-            # 假设past_key_values的每个元素是(key, value)元组
-            updated_k, updated_v = cache.update(
-                k[:, :, -1:, :],  # 新token的K/V
-                v[:, :, -1:, :],
-                attention_scores[:, i, :, :] if attention_scores is not None else None
-            )
-            new_k.append(updated_k)
-            new_v.append(updated_v)
-
-        # 构造新的past_key_values
-        past_key_values = tuple(zip(new_k, new_v))
         # 下一步预测
         outputs = model(
             next_token,
             past_key_values=past_key_values,
-            output_attentions=True  # 需要获取注意力分数
+            output_attentions=True,
+            use_cache=True,
+            attention_scores=attention_scores  # 显式传递
         )
 
     return tokenizer.decode(generated_ids[0], skip_special_tokens=True)
