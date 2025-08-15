@@ -53,6 +53,11 @@ def _training_function(config: dict[str, Any]) -> None:
     args = config.get("args")
     callbacks: list[Any] = config.get("callbacks")
     model_args, data_args, training_args, finetuning_args, generating_args = get_train_args(args)
+    logger.info_rank0(f"loaded training_args:\n===========================\n{model_args}\n===========================")
+    logger.info_rank0(f"loaded data_args:\n===========================\n{data_args}\n===========================")
+    logger.info_rank0(f"loaded training_args:\n===========================\n{training_args}\n===========================")
+    logger.info_rank0(f"loaded finetuning_args:\n===========================\n{finetuning_args}\n===========================")
+    logger.info_rank0(f"loaded generating_args:\n===========================\n{generating_args}\n===========================")
 
     callbacks.append(LogCallback())
     if finetuning_args.pissa_convert:

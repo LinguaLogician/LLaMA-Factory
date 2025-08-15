@@ -870,6 +870,11 @@ register_template(
     replace_jinja_template=True,
 )
 
+register_template(
+    name="nextline",
+    format_assistant=StringFormatter(slots=["{{content}}\n"]),
+    replace_jinja_template=True,
+)
 
 register_template(
     name="exaone",

@@ -21,6 +21,7 @@ from functools import partial
 
 # huggingface 镜像地址
 os.environ['HF_ENDPOINT'] = "https://hf-mirror.com"
+os.environ["ALLOW_EXTRA_ARGS"] = "1"
 
 
 USAGE = (

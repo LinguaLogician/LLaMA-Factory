@@ -115,6 +115,22 @@ class BaseModelArguments:
         default=None,
         metadata={"help": "Coefficient of the auxiliary router loss in mixture-of-experts model."},
     )
+    attention_dropout: Optional[float] = field(
+        default=0.1,
+        metadata={"help": "Attention dropout rate."},
+    )
+    num_attention_heads: Optional[int] = field(
+        default=None,
+        metadata={"help": "Number of attention heads for each attention layer in the transformer."},
+    )
+    num_hidden_layers: Optional[int] = field(
+        default=None,
+        metadata={"help": "Number of hidden layers in the transformer model."},
+    )
+    num_key_value_heads: Optional[int] = field(
+        default=None,
+        metadata={"help": "Number of key-value heads for grouped query attention. If not specified, defaults to same as num_attention_heads."},
+    )
     disable_gradient_checkpointing: bool = field(
         default=False,
         metadata={"help": "Whether or not to disable gradient checkpointing."},

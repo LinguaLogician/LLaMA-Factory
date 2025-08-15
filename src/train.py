@@ -15,6 +15,7 @@
 from llamafactory.train.tuner import run_exp
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+os.environ["ALLOW_EXTRA_ARGS"] = "1"
 
 def main():
     run_exp()

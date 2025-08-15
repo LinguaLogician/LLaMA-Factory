@@ -1,3 +1,5 @@
+import os
+
 from sympy.physics.units import temperature
 
 from llamafactory.hparams import get_infer_args
@@ -14,7 +16,7 @@ import torch
 
 from llamafactory.chat import ChatModel
 from llamafactory.chat.hf_engine import HuggingfaceEngine
-
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 class SparseCacheModel:
     def __init__(self, model, window_size=512):
@@ -52,10 +54,10 @@ class SparseCacheModel:
         return tokenizer.decode(input_ids[0])
 
 if __name__ == "__main__":
-    model_name_or_path = "/home/liangtao/Models/Qwen/Qwen2-0.5B"
+    model_name_or_path = "/home/liangtao/Models/Qwen/Qwen2-0.5B-VocabPruned"
     temperature = 1.5
     args = {
-        "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B",
+        "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B-VocabPruned",
         "finetuning_type": "lora",
         "template": "qwen",
         # "num_return_sequences": 5,
@@ -84,4 +86,4 @@ if __name__ == "__main__":
     tokenizer.decode(gen_kwargs["inputs"][0], skip_special_tokens=False)
     sparse_model = SparseCacheModel(engine.model, window_size=512)
     output = sparse_model.generate(gen_kwargs)
-    print(output)
+    print(f"=======================\n{output}")

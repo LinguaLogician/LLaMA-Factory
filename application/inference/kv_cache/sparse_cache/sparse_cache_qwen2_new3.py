@@ -7,6 +7,7 @@
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+import numpy as np
 
 
 class SparseCacheModel:
@@ -52,9 +53,11 @@ if __name__ == "__main__":
     ]
 
     messages = messages + [{"role": "assistant", "content": ""}]
-    model = AutoModelForCausalLM.from_pretrained(model_name_or_path)
+    model = AutoModelForCausalLM.from_pretrained(model_name_or_path).to("cuda:0")
+    print(model.config)
+    print(model)
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
-    input_ids = tokenizer.apply_chat_template(messages, return_tensors="pt")
+    input_ids = tokenizer.apply_chat_template(messages, return_tensors="pt").to("cuda:0")
     eos_token_id = tokenizer.eos_token_id
     sparse_model = SparseCacheModel(model, window_size=512)
 

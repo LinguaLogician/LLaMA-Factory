@@ -114,10 +114,17 @@ def load_tokenizer(model_args: "ModelArguments") -> "TokenizerModule":
 
 
 def load_config(model_args: "ModelArguments") -> "PretrainedConfig":
-    r"""Load model config."""
+    r"""Load model config and override with model_args attributes."""
+    # 1. First load the pretrained config
     init_kwargs = _get_init_kwargs(model_args)
-    return AutoConfig.from_pretrained(model_args.model_name_or_path, **init_kwargs)
+    config = AutoConfig.from_pretrained(model_args.model_name_or_path, **init_kwargs)
 
+    # 2. Then update with any attributes from model_args that are not None
+    for key, value in vars(model_args).items():
+        if value is not None and hasattr(config, key):
+            setattr(config, key, value)
+
+    return config
 
 def load_model(
     tokenizer: "PreTrainedTokenizer",
@@ -131,6 +138,7 @@ def load_model(
     config = load_config(model_args)
     patch_config(config, tokenizer, model_args, init_kwargs, is_trainable)
     apply_liger_kernel(config, model_args, is_trainable, require_logits=(finetuning_args.stage not in ["pt", "sft"]))
+    logger.info_rank0(f"loaded config:\n===========================\n{config}\n===========================")
 
     model = None
     lazy_load = False
