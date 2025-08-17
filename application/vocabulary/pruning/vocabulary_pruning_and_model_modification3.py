@@ -2,8 +2,9 @@ import os
 import json
 import shutil
 import torch
-from transformers import AutoModelForCausalLM
-from safetensors.torch import save_file as safe_save
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from safetensors.torch import save_file
+
 
 def is_valid_token(token):
     """检查token是否只包含ASCII字符或Ġ(空格)"""
@@ -28,12 +29,9 @@ def prune_vocab_and_merges(tokenizer_path):
         tokenizer_json = json.load(f)
 
     original_vocab = tokenizer_json["model"]["vocab"]
-    special_tokens_map = {tk["content"]: tk["id"] for tk in tokenizer_json["added_tokens"]}
-    original_vocab = {**original_vocab, **special_tokens_map}
-    special_tokens = [token["content"] for token in tokenizer_json["added_tokens"]]
     kept_tokens = [token for token in original_vocab if is_valid_token(token)]
 
-
+    special_tokens = [token["content"] for token in tokenizer_json["added_tokens"]]
     normal_tokens = [token for token in kept_tokens if token not in special_tokens]
     normal_tokens_sorted = sorted(normal_tokens, key=lambda x: original_vocab[x])
 
@@ -68,7 +66,7 @@ def prune_vocab_and_merges(tokenizer_path):
     print(f"缩减后merges数量: {len(pruned_merges)}")
 
     old_to_new = {}
-    for token, new_id in new_vocab.items():
+    for new_id, token in new_vocab.items():
         if token in original_vocab:
             old_to_new[original_vocab[token]] = new_id
     return tokenizer_json, new_vocab, special_tokens, old_to_new
@@ -191,33 +189,88 @@ def adjust_model_embeddings(model_path, old_to_new_id_map, new_vocab_size, origi
     return model
 
 
-def save_model_safely(model, save_path, original_metadata=None):
-    """
-    安全保存模型，处理共享权重问题
-    """
-    state_dict = model.state_dict()
+def resize_model_embeddings(model_path, new_vocab_size, original_dtype=torch.bfloat16):
+    """调整模型的embedding层大小并保持bfloat16精度"""
+    model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=original_dtype)
+    original_vocab_size = model.config.vocab_size
+    hidden_size = model.config.hidden_size
 
-    # 处理共享权重问题
+    print(f"原始模型词表大小: {original_vocab_size}")
+    print(f"新词表大小: {new_vocab_size}")
+    print(f"Embedding 层精度: {original_dtype}")
+
+    if original_vocab_size == new_vocab_size:
+        print("词表大小未改变，无需调整embedding层")
+        return model
+
+    old_embeddings = model.get_input_embeddings()
+    old_weight = old_embeddings.weight.data
+
+    new_embeddings = torch.nn.Embedding(new_vocab_size, hidden_size, dtype=original_dtype)
+    new_embeddings = new_embeddings.to(old_weight.device)
+
+    min_size = min(original_vocab_size, new_vocab_size)
+    new_embeddings.weight.data[:min_size] = old_weight[:min_size]
+
+    if new_vocab_size > original_vocab_size:
+        new_embeddings.weight.data[original_vocab_size:] = torch.normal(
+            mean=0.0,
+            std=model.config.initializer_range,
+            size=(new_vocab_size - original_vocab_size, hidden_size),
+            device=old_weight.device,
+            dtype=original_dtype
+        )
+
+    model.set_input_embeddings(new_embeddings)
+
     if model.config.tie_word_embeddings:
-        # 解除权重绑定
-        lm_head_weight = state_dict["lm_head.weight"].clone()
-        state_dict["lm_head.weight"] = lm_head_weight
+        # 创建共享权重的输出层
+        model.lm_head = torch.nn.Linear(
+            hidden_size,
+            new_vocab_size,
+            bias=False,
+            dtype=original_dtype
+        ).to(old_weight.device)
+        model.lm_head.weight = model.get_input_embeddings().weight
+        print("输入/输出 Embedding 权重已共享")
+    else:
+        old_output_embeddings = model.get_output_embeddings()
+        if old_output_embeddings is not None:
+            old_output_weight = old_output_embeddings.weight.data
+            new_output_embeddings = torch.nn.Linear(
+                hidden_size,
+                new_vocab_size,
+                bias=False,
+                dtype=original_dtype
+            ).to(old_output_weight.device)
+            new_output_embeddings.weight.data[:min_size] = old_output_weight[:min_size]
 
-    # 设置metadata
-    metadata = {
-        "format": "pt",
-        "vocab_size": str(model.config.vocab_size),
-    }
+            if new_vocab_size > original_vocab_size:
+                new_output_embeddings.weight.data[original_vocab_size:] = torch.normal(
+                    mean=0.0,
+                    std=model.config.initializer_range,
+                    size=(new_vocab_size - original_vocab_size, hidden_size),
+                    device=old_output_weight.device,
+                    dtype=original_dtype
+                )
+            model.set_output_embeddings(new_output_embeddings)
+            print("输入/输出 Embedding 权重未共享，已分别调整")
 
-    # 添加原始metadata（如果存在）
-    if original_metadata and isinstance(original_metadata, dict):
-        metadata.update({
-            k: v for k, v in original_metadata.items()
-            if k in {"description", "author", "date"}
-        })
+    model.config.vocab_size = new_vocab_size
 
-    # 保存为safetensors
-    safe_save(state_dict, os.path.join(save_path, "model.safetensors"), metadata)
+    return model
+
+
+def save_model_safely(model, output_path):
+    """安全保存模型，处理共享权重问题"""
+    # 创建临时状态字典，解除权重共享
+    state_dict = {k: v.clone() if isinstance(v, torch.Tensor) else v
+                  for k, v in model.state_dict().items()}
+
+    # 保存模型配置
+    model.save_pretrained(output_path, state_dict=state_dict, safe_serialization=True)
+
+    print("模型已安全保存")
 
 
 def main():

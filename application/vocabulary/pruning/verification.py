@@ -33,24 +33,26 @@ def verify_model():
     )
 
     # 3. 验证设备兼容性
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
     print(f"使用设备: {device}")
 
     # 4. 测试对话生成
     print("\n=== 测试对话生成 ===")
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What is the future of AI?"}
+        {"role": "user", "content": "What is the future of AI?"},
+        {"role": "assistant", "content": ""}
     ]
 
     try:
         # 生成输入IDs
-        input_ids = tokenizer.apply_chat_template(
-            messages,
-            tokenize=True,
-            add_generation_prompt=True,
-            return_tensors="pt"
-        ).to(device)
+        # input_ids = tokenizer.apply_chat_template(
+        #     messages,
+        #     tokenize=True,
+        #     add_generation_prompt=True,
+        #     return_tensors="pt"
+        # ).to(device)
+        input_ids = tokenizer.apply_chat_template(messages, return_tensors="pt").to("cuda:0")
 
         # 生成attention mask
         attention_mask = torch.ones_like(input_ids)

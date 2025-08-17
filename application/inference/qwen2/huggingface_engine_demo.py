@@ -18,7 +18,7 @@ generating_args:
 '''
 
 INFER_ARGS = {
-    "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B",
+    "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B-VocabPruned",
     # "model_name_or_path": "/home/liangtao/Development/LLMSpace/LLaMA-Factory/output/qwen205_moltrans_mit_mixed_space_lora_para1_epoch3",
     "finetuning_type": "lora",
     "template": "qwen",
