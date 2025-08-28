@@ -52,5 +52,19 @@
   },
   "alpaca_retrosyn_nospace_train": {
     "file_name": "/home/liangtao/DataSets/Chemistry/RetroSynthesis/retrosynthesis_train.json"
+  },
+  "sharegpt_chemicals_retrosyn_train": {
+    "file_name": "/home/liangtao/Development/ChemistrySpace/ChemProphet/data/chemicals/retrosyn/chemicals.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
   }
 }

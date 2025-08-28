@@ -37,6 +37,7 @@ if __name__=='__main__':
     base_dir = r"/home/liangtao/Development/ChemistrySpace/retrosynthesis/data"
     output_dir = r"/home/liangtao/DataSets/Chemistry/RetroSynthesis"
     task = "PREDICT_REACTANTS"
-    convert_to_json(base_dir, output_dir, task, nospace=True, split="train")
-    convert_to_json(base_dir, output_dir, task, nospace=True, split="valid")
-    convert_to_json(base_dir, output_dir, task, nospace=True, split="test")
+    # convert_to_json(base_dir, output_dir, task, nospace=True, split="train")
+    # convert_to_json(base_dir, output_dir, task, nospace=True, split="valid")
+    # convert_to_json(base_dir, output_dir, task, nospace=True, split="test")
+    convert_to_json(base_dir, output_dir, task, nospace=True, split="all")
