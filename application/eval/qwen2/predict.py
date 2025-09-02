@@ -4,6 +4,8 @@
 # @author: Karl Wu
 # @contact: wlt1990@outlook.com
 # @time: 2025/6/3 15:01
+# https://chat.deepseek.com/a/chat/s/cc2cabaf-4587-4ac0-a554-3d7587db7909
+
 import gc
 import os
 import json
@@ -11,33 +13,11 @@ import argparse
 from pathlib import Path
 
 import torch
-from torch.utils.checkpoint import checkpoint
 from tqdm import tqdm
 from rdkit import Chem
 from typing import List, Dict, Any
 from torch.utils.data import Dataset
 from llamafactory.chat import ChatModel
-
-'''
-继续为我优化：
-1. 设置一个参数batch_token_size, 表示一个batch中，最多有的token_id的总长度
-2. 设置一个参数minmax_gap, 表示一个batch中，序列的最长和最短的的token_id长度不能超过minmax_gap
-3. DataLoader在组装数据时，一个batch受到batch_token_size和minmax_gap的限制, 将原参数batch_size改为batch_limit, 表示一个batch中最大可以接受的序列个数
-4. 将原来的固定batch_size改为根据上述约束而进行的动态长度batch
-5. 将最终从数据集predict后得到的结果根据id进行排序，保持和原来顺序一致
-6. 将程序的代码整理后，对变量进行抽取，抽取的变量包括：
-	INFER_ARGS中的所有变量
-	num_return_sequences
-	output_scores
-	return_dict_in_generate
-	batch_limit
-	FILE_NAME
-	MODEL_NAME
-	DATA_PATH
-	OUTPUT_DIR
-	OUTPUT_FILE
-可以改变原先变量名，使得程序通过arg parser设置变量，并可以通过外部shell执行脚本传入变量
-'''
 
 
 class DynamicBatchDataset(Dataset):

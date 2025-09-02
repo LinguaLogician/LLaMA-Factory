@@ -101,33 +101,56 @@ class InternVLChatModel(PreTrainedModel, GenerationMixin):
             output_hidden_states: Optional[bool] = None,
             return_dict: Optional[bool] = None,
     ) -> Union[Tuple, CausalLMOutputWithPast]:
+        # https://chat.deepseek.com/a/chat/s/d2f05d3a-a877-420d-912e-59a46a2fbe42
+
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
-        image_flags = image_flags.squeeze(-1)
+        if pixel_values is not None and input_ids.shape[0] > 1:
+            image_flags = image_flags.squeeze(-1)
+            vit_embeds = self.extract_feature(pixel_values)
+            vit_embeds = vit_embeds[image_flags == 1]
+            vit_batch_size = pixel_values.shape[0]
+        else:
+            vit_embeds = None
+
         input_embeds = self.language_model.get_input_embeddings()(input_ids).clone()
 
-        vit_embeds = self.extract_feature(pixel_values)
-        vit_embeds = vit_embeds[image_flags == 1]
-        vit_batch_size = pixel_values.shape[0]
+        if vit_embeds is not None and self.img_context_token_id is not None:
+            B, N, C = input_embeds.shape
+            input_embeds_flat = input_embeds.reshape(B * N, C)
+            input_ids_flat = input_ids.reshape(B * N)
 
-        B, N, C = input_embeds.shape
-        input_embeds = input_embeds.reshape(B * N, C)
+            # 找出所有需要替换的image token位置
+            selected = (input_ids_flat == self.img_context_token_id)
+            num_selected_tokens = selected.sum().item()
+            num_vit_tokens = vit_embeds.numel() // C
 
-        if torch.distributed.is_initialized() and torch.distributed.get_rank() == 0:
-            print(f'dynamic ViT batch size: {vit_batch_size}, images per sample: {vit_batch_size / B}, dynamic token length: {N}')
+            # 精确匹配检查
+            if num_selected_tokens == num_vit_tokens:
+                # 完美匹配情况：直接替换
+                input_embeds_flat[selected] = vit_embeds.reshape(-1, C)
+            elif num_selected_tokens > num_vit_tokens:
+                # 选择的token多于可用的图像token：用图像token填充前部分，剩余保持原状
+                vit_embeds_flat = vit_embeds.reshape(-1, C)
+                selected_indices = selected.nonzero(as_tuple=True)[0]
+                input_embeds_flat[selected_indices[:num_vit_tokens]] = vit_embeds_flat
+                # 可以选择记录警告或保持剩余token不变
+                if torch.distributed.is_initialized() and torch.distributed.get_rank() == 0:
+                    print(
+                        f'Warning: More image tokens ({num_selected_tokens}) than available ViT tokens ({num_vit_tokens})')
+            # else:
+            #     # 选择的token少于可用的图像token：使用所有可用的图像token的前部分
+            #     vit_embeds_flat = vit_embeds.reshape(-1, C)
+            #     input_embeds_flat[selected] = vit_embeds_flat[:num_selected_tokens]
+            #     if torch.distributed.is_initialized() and torch.distributed.get_rank() == 0:
+            #         print(
+            #             f'Warning: Fewer image tokens ({num_selected_tokens}) than available ViT tokens ({num_vit_tokens})')
 
-        input_ids = input_ids.reshape(B * N)
-        selected = (input_ids == self.img_context_token_id)
-        try:
-            input_embeds[selected] = input_embeds[selected] * 0.0 + vit_embeds.reshape(-1, C)
-        except Exception as e:
-            vit_embeds = vit_embeds.reshape(-1, C)
-            print(f'warning: {e}, input_embeds[selected].shape={input_embeds[selected].shape}, '
-                  f'vit_embeds.shape={vit_embeds.shape}')
-            n_token = selected.sum()
-            input_embeds[selected] = input_embeds[selected] * 0.0 + vit_embeds[:n_token]
+            input_embeds = input_embeds_flat.reshape(B, N, C)
 
-        input_embeds = input_embeds.reshape(B, N, C)
+        if torch.distributed.is_initialized() and torch.distributed.get_rank() == 0 and vit_embeds is not None:
+            print(
+                f'dynamic ViT batch size: {vit_batch_size}, images per sample: {vit_batch_size / B}, dynamic token length: {N}')
 
         outputs = self.language_model(
             inputs_embeds=input_embeds,
@@ -139,28 +162,23 @@ class InternVLChatModel(PreTrainedModel, GenerationMixin):
             output_hidden_states=output_hidden_states,
             return_dict=return_dict,
         )
-        logits = outputs.logits
 
         loss = None
         if labels is not None:
-            # Shift so that tokens < n predict n
-            shift_logits = logits[..., :-1, :].contiguous()
+            shift_logits = outputs.logits[..., :-1, :].contiguous()
             shift_labels = labels[..., 1:].contiguous()
-            # Flatten the tokens
             loss_fct = CrossEntropyLoss()
             shift_logits = shift_logits.view(-1, self.language_model.config.vocab_size)
-            shift_labels = shift_labels.view(-1)
-            # Enable model parallelism
-            shift_labels = shift_labels.to(shift_logits.device)
+            shift_labels = shift_labels.view(-1).to(shift_logits.device)
             loss = loss_fct(shift_logits, shift_labels)
 
         if not return_dict:
-            output = (logits,) + outputs[1:]
+            output = (outputs.logits,) + outputs[1:]
             return (loss,) + output if loss is not None else output
 
         return CausalLMOutputWithPast(
             loss=loss,
-            logits=logits,
+            logits=outputs.logits,
             past_key_values=outputs.past_key_values,
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
@@ -181,7 +199,6 @@ class InternVLChatModel(PreTrainedModel, GenerationMixin):
         else:
             x = x.permute(0, 2, 1, 3).contiguous()
         return x
-
     def extract_feature(self, pixel_values):
         if self.select_layer == -1:
             vit_embeds = self.vision_model(

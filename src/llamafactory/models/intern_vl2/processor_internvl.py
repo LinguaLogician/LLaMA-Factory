@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 # @project: LLaMA-Factory
-# @filename: demo.py
+# @filename: processor_internvl.py
 # @author: Karl Wu
 # @contact: wlt1990@outlook.com
 # @time: 2025/9/1 14:23
-
+# https://chat.deepseek.com/a/chat/s/c515b979-6a54-4b50-b745-d6f18e3b2da4
+# https://chat.deepseek.com/a/chat/s/2ca4efb8-a508-410e-bd2e-b2928b136da8
+# https://chat.deepseek.com/a/chat/s/92473a53-fc53-47b5-8c01-7e09e58b45f8
 import torch
 from PIL import Image
 from PIL.Image import Image as ImageObject

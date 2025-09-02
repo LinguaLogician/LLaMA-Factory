@@ -34,6 +34,7 @@ class Response:
     response_length: int
     prompt_length: int
     sequence_score: Optional[float] = None
+    sequence_prob: Optional[float] = None
     finish_reason: Literal["stop", "length"] = "stop"
 
 
@@ -85,6 +86,14 @@ class BaseEngine(ABC):
         r"""Get a list of responses of the chat model."""
         ...
 
+    @abstractmethod
+    async def chat_lmm_batch(
+        self,
+        messages_batch: list[list[dict[str, str]]],
+        **input_kwargs,
+    ) -> list[list["Response"]]:
+        r"""Get a list of responses of the chat model."""
+        ...
 
     @abstractmethod
     async def stream_chat(

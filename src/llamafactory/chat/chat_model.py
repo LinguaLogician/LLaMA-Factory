@@ -82,12 +82,22 @@ class ChatModel:
     def batch_llm_predict(
         self,
         messages_batch: list[list[dict[str, str]]],
-        system: Optional[str] = None,
         **input_kwargs,
     ) -> list[list["Response"]]:
         r"""Get a list of responses of the chat model."""
         task = asyncio.run_coroutine_threadsafe(
             self.achat_batch_llm(messages_batch, **input_kwargs), self._loop
+        )
+        return task.result()
+
+    def batch_lmm_predict(
+        self,
+        messages_batch: list[list[dict[str, str]]],
+        **input_kwargs,
+    ) -> list[list["Response"]]:
+        r"""Get a list of responses of the chat model."""
+        task = asyncio.run_coroutine_threadsafe(
+            self.achat_batch_lmm(messages_batch, **input_kwargs), self._loop
         )
         return task.result()
 
@@ -112,6 +122,14 @@ class ChatModel:
     ) -> list[list["Response"]]:
         r"""Asynchronously get a list of responses of the chat model."""
         return await self.engine.chat_llm_batch(messages_batch, **input_kwargs)
+
+    async def achat_batch_lmm(
+        self,
+        messages_batch: list[list[dict[str, str]]],
+        **input_kwargs,
+    ) -> list[list["Response"]]:
+        r"""Asynchronously get a list of responses of the chat model."""
+        return await self.engine.chat_lmm_batch(messages_batch, **input_kwargs)
 
     def stream_chat(
         self,
