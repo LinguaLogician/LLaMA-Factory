@@ -23,7 +23,7 @@ from transformers import (
     AutoModelForTextToWaveform,
     AutoModelForVision2Seq,
     AutoProcessor,
-    AutoTokenizer,
+    AutoTokenizer, GenerationConfig,
 )
 from trl import AutoModelForCausalLMWithValueHead
 
@@ -37,7 +37,8 @@ from .model_utils.mod import convert_pretrained_model_to_mod, load_mod_pretraine
 from .model_utils.unsloth import load_unsloth_pretrained_model
 from .model_utils.valuehead import load_valuehead_params
 from .patcher import patch_config, patch_model, patch_processor, patch_tokenizer, patch_valuehead_model
-
+from llamafactory.models.intern_vl2.processor_internvl import InternVL2Processor
+from ..models.intern_vl2.modeling_internvl_chat import InternVLChatModel
 
 if is_transformers_version_greater_than("4.46.0"):
     from transformers import AutoModelForImageTextToText
@@ -69,6 +70,7 @@ def _get_init_kwargs(model_args: "ModelArguments") -> dict[str, Any]:
         "cache_dir": model_args.cache_dir,
         "revision": model_args.model_revision,
         "token": model_args.hf_hub_token,
+        'local_files_only': model_args.local_files_only,
     }
 
 
@@ -98,17 +100,22 @@ def load_tokenizer(model_args: "ModelArguments") -> "TokenizerModule":
 
     patch_tokenizer(tokenizer, model_args)
     try:
-        processor = AutoProcessor.from_pretrained(model_args.model_name_or_path, **init_kwargs)
+        config = load_config(model_args)
+        if "InternVLChatModel" in getattr(config, "architectures", []):
+            # processor = load_internvl2_processor(model_args.model_name_or_path, trust_remote_code=True)
+            processor = InternVL2Processor.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+        else:
+            processor = AutoProcessor.from_pretrained(model_args.model_name_or_path, **init_kwargs)
         patch_processor(processor, tokenizer, model_args)
     except Exception as e:
         logger.info_rank0(f"Failed to load processor: {e}.")
-        processor = None
+        raise e
 
     # Avoid load tokenizer, see:
     # https://github.com/huggingface/transformers/blob/v4.40.0/src/transformers/models/auto/processing_auto.py#L324
     if processor is not None and "Processor" not in processor.__class__.__name__:
         logger.debug("The loaded processor is not an instance of Processor. Dropping it.")
-        processor = None
+        # processor = None
 
     return {"tokenizer": tokenizer, "processor": processor}
 
@@ -166,6 +173,8 @@ def load_model(
                 load_class = AutoModelForSeq2SeqLM
             elif type(config) in AutoModelForTextToWaveform._model_mapping.keys():  # audio hack for qwen2_5_omni
                 load_class = AutoModelForTextToWaveform
+            elif config.architectures[0] == "InternVLChatModel":
+                load_class = InternVLChatModel
             else:
                 load_class = AutoModelForCausalLM
 
@@ -173,6 +182,8 @@ def load_model(
                 model = load_class.from_config(config, trust_remote_code=model_args.trust_remote_code)
             else:
                 model = load_class.from_pretrained(**init_kwargs)
+                if model.generation_config is None:
+                    model.generation_config = GenerationConfig.from_pretrained(model_args.model_name_or_path)
                 if getattr(model.config, "model_type", None) == "qwen2_5_omni":
                     model = model.thinker  # use part of Omni model
 

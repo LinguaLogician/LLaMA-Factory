@@ -83,6 +83,10 @@ class BaseModelArguments:
         default=True,
         metadata={"help": "Whether or not to use memory-efficient model loading."},
     )
+    local_files_only: bool = field(
+        default=False,
+        metadata={"help": "If true, will try to load the model from a local folder."},
+    )
     rope_scaling: Optional[RopeScaling] = field(
         default=None,
         metadata={"help": "Which scaling strategy should be adopted for the RoPE embeddings."},

@@ -1,4 +1,7 @@
+import os
+
 from llamafactory.chat import ChatModel
+os.environ["TOKENIZERS_PARALLELISM"]="false"
 
 '''
 generating_args: 
@@ -18,28 +21,32 @@ generating_args:
 '''
 
 INFER_ARGS = {
-    # "model_name_or_path": "/home/liangtao/Models/Qwen/Qwen2-0.5B-VocabPruned",
-    "model_name_or_path": "/mnt/e/CheckPoints/ChemicalFactory/output/qwen205_moltrans_mit_mixed_augm_nospace_full_para1",
-    "finetuning_type": "lora",
-    "template": "qwen",
-    "num_return_sequences": 5,
+    "model_name_or_path": "/mnt/d/ChemicalFactory/output/internvl21_chemicals_retrosyn_full_para01",
+    "finetuning_type": "full",
+    "template": "intern_vl",
     # "infer_dtype": "float16",
     "num_beams": 5,
     "temperature": 0.95,
+    "trust_remote_code": True,
+    "local_files_only": True,
     # "temperature": 0,
     "max_new_tokens": 1000,
 }
 
 MESSAGES = [
     # {"role": "user", "content": "What is the future of AI"}
-    {"role": "user", "content": "PREDICT_PRODUCT:\nC I . N N 1 C C O C C 1"},
+    # {"role": "user", "content": "PREDICT_PRODUCT:\nC I . N N 1 C C O C C 1"},
+    {"role": "user", "content": "<image>\nTRANSLATE_TO_SMILES:"},
     # {"role": "user", "content": "PREDICT_PRODUCT:\nC . C C O C ( C ) = O . C c 1 o c ( - c 2 c c c c c 2 ) n c 1 C C O c 1 c c c ( [N+] ( = O ) [O-] ) c n 1 . [Pd]"},
 ]
 
 def chat():
     # torch.manual_seed(int(time.time()))
     chat_model = ChatModel(INFER_ARGS)
-    responses = chat_model.chat(MESSAGES, num_return_sequences=5, output_scores=True, return_dict_in_generate=True,
+    images = ["/home/liangtao/Development/ChemistrySpace/ChemProphet/data/chemicals/retrosyn/images/bwatom/retrosyn_bwatom_00021579.png"]
+    responses = chat_model.chat(messages=MESSAGES,
+                                images=images,
+                                num_return_sequences=5, output_scores=True, return_dict_in_generate=True,
                                 do_sample=True,)
     # responses = chat_model.chat(MESSAGES, num_return_sequences=5)
     print(responses)

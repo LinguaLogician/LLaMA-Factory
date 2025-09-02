@@ -25,7 +25,7 @@ import torch.nn.functional as F
 
 from ..data import get_template_and_fix_tokenizer
 from ..extras import logging
-from ..extras.constants import AUDIO_PLACEHOLDER, IMAGE_PLACEHOLDER, VIDEO_PLACEHOLDER, EngineName
+from ..extras.constants import AUDIO_PLACEHOLDER, IMAGE_PLACEHOLDER, VIDEO_PLACEHOLDER, EngineName, IMG_CONTEXT_TOKEN
 from ..model import load_model, load_tokenizer
 from .base_engine import BaseEngine, Response
 
@@ -341,6 +341,7 @@ class HuggingfaceEngine(BaseEngine):
             return True
 
         def compute_beam_sequence_probs(output, prompt_length, messages=[]):
+            # https://chatgpt.com/c/683984f8-5c50-8004-8899-cb7a62ff8040
             sequences = output.sequences  # [num_return_sequences, total_length]
             scores = output.scores  # List of [num_beams, vocab_size] tensors (length: max_new_tokens)
             beam_indices = output.beam_indices  # [num_return_sequences, max_new_tokens]
@@ -391,6 +392,18 @@ class HuggingfaceEngine(BaseEngine):
             audios,
             input_kwargs,
         )
+
+        logger.info(f"{'='*50}\nGenerating with gen_kwargs: {gen_kwargs['generation_config'].__dict__}\n{'='*50}")
+        if 'InternVLChatModel' in str(type(model)):
+            img_context_token_id = tokenizer.convert_tokens_to_ids(IMG_CONTEXT_TOKEN)
+            model.img_context_token_id = img_context_token_id
+
+            gen_kwargs['input_ids'] = gen_kwargs['inputs']
+            gen_kwargs.pop('inputs')
+            gen_kwargs['bos_token_id'] = 151643
+            gen_kwargs['image_flags'] = torch.ones(1, 1, dtype=torch.int).to(model.device) \
+                if gen_kwargs['pixel_values'].shape[0] > 0 \
+                else torch.zeros(1, 1, dtype=torch.int)
         generate_output = model.generate(**gen_kwargs)
 
         beam_probs = []
