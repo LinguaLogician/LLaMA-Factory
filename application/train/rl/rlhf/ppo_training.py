@@ -5,6 +5,9 @@
 # @contact: wlt1990@outlook.com
 # @time: 2025/9/13 18:04
 # https://chat.deepseek.com/a/chat/s/c8d54e56-f9a6-497c-b711-9afcd644c971
+# https://chat.deepseek.com/a/chat/s/8498345c-ee59-413a-9771-17512fdafde0
+# https://chat.deepseek.com/a/chat/s/b23ee767-7e3c-42c1-96d2-4e0cd5639883
+# https://chat.deepseek.com/a/chat/s/9b9ecc23-57e2-44b5-af1f-435d196670fb
 
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
@@ -52,13 +55,13 @@ logger = logging.getLogger(__name__)
 @dataclass
 class TrainingConfig:
     """Training configuration parameters"""
-    model_path: str = "/mnt/e/CheckPoints/ChemicalFactory/output/qwen205_moltrans_mit_mixed_augm_rlhf_sft_lora_para1"
+    model_path: str = "/mnt/e/CheckPoints/ChemicalFactory/output/qwen205_moltrans_mit_mixed_augm_nospace_full_para1"
     ppo_data_path: str = "/mnt/e/DataSets/Chemistry/ForwardPrediction/RLHF/mit_mixed/ppo/"
     ppo_data_file: str = "MIT_mixed_augm.json"
     ppo_model_output_path: str = "/mnt/e/CheckPoints/ChemicalFactory/output/qwen205_moltrans_mit_mixed_augm_rlhf_ppo_lora_para1"
 
     # Training parameters
-    batch_size: int = 4
+    batch_size: int = 16
     mini_batch_size: int = 1
     gradient_accumulation_steps: int = 4
     learning_rate: float = 1.41e-5
