@@ -1,5 +1,5 @@
 ### model
-model_name_or_path: /home/vipuser/Models/Qwen/Qwen2-0.5B
+model_name_or_path: /home/liangtao/Models/Qwen/Qwen2-0.5B
 trust_remote_code: true
 
 ### method
@@ -20,15 +20,15 @@ dataloader_num_workers: 4
 ### output
 output_dir: output/qwen205_moltrans_mit_mixed_nospace_full_para2
 logging_steps: 100
-save_steps: 80000
+save_steps: 8000000000
 plot_loss: true
 overwrite_output_dir: true
 save_only_model: false
 report_to: tensorboard  # choices: [none, wandb, tensorboard, swanlab, mlflow]
 
 ### train
-per_device_train_batch_size: 2
-gradient_accumulation_steps: 4
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 2
 learning_rate: 1.0e-5
 num_train_epochs: 4.0
 lr_scheduler_type: cosine

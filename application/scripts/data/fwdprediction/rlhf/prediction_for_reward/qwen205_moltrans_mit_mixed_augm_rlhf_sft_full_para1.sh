@@ -1,15 +1,13 @@
 #!/bin/bash
-echo "Starting prediction ..."
-MODEL_NAME="qwen205_moltrans_mit_mixed_nospace_full_para1"
-MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
-DATA_FILE="MIT_mixed.json"
-#CHECKPOINTS="checkpoint-150318"
-CHECKPOINTS=""
-FILE_PREFIX="mit_mixed_nospace_test"
-DATA_DIR="/home/liangtao/DataSets/Chemistry/MolecularTransformer/nospace/test/"
-PREDICTION_DIR="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
 
-BATCH_LIMIT=1
+MODEL_NAME="qwen205_moltrans_mit_mixed_augm_rlhf_sft_full_para1"
+MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
+DATA_FILE="MIT_mixed_augm.json"
+FILE_PREFIX="mit_mixed_augm"
+DATA_DIR="/mnt/e/DataSets/Chemistry/ForwardPrediction/RLHF/mit_mixed/reward/"
+PREDICTION_DIR="/mnt/e/DataSets/Chemistry/ForwardPrediction/RewardModel/mit_mixed_augm"
+
+BATCH_LIMIT=2
 BATCH_TOKEN_SIZE=400
 MINMAX_GAP=20
 NUM_RETURN_SEQUENCES=5
@@ -42,7 +40,6 @@ python "$PREDICT_SCRIPT" \
     --model_name "$MODEL_NAME" \
     --model_path "$MODEL_PATH" \
     --data_file "$DATA_FILE" \
-    --checkpoints "$CHECKPOINTS" \
     --data_dir "$DATA_DIR" \
     --output_dir "$PREDICTION_DIR" \
     --finetuning_type "lora" \
@@ -65,9 +62,11 @@ fi
 echo "Prediction completed successfully at $(date)" | tee -a "$LOG_FILE"
 
 # 执行评分脚本
+PREDICTION_FILE="${MODEL_NAME}"  # 不含.json后缀
 
 echo "Starting scoring at $(date)" | tee -a "$LOG_FILE"
 python "$SCORE_SCRIPT" \
+    --prediction_file "$PREDICTION_FILE" \
     --prediction_dir "$PREDICTION_DIR" \
     --output_dir "$SCORE_OUTPUT_DIR" \
     2>&1 | tee -a "$LOG_FILE"

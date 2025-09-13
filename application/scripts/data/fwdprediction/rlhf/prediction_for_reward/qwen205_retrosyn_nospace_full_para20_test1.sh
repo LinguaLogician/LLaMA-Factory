@@ -1,14 +1,14 @@
 #!/bin/bash
 
-MODEL_NAME="qwen205_moltrans_mit_mixed_nospace_full_para2"
+MODEL_NAME="qwen205_retrosyn_nospace_full_para20"
 MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
-DATA_FILE="MIT_mixed.json"
+DATA_FILE="retrosynthesis_test.json"
 CHECKPOINTS=""
-FILE_PREFIX="mit_mixed_nospace_test"
-DATA_DIR="/home/liangtao/DataSets/Chemistry/MolecularTransformer/nospace/test/"
+FILE_PREFIX="retrosyn_nospace_test"
+DATA_DIR="/home/liangtao/DataSets/Chemistry/RetroSynthesis/"
 PREDICTION_BASE_DIR="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
 
-BATCH_LIMIT=1
+BATCH_LIMIT=3
 BATCH_TOKEN_SIZE=600
 MINMAX_GAP=20
 NUM_RETURN_SEQUENCES=5
@@ -49,7 +49,7 @@ process_checkpoint() {
         --checkpoints "$checkpoint" \
         --data_dir "$DATA_DIR" \
         --output_dir "$prediction_dir" \
-        --finetuning_type "full" \
+        --finetuning_type "lora" \
         --template "qwen" \
         --num_beams "$NUM_BEAMS" \
         --max_new_tokens 1000 \

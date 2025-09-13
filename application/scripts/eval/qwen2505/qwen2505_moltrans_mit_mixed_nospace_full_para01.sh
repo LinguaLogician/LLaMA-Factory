@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODEL_NAME="qwen205_moltrans_mit_mixed_nospace_full_para2"
+MODEL_NAME="qwen2505_moltrans_mit_mixed_nospace_full_para01"
 MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
 DATA_FILE="MIT_mixed.json"
 CHECKPOINTS=""
@@ -49,7 +49,7 @@ process_checkpoint() {
         --checkpoints "$checkpoint" \
         --data_dir "$DATA_DIR" \
         --output_dir "$prediction_dir" \
-        --finetuning_type "full" \
+        --finetuning_type "lora" \
         --template "qwen" \
         --num_beams "$NUM_BEAMS" \
         --max_new_tokens 1000 \

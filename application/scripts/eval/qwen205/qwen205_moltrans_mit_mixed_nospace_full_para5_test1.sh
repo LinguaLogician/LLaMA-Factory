@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODEL_NAME="qwen205_moltrans_mit_mixed_nospace_full_para2"
+MODEL_NAME="qwen205_moltrans_mit_mixed_nospace_full_para5"
 MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
 DATA_FILE="MIT_mixed.json"
 CHECKPOINTS=""

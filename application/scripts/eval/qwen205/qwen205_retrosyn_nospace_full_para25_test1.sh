@@ -8,7 +8,7 @@ FILE_PREFIX="retrosyn_nospace_test"
 DATA_DIR="/home/liangtao/DataSets/Chemistry/RetroSynthesis/"
 PREDICTION_BASE_DIR="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
 
-BATCH_LIMIT=3
+BATCH_LIMIT=1
 BATCH_TOKEN_SIZE=600
 MINMAX_GAP=20
 NUM_RETURN_SEQUENCES=5

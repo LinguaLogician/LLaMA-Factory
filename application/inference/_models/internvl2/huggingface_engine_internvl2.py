@@ -30,7 +30,7 @@ def chat():
 
 def chat_batch():
     images1 = ["/home/liangtao/Development/ChemistrySpace/ChemProphet/data/chemicals/retrosyn/images/bwatom/retrosyn_bwatom_00021579.png"]
-    images2 = ["/home/liangtao/Development/ChemistrySpace/ChemProphet/data/chemicals/retrosyn/images/bwatom/retrosyn_bwatom_00057555.png"]
+    # images2 = ["/home/liangtao/Development/ChemistrySpace/ChemProphet/data/chemicals/retrosyn/images/bwatom/retrosyn_bwatom_00057555.png"]
     MESSAGES_LIST = []
     MESSAGES_LIST.append([{"role": "user", "images": images1, "content": "<image>\nTRANSLATE_TO_SMILES:"},])
     # MESSAGES_LIST.append([{"role": "user", "images": images2, "content": "<image>\nTRANSLATE_TO_SMILES:"},])
