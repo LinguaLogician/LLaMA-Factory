@@ -239,38 +239,45 @@ def train_ppo(config):
     device = torch.device(config.device)
     logger.info(f"Using device: {device}")
 
-    # Load tokenizer and model
-    logger.info("Loading tokenizer and model...")
+    # Load tokenizer
+    logger.info("Loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(config.model_path)
     tokenizer.pad_token = tokenizer.eos_token
 
-    # Load base model
+    # 使用 trl 的简化方式
     model = AutoModelForCausalLMWithValueHead.from_pretrained(
+        config.model_path,
+        torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
+        device_map="auto",
+        trust_remote_code=True,
+        peft_config=LoraConfig(
+            r=config.lora_r,
+            lora_alpha=config.lora_alpha,
+            lora_dropout=config.lora_dropout,
+            bias="none",
+            task_type=TaskType.CAUSAL_LM,
+            target_modules=config.lora_target_modules,
+        )
+    )
+
+    # 参考模型（不应用 LoRA）
+    ref_model = AutoModelForCausalLMWithValueHead.from_pretrained(
         config.model_path,
         torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
         device_map="auto",
         trust_remote_code=True
     )
 
-    # Enable gradient checkpointing to save memory
-    model.gradient_checkpointing_enable()
-    model.config.use_cache = False
+    # 冻结参考模型的参数
+    for param in ref_model.parameters():
+        param.requires_grad = False
 
-    # Prepare model for training
-    model = prepare_model_for_kbit_training(model)
+    # 检查是否有可训练的参数
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    logger.info(f"Number of trainable parameters: {trainable_params}")
 
-    # 修改这里：对带有价值头的模型应用 LoRA
-    lora_config = LoraConfig(
-        r=config.lora_r,
-        lora_alpha=config.lora_alpha,
-        lora_dropout=config.lora_dropout,
-        bias="none",
-        task_type=TaskType.CAUSAL_LM,
-        target_modules=config.lora_target_modules,
-    )
-
-    model = get_peft_model(model, lora_config)
-    model.print_trainable_parameters()
+    if trainable_params == 0:
+        raise ValueError("No trainable parameters found! Check LoRA configuration.")
 
     # Create dataset and dataloader
     logger.info("Creating dataset and dataloader...")
@@ -299,15 +306,15 @@ def train_ppo(config):
         gamma=config.gamma,
         lam=config.lam,
         optimize_cuda_cache=True,
-        log_with=None,  # Disable wandb/tensorboard for simplicity
+        log_with=None,
         seed=config.seed,
     )
 
-    # Initialize PPOTrainer
+    # 修改这里：传递参考模型给 PPOTrainer
     ppo_trainer = PPOTrainer(
         config=ppo_config,
         model=model,
-        ref_model=None,  # We'll use the current model as reference
+        ref_model=ref_model,  # 传递参考模型
         tokenizer=tokenizer,
         dataset=dataset,
     )
@@ -327,9 +334,17 @@ def train_ppo(config):
             attention_mask = batch['attention_mask'].to(device)
             target_smiles = batch['target_smiles']
 
-            # Generate responses
+            # 修复：将批次转换为列表形式
+            query_tensors = []
+            for i in range(len(input_ids)):
+                # 获取实际长度（去除填充）
+                actual_length = attention_mask[i].sum().item()
+                query_tensor = input_ids[i][:actual_length]
+                query_tensors.append(query_tensor)
+
+            # 生成响应
             generation_kwargs = {
-                "max_length": config.max_length,
+                "max_new_tokens": config.max_length,
                 "min_length": -1,
                 "top_k": 0.0,
                 "top_p": 1.0,
@@ -339,14 +354,16 @@ def train_ppo(config):
             }
 
             response_tensors = ppo_trainer.generate(
-                input_ids,
-                attention_mask=attention_mask,
+                query_tensors,  # 直接传递列表
                 return_prompt=False,
                 **generation_kwargs
             )
 
-            # Decode responses
-            generated_texts = tokenizer.batch_decode(response_tensors, skip_special_tokens=True)
+            # 解码响应
+            generated_texts = []
+            for response in response_tensors:
+                gen_text = tokenizer.decode(response, skip_special_tokens=True)
+                generated_texts.append(gen_text)
 
             # Calculate rewards
             rewards = []
@@ -357,11 +374,30 @@ def train_ppo(config):
             rewards = torch.tensor(rewards, dtype=torch.float32).to(device)
             epoch_rewards.extend(rewards.cpu().numpy())
 
+            # 修复：将批次转换为列表形式
+            query_tensors_list = []
+            for i in range(len(input_ids)):
+                actual_length = attention_mask[i].sum().item()
+                query_tensor = input_ids[i][:actual_length]
+                query_tensors_list.append(query_tensor)
+
+            # 确保 response_tensors 是列表
+            if not isinstance(response_tensors, list):
+                response_tensors = [response_tensors]
+
+            # 确保 rewards 是 FloatTensor 列表
+            rewards_list = []
+            for reward in rewards:
+                if isinstance(reward, torch.Tensor):
+                    rewards_list.append(reward.float().to(device))
+                else:
+                    rewards_list.append(torch.tensor(reward, dtype=torch.float32, device=device))
+
             # Run PPO step
             stats = ppo_trainer.step(
-                input_ids,
-                response_tensors,
-                rewards
+                query_tensors_list,  # 张量列表
+                response_tensors,  # 张量列表
+                rewards_list  # FloatTensor 列表
             )
 
             if stats is not None:
