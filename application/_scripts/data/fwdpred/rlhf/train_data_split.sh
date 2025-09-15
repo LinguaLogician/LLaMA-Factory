@@ -2,8 +2,8 @@
 
 # 设置参数
 BASE_DIR="/mnt/e/DataSets/Chemistry/MolecularTransformer/nospace/train"
-DATA_FILE="MIT_mixed_augm.json"
-OUTPUT_DIR="/mnt/e/DataSets/Chemistry/ForwardPrediction/RLHF/mit_mixed/{split}/"
+DATA_FILE="MIT_mixed.json"
+OUTPUT_DIR="/mnt/e/DataSets/Chemistry/ForwardPrediction/RLHF/{split}/"
 
 # 执行Python脚本
 python application/data/fwdprediction/rlhf/train_data_split.py \

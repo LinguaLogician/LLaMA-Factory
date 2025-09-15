@@ -1,0 +1,20 @@
+### Note: DO NOT use quantized model or quantization_bit when merging lora adapters
+
+### model
+#model_name_or_path: output/qwen205_moltrans_mit_mixed_augm_rlhf_sft_lora_para1
+model_name_or_path: /mnt/e/CheckPoints/ChemicalFactory/output/qwen205_moltrans_mit_mixed_augm_rlhf_sft_lora_para1
+
+#adapter_name_or_path: /mnt/e/CheckPoints/ChemicalFactory/output/qwen205_moltrans_mit_mixed_augm_dpo_lora_para1/final_model
+adapter_name_or_path: saves/dpo_lora/qwen205_moltrans_mit_mixed_augm_dpo_lora_para1
+template: qwen
+trust_remote_code: true
+
+### export
+export_dir: output/qwen205_moltrans_mit_mixed_augm_dpo_lora_para1_lf
+export_size: 5
+export_device: cpu  # choices: [cpu, auto]
+export_legacy_format: false
+
+
+# llamafactory-cli export examples/merge_lora/qwen205/rlhf/qwen205_moltrans_mit_mixed_augm_dpo_lora_para1.yaml
+

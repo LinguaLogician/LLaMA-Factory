@@ -1,18 +1,18 @@
 #!/bin/bash
 
-MODEL_NAME="qwen205_moltrans_mit_mixed_augm_rlhf_sft_lora_para1"
+MODEL_NAME="qwen205_retrosyn_augm_nospace_lora_para01"
 MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
-DATA_FILE="MIT_mixed_augm.json"
-FILE_PREFIX="mit_mixed_augm"
-DATA_DIR="/mnt/e/DataSets/Chemistry/ForwardPrediction/RLHF/mit_mixed/reward/"
-PREDICTION_BASE_DIR="/mnt/e/DataSets/Chemistry/ForwardPrediction/RewardModel/mit_mixed_augm"
+DATA_FILE="retrosynthesis_test.json"
+CHECKPOINTS=""
+FILE_PREFIX="retrosyn_nospace_test"
+DATA_DIR="/home/liangtao/DataSets/Chemistry/RetroSynthesis/"
+PREDICTION_BASE_DIR="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
 
-BATCH_LIMIT=4
-BATCH_TOKEN_SIZE=400
+BATCH_LIMIT=6
+BATCH_TOKEN_SIZE=600
 MINMAX_GAP=20
 NUM_RETURN_SEQUENCES=5
 NUM_BEAMS=5
-
 
 # Base path settings
 BASE_DIR=$(dirname "$0")/../..
@@ -46,11 +46,11 @@ process_checkpoint() {
         --model_name "$MODEL_NAME" \
         --model_path "$MODEL_PATH" \
         --data_file "$DATA_FILE" \
-        --checkpoints "" \
+        --checkpoints "$checkpoint" \
         --data_dir "$DATA_DIR" \
         --output_dir "$prediction_dir" \
         --finetuning_type "lora" \
-        --template "qwen" \
+        --template "nextline" \
         --num_beams "$NUM_BEAMS" \
         --max_new_tokens 1000 \
         --num_return_sequences "$NUM_RETURN_SEQUENCES" \

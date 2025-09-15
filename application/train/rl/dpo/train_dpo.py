@@ -466,8 +466,7 @@ def train_dpo(
                 policy_rejected_logps,
                 reference_chosen_logps,
                 reference_rejected_logps,
-                beta
-            )
+                beta)
 
             # Backward pass
             optimizer.zero_grad()
@@ -503,17 +502,17 @@ if __name__ == "__main__":
                         help="Path to the pre-trained model")
     parser.add_argument("--dpo_data_path", type=str, default="/mnt/e/DataSets/Chemistry/ForwardPrediction/DPO",
                         help="Path to the PPO data directory")
-    parser.add_argument("--dpo_data_file", type=str, default="MIT_mixed_augm_demo.json",
+    parser.add_argument("--dpo_data_file", type=str, default="MIT_mixed_augm.json",
                         help="Name of the PPO data file")
-    parser.add_argument("--output_path", type=str, default="/mnt/e/CheckPoints/ChemicalFactory/output/qwen205_moltrans_mit_mixed_augm_dpo_lora_para1",
+    parser.add_argument("--output_path", type=str, default="/mnt/e/CheckPoints/ChemicalFactory/output/qwen205_moltrans_mit_mixed_augm_dpo_lora_para2",
                         help="Path to save the trained model and checkpoints")
-    parser.add_argument("--log_path", type=str, default=None,
+    parser.add_argument("--log_path", type=str, default="/mnt/e/CheckPoints/ChemicalFactory/output/qwen205_moltrans_mit_mixed_augm_dpo_lora_para2/training.log",
                         help="Path to the log file")
-    parser.add_argument("--num_samples", type=int, default=1000,
+    parser.add_argument("--num_samples", type=int, default=10000000000000,
                         help="Number of samples to use for training")
     parser.add_argument("--max_length", type=int, default=512, help="Maximum sequence length")
     parser.add_argument("--batch_size", type=int, default=4, help="Batch size")
-    parser.add_argument("--num_epochs", type=int, default=3, help="Number of training epochs")
+    parser.add_argument("--num_epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate")
     parser.add_argument("--beta", type=float, default=0.1, help="DPO beta parameter")
     parser.add_argument("--lora_rank", type=int, default=16, help="LoRA rank")

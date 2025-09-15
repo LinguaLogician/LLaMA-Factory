@@ -2,6 +2,9 @@
   "alpaca_en_demo": {
     "file_name": "alpaca_en_demo.json"
   },
+  "dpo_en_demo": {
+    "file_name": "dpo_en_demo.json"
+  },
   "alpaca_moltrans_mit_mixed_space_train": {
     "file_name": "/home/liangtao/DataSets/Chemistry/MolecularTransformer/space/train/MIT_mixed.json"
   },
@@ -53,8 +56,24 @@
   "alpaca_moltrans_mit_mixed_augm_nospace_rlhf_sft": {
     "file_name": "/mnt/e/DataSets/Chemistry/ForwardPrediction/RLHF/mit_mixed/sft/MIT_mixed_augm.json"
   },
+  "alpaca_moltrans_mit_mixed_nospace_rlhf_sft": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ForwardPrediction/RLHF/sft/MIT_mixed.json"
+  },
   "alpaca_retrosyn_nospace_train": {
     "file_name": "/home/liangtao/DataSets/Chemistry/RetroSynthesis/retrosynthesis_train.json"
+  },
+  "alpaca_retrosyn_augm_nospace_train_v2": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/train_augm/v1/inout_augm.json"
+  },
+  "qwen205_moltrans_mit_mixed_augm_dpo_lora_para1_data": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ForwardPrediction/DPO/qwen205_moltrans_mit_mixed_augm_dpo_lora_para1_data.json",
+    "ranking": true,
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
   },
   "sharegpt_chemicals_retrosyn_train": {
     "file_name": "/home/liangtao/Development/ChemistrySpace/ChemProphet/data/chemicals/retrosyn/chemicals.json",
