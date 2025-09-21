@@ -112,13 +112,13 @@ def main():
     parser = argparse.ArgumentParser(description="处理逆合成数据，检查SMILES规范形式")
 
     # 添加命令行参数，设置默认值
-    parser.add_argument('--data_dir', type=str, default='/mnt/e/DataSets/Chemistry/RetroSynthesis',
+    parser.add_argument('--data_dir', type=str, default='/mnt/e/DataSets/Chemistry/MolecularTransformer/nospace/train',
                         help='输入数据目录路径')
-    parser.add_argument('--data_file', type=str, default='retrosynthesis_train.json',
+    parser.add_argument('--data_file', type=str, default='MIT_mixed_augm.json',
                         help='输入数据文件名')
-    parser.add_argument('--output_dir', type=str, default='/mnt/e/DataSets/Chemistry/RetroPrediction',
+    parser.add_argument('--output_dir', type=str, default='/mnt/e/DataSets/Chemistry/MolecularTransformer/nospace/train',
                         help='输出目录路径')
-    parser.add_argument('--output_file', type=str, default='retrosynthesis_train_info.json',
+    parser.add_argument('--output_file', type=str, default='MIT_mixed_augm_info.json',
                         help='输出文件名')
 
     # 解析参数

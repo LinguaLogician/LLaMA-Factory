@@ -1,14 +1,14 @@
 #!/bin/bash
 
-MODEL_NAME="qwen205_retrosyn_nospace_full_para22"
+MODEL_NAME="qwen205_retrosyn_nospace_split1_lora_para1"
 MODEL_PATH="/home/liangtao/Development/LLMSpace/LLaMA-Factory/output"
-DATA_FILE="retrosynthesis_test.json"
+DATA_FILE="retrosynthesis_train_split2.json"
 CHECKPOINTS=""
-FILE_PREFIX="retrosyn_nospace_test"
-DATA_DIR="/home/liangtao/DataSets/Chemistry/RetroSynthesis/"
-PREDICTION_BASE_DIR="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/${FILE_PREFIX}/"
+FILE_PREFIX="retrosyn_nospace_hardxmp"
+DATA_DIR="/mnt/e/DataSets/Chemistry/RetroSynthesis/v1/"
+PREDICTION_BASE_DIR="/mnt/e/DataSets/Chemistry/RetroSynthesis/v1/pred_split2"
 
-BATCH_LIMIT=3
+BATCH_LIMIT=6
 BATCH_TOKEN_SIZE=600
 MINMAX_GAP=20
 NUM_RETURN_SEQUENCES=5
@@ -50,7 +50,7 @@ process_checkpoint() {
         --data_dir "$DATA_DIR" \
         --output_dir "$prediction_dir" \
         --finetuning_type "lora" \
-        --template "nextline" \
+        --template "qwen" \
         --num_beams "$NUM_BEAMS" \
         --max_new_tokens 1000 \
         --num_return_sequences "$NUM_RETURN_SEQUENCES" \

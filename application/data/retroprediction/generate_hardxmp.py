@@ -146,7 +146,7 @@ def generate_summary(data: List[Dict], splits: List[List[Dict]], thresholds: Lis
         base_name: 基础文件名
         target_dir: 目标目录
     """
-    summary_path = os.path.join(target_dir, f"{base_name}_summary.txt")
+    summary_path = os.path.join(target_dir, f"summary.txt")
 
     with open(summary_path, 'w', encoding='utf-8') as f:
         f.write(f"数据集摘要: {base_name}\n")
@@ -225,7 +225,7 @@ def main(data_dir: str, data_file: str, target_dir: str, hardness_thresholds: Li
     base_name = os.path.splitext(data_file)[0]
 
     # 保存完整数据（包含output）
-    all_data_path = os.path.join(target_dir, f"{base_name}_all.json")
+    all_data_path = os.path.join(target_dir, f"all.json")
     logging.info(f"正在保存完整数据: {all_data_path}")
     save_json(sorted_data, all_data_path)
 
@@ -233,14 +233,15 @@ def main(data_dir: str, data_file: str, target_dir: str, hardness_thresholds: Li
     tidy_data = []
     for item in sorted_data:
         tidy_item = item.copy()
-        tidy_item.pop("output", None)
+        label = tidy_item.pop("label", None)
+        tidy_item["output"] = label
         tidy_data.append(tidy_item)
 
     # 对精简数据进行排序（虽然已经是排序的，但为了确保）
     tidy_data = sort_data_by_hardness(tidy_data)
 
     # 保存精简数据
-    tidy_data_path = os.path.join(target_dir, f"{base_name}_tidy.json")
+    tidy_data_path = os.path.join(target_dir, f"tidy.json")
     logging.info(f"正在保存精简数据: {tidy_data_path}")
     save_json(tidy_data, tidy_data_path)
 
@@ -252,7 +253,7 @@ def main(data_dir: str, data_file: str, target_dir: str, hardness_thresholds: Li
     for i, split_data in enumerate(splits, 1):
         # 确保每个划分内的数据也是排序的
         split_data_sorted = sort_data_by_hardness(split_data)
-        split_path = os.path.join(target_dir, f"{base_name}_h{i}.json")
+        split_path = os.path.join(target_dir, f"h{i}.json")
         logging.info(f"正在保存划分 {i} 的完整数据: {split_path}")
         save_json(split_data_sorted, split_path)
 
@@ -263,7 +264,7 @@ def main(data_dir: str, data_file: str, target_dir: str, hardness_thresholds: Li
     for i, split_data in enumerate(tidy_splits, 1):
         # 确保每个划分内的数据也是排序的
         split_data_sorted = sort_data_by_hardness(split_data)
-        split_path = os.path.join(target_dir, f"{base_name}_ht{i}.json")
+        split_path = os.path.join(target_dir, f"ht{i}.json")
         logging.info(f"正在保存划分 {i} 的精简数据: {split_path}")
         save_json(split_data_sorted, split_path)
 
@@ -280,16 +281,16 @@ if __name__ == "__main__":
 
     # 添加参数
     parser.add_argument("--data_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/prediction/retrosyn_nospace_test",
+                        default="/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/pred",
                         help="数据目录路径")
     parser.add_argument("--data_file", type=str,
-                        default="qwen205_retrosyn_nospace_full_para1_ckptlast.json",
+                        default="merged.json",
                         help="数据文件名")
     parser.add_argument("--target_dir", type=str,
-                        default="/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/prediction_test/qwen205_retrosyn_nospace_full_para1_ckptlast",
+                        default="/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/train/merged",
                         help="目标目录路径")
     parser.add_argument("--hardness_thresholds", type=float, nargs="+",
-                        default=[0.2, 0.4, 0.6, 0.8],
+                        default=[0.2, 0.8],
                         help="困难度阈值列表")
 
     # 解析参数

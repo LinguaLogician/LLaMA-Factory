@@ -62,8 +62,53 @@
   "alpaca_retrosyn_nospace_train": {
     "file_name": "/home/liangtao/DataSets/Chemistry/RetroSynthesis/retrosynthesis_train.json"
   },
+    "retrosyn_train_split1": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroSynthesis/v1/retrosynthesis_train_split1.json"
+  },
+    "retrosyn_train_split2": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroSynthesis/v1/retrosynthesis_train_split2.json"
+  },
+
+  "retrosyn_train_split1_ht5": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/prediction_train_split1/qwen205_retrosyn_nospace_split2_lora_para1_ckptlast_ht5.json"
+  },
+  "retrosyn_train_split2_ht5": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/prediction_train_split2/qwen205_retrosyn_nospace_split1_lora_para1_ckptlast_ht5.json"
+  },
+  "retrosyn_train_split1_ht5_copy1": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/prediction_train_split1/qwen205_retrosyn_nospace_split2_lora_para1_ckptlast_ht5.json"
+  },
+  "retrosyn_train_split2_ht5_copy1": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/prediction_train_split2/qwen205_retrosyn_nospace_split1_lora_para1_ckptlast_ht5.json"
+  },
+  "retrosyn_train_split1_ht5_copy2": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/prediction_train_split1/qwen205_retrosyn_nospace_split2_lora_para1_ckptlast_ht5.json"
+  },
+  "retrosyn_train_split2_ht5_copy2": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/prediction_train_split2/qwen205_retrosyn_nospace_split1_lora_para1_ckptlast_ht5.json"
+  },
+  "retrosyn_train_augm_v4_ht1_ht2_merged": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/Augmented/train/v4/ht1_ht2_merged.json"
+  },
+  "retrosyn_train_augm_v3_ht3_merged": {
+    "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/Augmented/train/v3/ht3_merged.json"
+  },
+
   "alpaca_retrosyn_augm_nospace_train_v2": {
     "file_name": "/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/train_augm/v1/inout_augm.json"
+  },
+
+  "chemechpred_train": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/chemech_prediction/train.json"
+  },
+  "amrxts_to_amprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_to_amprds_train.json"
+  },
+  "amrxts_to_cls_mech_amprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_to_cls_mech_amprds_train.json"
+  },
+  "amrxts_to_mech_amprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_to_mech_amprds_train.json"
   },
   "qwen205_moltrans_mit_mixed_augm_dpo_lora_para1_data": {
     "file_name": "/mnt/e/DataSets/Chemistry/ForwardPrediction/DPO/qwen205_moltrans_mit_mixed_augm_dpo_lora_para1_data.json",

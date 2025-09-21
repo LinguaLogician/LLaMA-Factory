@@ -44,11 +44,11 @@ def calculate_metrics(prediction_data):
                 kth_acc_counts[k] += 1
 
             # Top-k validity (sum of valid in top k)
-            topk_valid_counts[k] += sum(1 for output in top_k_outputs if output['is_valid'])
-
-            # K-th validity (only the k-th prediction)
-            if k <= len(outputs):
-                kth_valid_counts[k] += 1 if outputs[k - 1]['is_valid'] else 0
+            # topk_valid_counts[k] += sum(1 for output in top_k_outputs if output['is_valid'])
+            #
+            # # K-th validity (only the k-th prediction)
+            # if k <= len(outputs):
+            #     kth_valid_counts[k] += 1 if outputs[k - 1]['is_valid'] else 0
 
     # Calculate rates
     def calculate_rate(count_dict, denominator):
@@ -57,16 +57,16 @@ def calculate_metrics(prediction_data):
     accuracy_rates = calculate_rate(topk_acc_counts, {k: total_samples for k in k_values})
     kth_accuracy_rates = calculate_rate(kth_acc_counts, {k: total_samples for k in k_values})
 
-    validity_rates = calculate_rate(topk_valid_counts, {k: total_samples * k for k in k_values})
-    kth_validity_rates = calculate_rate(kth_valid_counts, {k: total_samples for k in k_values})
+    # validity_rates = calculate_rate(topk_valid_counts, {k: total_samples * k for k in k_values})
+    # kth_validity_rates = calculate_rate(kth_valid_counts, {k: total_samples for k in k_values})
 
     return {
         'total_samples': total_samples,
         'beam_size': beam_size,
         'accuracy_rates': accuracy_rates,
         'kth_accuracy_rates': kth_accuracy_rates,
-        'validity_rates': validity_rates,
-        'kth_validity_rates': kth_validity_rates,
+        # 'validity_rates': validity_rates,
+        # 'kth_validity_rates': kth_validity_rates,
         'k_values': k_values
     }
 
@@ -89,13 +89,13 @@ def save_results(results, output_path, prediction_file_name):
         for k in results['k_values']:
             f.write(f"K={k}: {results['kth_accuracy_rates'][k]:.4f}\n")
 
-        f.write("\nTop-k Validity Rate:\n")
-        for k in results['k_values']:
-            f.write(f"Top-{k}: {results['validity_rates'][k]:.4f}\n")
-
-        f.write("\nK-th Validity Rate:\n")
-        for k in results['k_values']:
-            f.write(f"K={k}: {results['kth_validity_rates'][k]:.4f}\n")
+        # f.write("\nTop-k Validity Rate:\n")
+        # for k in results['k_values']:
+        #     f.write(f"Top-{k}: {results['validity_rates'][k]:.4f}\n")
+        #
+        # f.write("\nK-th Validity Rate:\n")
+        # for k in results['k_values']:
+        #     f.write(f"K={k}: {results['kth_validity_rates'][k]:.4f}\n")
 
 
 def load_prediction_data(prediction_file_path):
@@ -125,10 +125,11 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Calculate prediction metrics")
     parser.add_argument('--prediction_file', type=str,
-                        default='qwen205_retrosyn_augm_nospace_lora_para01_ckptlast',
+                        default='qwen205_chemechpred_full_para01_ckptlast',
                         help="Name of the prediction file (without extension)")
     parser.add_argument('--prediction_dir', type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/prediction/retrosyn_nospace_test",
+                        default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/results/prediction/"
+                                "chempred_test",
                                 # "mit_mixed_augm_nospace_test_random100",
                         help="Directory containing prediction files")
     parser.add_argument('--output_dir', type=str,

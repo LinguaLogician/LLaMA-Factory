@@ -71,6 +71,19 @@ def process_data(data_dir, data_file, output_dir, version, num_augmentations=1):
             new_item["output"] = random_output
             output_augm_data.append(new_item)
 
+
+    input_augm_data = []
+    print("正在生成input增强数据...")
+    for item in tqdm(data):
+        original_input = item["input"]
+        randomized_inputs = randomize_smiles(original_input, num_augmentations)
+
+        for i, random_input in enumerate(randomized_inputs):
+            new_item = item.copy()
+            new_item["id"] = f"input_augm_{version}_{item['id']}_{i}"
+            new_item["input"] = random_input
+            input_augm_data.append(new_item)
+
     # 处理input和output增强
     inout_augm_data = []
     print("正在生成input和output增强数据...")
@@ -89,8 +102,10 @@ def process_data(data_dir, data_file, output_dir, version, num_augmentations=1):
             inout_augm_data.append(new_item)
 
     # 保存增强后的数据
-    output_augm_file = os.path.join(output_path, "output_augm.json")
-    inout_augm_file = os.path.join(output_path, "inout_augm.json")
+    data_file_name = data_file.split('.')[0]
+    input_augm_file = os.path.join(output_path, f"{data_file_name}_input_augm.json")
+    output_augm_file = os.path.join(output_path, f"{data_file_name}_output_augm.json")
+    inout_augm_file = os.path.join(output_path, f"{data_file_name}_inout_augm.json")
 
     with open(output_augm_file, 'w') as f:
         json.dump(output_augm_data, f, indent=2)
@@ -98,27 +113,36 @@ def process_data(data_dir, data_file, output_dir, version, num_augmentations=1):
     with open(inout_augm_file, 'w') as f:
         json.dump(inout_augm_data, f, indent=2)
 
+    with open(input_augm_file, 'w') as f:
+        json.dump(input_augm_data, f, indent=2)
+
     print(f"output增强数据已保存至: {output_augm_file}")
+    print(f"input增强数据已保存至: {input_augm_file}")
     print(f"inout增强数据已保存至: {inout_augm_file}")
 
-    return output_path, len(output_augm_data), len(inout_augm_data)
+    return output_path, len(input_augm_data), len(output_augm_data), len(inout_augm_data)
 
 
 def generate_summary(data_dir, data_file, output_dir, version,
-                     original_count, output_augm_count, inout_augm_count):
+                     original_count, input_augm_count, output_augm_count, inout_augm_count):
     """生成数据摘要信息"""
+    data_file_name = data_file.split('.')[0]
     summary = {
         "timestamp": datetime.now().isoformat(),
         "original_data": {
             "path": os.path.join(data_dir, data_file),
             "count": original_count
         },
+        "input_augmentation": {
+            "path": os.path.join(output_dir, version, f"{data_file_name}_input_augm.json"),
+            "count": input_augm_count
+        },
         "output_augmentation": {
-            "path": os.path.join(output_dir, version, "output_augm.json"),
+            "path": os.path.join(output_dir, version, f"{data_file_name}_output_augm.json"),
             "count": output_augm_count
         },
         "inout_augmentation": {
-            "path": os.path.join(output_dir, version, "inout_augm.json"),
+            "path": os.path.join(output_dir, version, f"{data_file_name}_inout_augm.json"),
             "count": inout_augm_count
         },
         "augmentation_ratio": {
@@ -127,7 +151,7 @@ def generate_summary(data_dir, data_file, output_dir, version,
         }
     }
 
-    summary_file = os.path.join(output_dir, version, "summary.json")
+    summary_file = os.path.join(output_dir, version, f"{data_file_name}_summary.json")
     with open(summary_file, 'w') as f:
         json.dump(summary, f, indent=2)
 
@@ -137,6 +161,7 @@ def generate_summary(data_dir, data_file, output_dir, version,
     print("\n=== 数据增强摘要 ===")
     print(f"处理时间: {summary['timestamp']}")
     print(f"原始数据条数: {original_count}")
+    print(f"input增强后条数: {input_augm_count} (增强倍数: {summary['augmentation_ratio']['output']:.2f})")
     print(f"output增强后条数: {output_augm_count} (增强倍数: {summary['augmentation_ratio']['output']:.2f})")
     print(f"inout增强后条数: {inout_augm_count} (增强倍数: {summary['augmentation_ratio']['inout']:.2f})")
 
@@ -145,7 +170,7 @@ def generate_summary(data_dir, data_file, output_dir, version,
 
 def main():
     # 处理数据
-    output_path, output_augm_count, inout_augm_count = process_data(
+    output_path, input_augm_count, output_augm_count, inout_augm_count = process_data(
         args.data_dir, args.data_file, args.output_dir, args.version, args.num_augmentations
     )
 
@@ -156,7 +181,7 @@ def main():
     # 生成摘要
     generate_summary(
         args.data_dir, args.data_file, args.output_dir, args.version,
-        len(original_data), output_augm_count, inout_augm_count
+        len(original_data), input_augm_count, output_augm_count, inout_augm_count
     )
 
     print("数据处理完成!")
@@ -164,14 +189,14 @@ def main():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="化学数据增强工具")
-    parser.add_argument("--data_dir", type=str, default="/mnt/e/DataSets/Chemistry/RetroSynthesis",
+    parser.add_argument("--data_dir", type=str, default="/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/train/rank",
                         help="原始数据目录")
-    parser.add_argument("--data_file", type=str, default="retrosynthesis_train.json",
+    parser.add_argument("--data_file", type=str, default="ht1.json",
                         help="原始数据文件名")
     parser.add_argument("--output_dir", type=str,
-                        default="/mnt/e/DataSets/Chemistry/RetroPrediction/HardExamples/train_augm",
+                        default="/mnt/e/DataSets/Chemistry/RetroPrediction/Augmented/train",
                         help="输出目录")
-    parser.add_argument("--version", type=str, default="v1",
+    parser.add_argument("--version", type=str, default="v4",
                         help="版本标识")
     parser.add_argument("--num_augmentations", type=int, default=1,
                         help="每条数据生成的增强版本数量")
