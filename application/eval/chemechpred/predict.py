@@ -5,7 +5,7 @@
 # @contact: wlt1990@outlook.com
 # @time: 2025/9/21 9:28
 # https://chat.deepseek.com/a/chat/s/e2277faf-eb05-4af3-8ffe-031dd0c3b00d
-
+# https://chat.deepseek.com/a/chat/s/8a1a7843-f825-428e-8b95-904abf3602f6
 # -*- coding: utf-8 -*-
 import gc
 import os
@@ -255,7 +255,8 @@ def wait_for_gpu_memory(threshold: int, check_interval: int = 30):
 
     while True:
         torch.cuda.empty_cache()
-        free_memory = torch.cuda.memory_reserved(0) - torch.cuda.memory_allocated(0)
+        # free_memory = torch.cuda.memory_reserved(0) - torch.cuda.memory_allocated(0)
+        free_memory, total_memory = torch.cuda.mem_get_info()
         free_memory_mb = free_memory / 1024 / 1024
 
         if free_memory_mb >= threshold:
@@ -364,17 +365,17 @@ if __name__ == "__main__":
     parser.add_argument("--task_id", type=str, default="AMRXTS_TO_CLS_MECH_AMPRDS", choices=list(TASKS.keys()), help="Task identifier")
 
     # 数据路径参数
-    parser.add_argument("--data_dir", type=str, default="/mnt/e/DataSets/Chemistry/ChemicalMechanism/test")
+    parser.add_argument("--data_dir", type=str, default="/mnt/e/DataSets/Chemistry/ChemicalMechanism/test/random100")
     parser.add_argument("--output_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction")
+                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction/random100")
 
     # Inference parameters
     parser.add_argument("--finetuning_type", type=str, default="full")
     parser.add_argument("--template", type=str, default="qwen")
-    parser.add_argument("--num_beams", type=int, default=5)
+    parser.add_argument("--num_beams", type=int, default=3)
     parser.add_argument("--do_sample", action="store_true", default=True)
     parser.add_argument("--max_new_tokens", type=int, default=2048)
-    parser.add_argument("--num_return_sequences", type=int, default=5)
+    parser.add_argument("--num_return_sequences", type=int, default=3)
     parser.add_argument("--output_scores", action="store_true", default=True)
     parser.add_argument("--return_dict_in_generate", action="store_true", default=True)
 

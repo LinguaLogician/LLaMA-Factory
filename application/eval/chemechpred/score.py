@@ -56,6 +56,11 @@ TASKS = {
     }
 }
 
+PROPERTY_DICT = {
+    "resolved": "is_resolved_correct",
+    "matched": "is_task_matched",
+}
+
 
 def calculate_metrics(data: List[Dict], task_id: str, num_return_sequences: int) -> Dict[str, Any]:
     """
@@ -82,6 +87,12 @@ def calculate_metrics(data: List[Dict], task_id: str, num_return_sequences: int)
                 "ValTopK": defaultdict(float),
                 "ValKth": defaultdict(float)
             }
+        elif metric in ["totally", "resolved", "matched"]:
+            results[metric] = {
+                "TopK": defaultdict(float),
+                "Kth": defaultdict(float)
+            }
+            pass
         else:
             results[metric] = {
                 "AccTopK": defaultdict(float),
@@ -96,8 +107,8 @@ def calculate_metrics(data: List[Dict], task_id: str, num_return_sequences: int)
                 "topk_correct": 0,  # 前k个中至少有一个正确的样本数
                 "kth_correct": 0,  # 第k个正确的样本数
                 "topk_total": 0,  # 前k个中正确的总数（用于比率计算）
-                "topk_valid": 0,  # 前k个中至少有一个有效的样本数（仅amprds）
-                "kth_valid": 0  # 第k个有效的样本数（仅amprds）
+                "topk_valid": 0,
+                "kth_valid": 0
             }
             for metric in metrics_config
         }
@@ -110,7 +121,7 @@ def calculate_metrics(data: List[Dict], task_id: str, num_return_sequences: int)
             for metric in metrics_config:
                 metric_key = f"is_correct_{metric}" if metric != "totally" else "is_correct_totally"
                 if metric in ["resolved", "matched"]:
-                    metric_key = f"is_{metric}_correct"
+                    metric_key = PROPERTY_DICT.get( metric, None)
 
                 # 检查前k个输出
                 topk_correct = any(output.get(metric_key, False) for output in outputs[:k])
@@ -127,7 +138,7 @@ def calculate_metrics(data: List[Dict], task_id: str, num_return_sequences: int)
 
                 # 对于amprds，还需要计算有效性
                 if metric == "amprds":
-                    topk_valid = any(output.get("is_valid_amprds", False) for output in outputs[:k])
+                    topk_valid = sum(output.get("is_valid_amprds", False) for output in outputs[:k])
                     counters[metric]["topk_valid"] += int(topk_valid)
 
                     if k <= len(outputs):
@@ -136,17 +147,23 @@ def calculate_metrics(data: List[Dict], task_id: str, num_return_sequences: int)
 
         # 计算比率并存储结果
         for metric in metrics_config:
-            # AccTopK: 前k个中至少有一个正确的样本比例
-            results[metric]["AccTopK"][f"K={k}"] = counters[metric]["topk_correct"] / n_samples if n_samples > 0 else 0
 
-            # AccKth: 第k个正确的样本比例
-            results[metric]["AccKth"][f"K={k}"] = counters[metric]["kth_correct"] / n_samples if n_samples > 0 else 0
-
+            if metric in ["totally", "resolved", "matched"]:
+                results[metric]["TopK"][f"K={k}"] = counters[metric]["topk_total"] / (n_samples*k) if n_samples > 0 else 0
+                results[metric]["Kth"][f"K={k}"] = counters[metric]["kth_correct"] / n_samples if n_samples > 0 else 0
             # 对于amprds，还需要计算有效性指标
-            if metric == "amprds":
-                results[metric]["ValTopK"][f"K={k}"] = counters[metric][
-                                                           "topk_valid"] / n_samples if n_samples > 0 else 0
-                results[metric]["ValKth"][f"K={k}"] = counters[metric]["kth_valid"] / n_samples if n_samples > 0 else 0
+            else:
+                if metric == "amprds":
+                    results[metric]["ValTopK"][f"K={k}"] = counters[metric][
+                                                               "topk_valid"] / (n_samples * k) if n_samples > 0 else 0
+                    results[metric]["ValKth"][f"K={k}"] = counters[metric][
+                                                              "kth_valid"] / n_samples if n_samples > 0 else 0
+                # AccTopK: 前k个中至少有一个正确的样本比例
+                results[metric]["AccTopK"][f"K={k}"] = counters[metric][
+                                                           "topk_correct"] / n_samples if n_samples > 0 else 0
+                # AccKth: 第k个正确的样本比例
+                results[metric]["AccKth"][f"K={k}"] = counters[metric][
+                                                          "kth_correct"] / n_samples if n_samples > 0 else 0
 
     return results
 
@@ -185,11 +202,7 @@ def main(args):
     # 设置日志
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(args.log_file),
-            logging.StreamHandler()
-        ]
+        format='%(asctime)s - %(levelname)s - %(message)s'
     )
 
     # 构建完整的文件路径
@@ -233,16 +246,17 @@ def main(args):
 
         for metric in TASKS[task_id]["metrics"]:
             print(f"\n--- {metric.upper()} ---")
-            acc_top1 = results[metric]["AccTopK"].get("K=1", 0)
-            acc_topk = results[metric]["AccTopK"].get(f"K={results['num_return_sequences']}", 0)
-            print(f"AccTop1: {acc_top1:.4f}")
-            print(f"AccTop{results['num_return_sequences']}: {acc_topk:.4f}")
+            topk_key = 'TopK' if metric in ["totally", "resolved", "matched"] else "AccTopK"
+            acc_top1 = results[metric][topk_key].get("K=1", 0)
+            acc_topk = results[metric][topk_key].get(f"K={results['num_return_sequences']}", 0)
+            print(f"AccTop1: {acc_top1:.6f}")
+            print(f"AccTop{results['num_return_sequences']}: {acc_topk:.6f}")
 
             if metric == "amprds":
                 val_top1 = results[metric]["ValTopK"].get("K=1", 0)
                 val_topk = results[metric]["ValTopK"].get(f"K={results['num_return_sequences']}", 0)
-                print(f"ValTop1: {val_top1:.4f}")
-                print(f"ValTop{results['num_return_sequences']}: {val_topk:.4f}")
+                print(f"ValTop1: {val_top1:.6f}")
+                print(f"ValTop{results['num_return_sequences']}: {val_topk:.6f}")
 
     except Exception as e:
         logging.error(f"Error processing file: {str(e)}")
@@ -254,15 +268,12 @@ if __name__ == "__main__":
 
     # 文件路径参数
     parser.add_argument("--prediction_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction")
-    parser.add_argument("--prediction_file", type=str, required=True,
+                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction/random100/amrxts_to_cls_mech_amprds")
+    parser.add_argument("--prediction_file", type=str,
+                        default="qwen205_amrxts_to_cls_mech_amprds_para01",
                         help="Name of the prediction file (without .json extension)")
     parser.add_argument("--output_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/scores")
-
-    # 日志参数
-    parser.add_argument("--log_file", type=str,
-                        default="./logs/chemechpred/scoring.log")
+                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/scores/random100/amrxts_to_cls_mech_amprds")
 
     args = parser.parse_args()
     main(args)
