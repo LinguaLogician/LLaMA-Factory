@@ -126,7 +126,7 @@ def main():
     ]
 
     # 所有数据集分割
-    splits = ["train", "valid", "test"]
+    splits = ["train", "val", "test"]
 
     print("开始处理所有化学机理数据任务...")
     print("=" * 60)

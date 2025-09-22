@@ -9,7 +9,7 @@ finetuning_type: full
 deepspeed: examples/deepspeed/ds_z2_config.json
 
 ### dataset
-dataset: amrxts_to_amprds,amrxts_to_cls_mech_amprds,amrxts_to_mech_amprds
+dataset: amrxts_cls_to_amprds
 template: qwen
 cutoff_len: 2048
 max_samples: 100000000000
@@ -18,7 +18,7 @@ preprocessing_num_workers: 1
 dataloader_num_workers: 4
 
 ### output
-output_dir: chemechpred/qwen205_triple_task_para01
+output_dir: chemechpred/qwen205_amrxts_cls_to_amprds_para01
 logging_steps: 100
 save_steps: 200000000
 plot_loss: true
@@ -44,6 +44,6 @@ eval_strategy: steps
 eval_steps: 4000
 
 
-run_name: qwen205_triple_task_para01
+run_name: qwen205_amrxts_cls_to_amprds_para01
 
-# FORCE_TORCHRUN=1 llamafactory-cli train examples/train_full/qwen205/chemechpred/triple_task/qwen205_triple_task_para01.yaml 2>&1 | tee -a logs/qwen205_triple_task_para01.log
+# FORCE_TORCHRUN=1 llamafactory-cli train examples/train_full/qwen205/chemechpred/amrxts_cls_to_amprds/qwen205_amrxts_cls_to_amprds_para01.yaml 2>&1 | tee -a logs/qwen205_amrxts_cls_to_amprds_para01.log

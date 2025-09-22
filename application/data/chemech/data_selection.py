@@ -7,6 +7,7 @@
 # https://chat.deepseek.com/a/chat/s/2567f80d-1de4-4a49-a99f-26c97ab7e981
 import json
 import argparse
+import re
 from pathlib import Path
 from tqdm import tqdm
 from rdkit import Chem
@@ -54,6 +55,18 @@ def process_reaction_smiles(reaction_smiles):
 
     return '.'.join(reactant_smiles_list), '.'.join(product_smiles_list)
 
+
+def process_smiles_string(smiles_string):
+    # 使用正则表达式提取所有英文字母
+    letters = re.findall(r'[a-zA-Z]', smiles_string)
+
+    # 将所有字母转换为小写
+    lowercase_letters = [letter.lower() for letter in letters]
+
+    # 对字母进行排序
+    sorted_letters = sorted(lowercase_letters)
+
+    return sorted_letters
 
 def main(data_dir1, data_dir2, data_file, split_names=None):
     if split_names is None:
@@ -132,14 +145,18 @@ def main(data_dir1, data_dir2, data_file, split_names=None):
             found_match = False
             for i, mech_item in enumerate(rest_mechanism):
                 if (
-                        retro_item['input'] == mech_item['products'] or
-                        retro_item['output'] == mech_item['reactants'] or
-                        retro_item['output'] == mech_item['ori_reactants'] or
-                        retro_item['input'] == mech_item['ori_products']
+                        # (
+                        # process_smiles_string(retro_item['input']) == process_smiles_string(mech_item['products']) or
+                        # process_smiles_string(retro_item['output']) == process_smiles_string(mech_item['reactants'])
+                        # retro_item['output'] == mech_item['reactants'])
+                        # or
+                        (process_smiles_string(retro_item['output']) == process_smiles_string(mech_item['ori_reactants']) and
+                        process_smiles_string(retro_item['input']) == process_smiles_string(mech_item['ori_products']))
                 ):
                     # 创建匹配的数据项
                     matched_data = mech_item['original_data'].copy()
                     matched_data['id'] = matched_data['id'].replace('chemical_mechanism', f'chemical_mechanism_{split}')
+                    matched_data['retrosyn_id'] = retro_item['original_id']
                     matched_mechanism.append(matched_data)
 
                     matched_retro.add(retro_item['original_id'])
@@ -181,11 +198,11 @@ def main(data_dir1, data_dir2, data_file, split_names=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process chemical mechanism and retrosynthesis data')
-    parser.add_argument('--data_dir1', type=str, default='/mnt/e/DataSets/Chemistry/ChemicalMechanism/',
+    parser.add_argument('--data_dir1', type=str, default='/mnt/e/DataSets/Chemistry/ChemechProcessing/',
                         help='Directory for mechanism data')
     parser.add_argument('--data_dir2', type=str, default='/mnt/e/DataSets/Chemistry/RetroSynthesis',
                         help='Directory for retrosynthesis data')
-    parser.add_argument('--data_file', type=str, default='mech-USPTO_rest2.json',
+    parser.add_argument('--data_file', type=str, default='mech-USPTO_rest9.json',
                         help='Mechanism data file name')
     parser.add_argument('--splits', type=str, nargs='+', default=['train', 'valid', 'test'],
                         help='Split names to process')

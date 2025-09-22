@@ -18,7 +18,7 @@ preprocessing_num_workers: 1
 dataloader_num_workers: 4
 
 ### output
-output_dir: output/qwen205_chemechpred_full_para02
+output_dir: chemechpred/qwen205_chemechpred_full_para02
 logging_steps: 100
 save_steps: 200000000
 plot_loss: true

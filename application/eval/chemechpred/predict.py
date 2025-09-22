@@ -360,14 +360,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chemical Mechanism Prediction Evaluation")
 
     # 模型和任务参数
-    parser.add_argument("--model_path", type=str, default="/mnt/e/Development/LLMSpace/LLaMA-Factory/output")
+    parser.add_argument("--model_path", type=str, default="/mnt/e/Development/LLMSpace/LLaMA-Factory/chemechpred")
     parser.add_argument("--model_name", type=str, default="qwen205_amrxts_to_cls_mech_amprds_para01", help="Name of the model to evaluate")
     parser.add_argument("--task_id", type=str, default="AMRXTS_TO_CLS_MECH_AMPRDS", choices=list(TASKS.keys()), help="Task identifier")
 
     # 数据路径参数
-    parser.add_argument("--data_dir", type=str, default="/mnt/e/DataSets/Chemistry/ChemicalMechanism/test/random100")
+    parser.add_argument("--data_dir", type=str, default="/mnt/e/DataSets/Chemistry/ChemicalMechanism/test/")
     parser.add_argument("--output_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction/random100")
+                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction/")
 
     # Inference parameters
     parser.add_argument("--finetuning_type", type=str, default="full")

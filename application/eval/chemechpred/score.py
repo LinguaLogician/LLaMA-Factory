@@ -268,12 +268,12 @@ if __name__ == "__main__":
 
     # 文件路径参数
     parser.add_argument("--prediction_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction/random100/amrxts_to_cls_mech_amprds")
+                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction/amrxts_to_cls_mech_amprds")
     parser.add_argument("--prediction_file", type=str,
                         default="qwen205_amrxts_to_cls_mech_amprds_para01",
                         help="Name of the prediction file (without .json extension)")
     parser.add_argument("--output_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/scores/random100/amrxts_to_cls_mech_amprds")
+                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/scores/amrxts_to_cls_mech_amprds")
 
     args = parser.parse_args()
     main(args)

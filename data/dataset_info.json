@@ -101,6 +101,18 @@
   "chemechpred_train": {
     "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/chemech_prediction/train.json"
   },
+  "amrxts_cls_to_amprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_cls_to_amprds_train.json"
+  },
+  "amrxts_mech_cls_to_amprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_mech_cls_to_amprds_train.json"
+  },
+  "amrxts_mech_to_amprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_mech_to_amprds_train.json"
+  },
+  "amrxts_to_cls_amprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_to_cls_amprds_train.json"
+  },
   "amrxts_to_amprds": {
     "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_to_amprds_train.json"
   },
