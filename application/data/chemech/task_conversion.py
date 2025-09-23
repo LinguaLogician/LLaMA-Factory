@@ -31,10 +31,10 @@ def process_chemical_mechanism_data(data_dir_pattern, output_dir_pattern, task_i
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     # 构建输入文件路径
-    input_file = os.path.join(data_dir, f"mech-USPTO-31k_{split}.json")
+    input_file = os.path.join(data_dir, f"{split}", f"mech_USPTO.json")
 
     # 构建输出文件路径
-    output_file = os.path.join(output_dir, f"{task_id.lower()}_{split}.json")
+    output_file = os.path.join(output_dir, f"{task_id.lower()}.json")
 
     print(f"处理任务: {task_id}")
     print(f"输入文件: {input_file}")
@@ -111,8 +111,8 @@ def process_chemical_mechanism_data(data_dir_pattern, output_dir_pattern, task_i
 
 def main():
     # 配置参数
-    data_dir_pattern = "/mnt/e/DataSets/Chemistry/ChemicalMechanism/processed"
-    output_dir_pattern = "/mnt/e/DataSets/Chemistry/ChemicalMechanism/{split}"
+    data_dir_pattern = "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random"
+    output_dir_pattern = "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/{split}"
 
     # 所有任务列表
     tasks = [

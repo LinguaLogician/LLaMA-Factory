@@ -285,7 +285,7 @@ def main(args):
 
     # 设置任务相关路径
     task_id_lower = args.task_id.lower()
-    data_file = f"{task_id_lower}_test.json"
+    data_file = f"{task_id_lower}.json"
     data_path = os.path.join(args.data_dir, data_file)
     output_dir = os.path.join(args.output_dir, task_id_lower)
     os.makedirs(output_dir, exist_ok=True)

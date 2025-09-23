@@ -10,7 +10,7 @@ MODEL_NAME="qwen205_amrxts_to_cls_mech_amprds_para01"
 TASK_ID="AMRXTS_TO_CLS_MECH_AMPRDS"
 
 # 数据路径参数
-DATA_DIR="/mnt/e/DataSets/Chemistry/ChemicalMechanism/test/"
+DATA_DIR="/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/test"
 PREDICTION_OUTPUT_DIR="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction/"
 SCORE_OUTPUT_DIR="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/scores/"
 

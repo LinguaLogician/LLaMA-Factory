@@ -145,13 +145,12 @@ def main(data_dir1, data_dir2, data_file, split_names=None):
             found_match = False
             for i, mech_item in enumerate(rest_mechanism):
                 if (
-                        # (
-                        # process_smiles_string(retro_item['input']) == process_smiles_string(mech_item['products']) or
-                        # process_smiles_string(retro_item['output']) == process_smiles_string(mech_item['reactants'])
-                        # retro_item['output'] == mech_item['reactants'])
-                        # or
-                        (process_smiles_string(retro_item['output']) == process_smiles_string(mech_item['ori_reactants']) and
-                        process_smiles_string(retro_item['input']) == process_smiles_string(mech_item['ori_products']))
+                        (
+                        (retro_item['input']) == (mech_item['products']) and
+                        (retro_item['output']) == (mech_item['reactants']))
+                        or
+                        ((retro_item['output']) == (mech_item['ori_reactants']) and
+                        (retro_item['input']) == (mech_item['ori_products']))
                 ):
                     # 创建匹配的数据项
                     matched_data = mech_item['original_data'].copy()
@@ -202,9 +201,9 @@ if __name__ == "__main__":
                         help='Directory for mechanism data')
     parser.add_argument('--data_dir2', type=str, default='/mnt/e/DataSets/Chemistry/RetroSynthesis',
                         help='Directory for retrosynthesis data')
-    parser.add_argument('--data_file', type=str, default='mech-USPTO_rest9.json',
+    parser.add_argument('--data_file', type=str, default='mech-USPTO-31k_train0.json',
                         help='Mechanism data file name')
-    parser.add_argument('--splits', type=str, nargs='+', default=['train', 'valid', 'test'],
+    parser.add_argument('--splits', type=str, nargs='+', default=['train', 'val', 'test'],
                         help='Split names to process')
 
     args = parser.parse_args()

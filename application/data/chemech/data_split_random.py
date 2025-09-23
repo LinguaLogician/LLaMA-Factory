@@ -27,7 +27,7 @@ def split_dataset(
         data_dir: 输入数据目录
         data_file: 输入数据文件名
         output_dir: 输出根目录
-        ratios: 分割比例 (train, valid, test)
+        ratios: 分割比例 (train, val, test)
         seed: 随机种子
     """
     # 设置随机种子以确保可重复性
@@ -59,20 +59,20 @@ def split_dataset(
     # 计算各分割的大小
     total_size = len(data)
     train_size = int(total_size * ratios[0])
-    valid_size = int(total_size * ratios[1])
-    test_size = total_size - train_size - valid_size
+    val_size = int(total_size * ratios[1])
+    test_size = total_size - train_size - val_size
 
-    print(f"分割大小 - 训练集: {train_size}, 验证集: {valid_size}, 测试集: {test_size}")
+    print(f"分割大小 - 训练集: {train_size}, 验证集: {val_size}, 测试集: {test_size}")
 
     # 分割数据
     train_data = data[:train_size]
-    valid_data = data[train_size:train_size + valid_size]
-    test_data = data[train_size + valid_size:]
+    val_data = data[train_size:train_size + val_size]
+    test_data = data[train_size + val_size:]
 
     # 定义分割名称和对应的数据
     splits = {
         "train": train_data,
-        "valid": valid_data,
+        "val": val_data,
         "test": test_data
     }
 
@@ -83,7 +83,7 @@ def split_dataset(
         os.makedirs(split_output_dir, exist_ok=True)
 
         # 构建输出文件名
-        output_filename = f"{os.path.splitext(data_file)[0]}_{split_name}.json"
+        output_filename = f"{os.path.splitext(data_file)[0]}.json"
         output_path = os.path.join(split_output_dir, output_filename)
 
         print(f"正在写入 {split_name} 分割数据到: {output_path}")
@@ -108,11 +108,11 @@ def main():
                         default="mech-USPTO-31k.json",
                         help="输入数据文件名")
     parser.add_argument("--output_dir", type=str,
-                        default="/mnt/e/DataSets/Chemistry/ChemicalMechanism",
+                        default="/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random",
                         help="输出根目录")
     parser.add_argument("--train_ratio", type=float,
                         default=0.8, help="训练集比例")
-    parser.add_argument("--valid_ratio", type=float,
+    parser.add_argument("--val_ratio", type=float,
                         default=0.1, help="验证集比例")
     parser.add_argument("--test_ratio", type=float,
                         default=0.1, help="测试集比例")
@@ -126,7 +126,7 @@ def main():
         data_dir=args.data_dir,
         data_file=args.data_file,
         output_dir=args.output_dir,
-        ratios=(args.train_ratio, args.valid_ratio, args.test_ratio),
+        ratios=(args.train_ratio, args.val_ratio, args.test_ratio),
         seed=args.seed
     )
 

@@ -278,17 +278,6 @@ def main():
 
     print(f"\n跨split重合: {cross_results['cross_split_count']}个唯一SMILES")
 
-    # 保存详细结果（可选）
-    output_file = "overlap_analysis_results.json"
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump({
-            'parameters': vars(args),
-            'split_results': results,
-            'cross_split_results': cross_results
-        }, f, indent=2, ensure_ascii=False)
-
-    print(f"\n详细结果已保存到: {output_file}")
-
 
 if __name__ == "__main__":
     main()

@@ -102,25 +102,25 @@
     "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/chemech_prediction/train.json"
   },
   "amrxts_cls_to_amprds": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_cls_to_amprds_train.json"
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/amrxts_cls_to_amprds.json"
   },
   "amrxts_mech_cls_to_amprds": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_mech_cls_to_amprds_train.json"
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/amrxts_mech_cls_to_amprds.json"
   },
   "amrxts_mech_to_amprds": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_mech_to_amprds_train.json"
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/amrxts_mech_to_amprds.json"
   },
   "amrxts_to_cls_amprds": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_to_cls_amprds_train.json"
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/amrxts_to_cls_amprds.json"
   },
   "amrxts_to_amprds": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_to_amprds_train.json"
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/amrxts_to_amprds.json"
   },
   "amrxts_to_cls_mech_amprds": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_to_cls_mech_amprds_train.json"
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/amrxts_to_cls_mech_amprds.json"
   },
   "amrxts_to_mech_amprds": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/train/amrxts_to_mech_amprds_train.json"
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/amrxts_to_mech_amprds.json"
   },
   "qwen205_moltrans_mit_mixed_augm_dpo_lora_para1_data": {
     "file_name": "/mnt/e/DataSets/Chemistry/ForwardPrediction/DPO/qwen205_moltrans_mit_mixed_augm_dpo_lora_para1_data.json",
