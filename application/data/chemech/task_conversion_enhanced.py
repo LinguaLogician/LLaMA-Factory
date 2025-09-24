@@ -24,47 +24,47 @@ class ChemicalMechanismDataProcessor:
 
         # 任务定义：输入部分 -> 输出部分
         self.tasks = {
-            "UPDCANOAMRTXS_TO_UPDCANOAMPRDS": {
-                "input": ["UPDCANOAMRTXS"],
+            "UPDCANOAMRXTS_TO_UPDCANOAMPRDS": {
+                "input": ["UPDCANOAMRXTS"],
                 "output": ["UPDCANOAMPRDS"]
             },
-            "UPDCANOAMRTXS_TO_MECH_UPDCANOAMPRDS": {
-                "input": ["UPDCANOAMRTXS"],
+            "UPDCANOAMRXTS_TO_MECH_UPDCANOAMPRDS": {
+                "input": ["UPDCANOAMRXTS"],
                 "output": ["MECH", "UPDCANOAMPRDS"]
             },
-            "UPDCANOAMRTXS_TO_CLS_UPDCANOAMPRDS": {
-                "input": ["UPDCANOAMRTXS"],
+            "UPDCANOAMRXTS_TO_CLS_UPDCANOAMPRDS": {
+                "input": ["UPDCANOAMRXTS"],
                 "output": ["CLS", "UPDCANOAMPRDS"]
             },
-            "UPDCANOAMRTXS_TO_CLS_MECH_UPDCANOAMPRDS": {
-                "input": ["UPDCANOAMRTXS"],
+            "UPDCANOAMRXTS_TO_CLS_MECH_UPDCANOAMPRDS": {
+                "input": ["UPDCANOAMRXTS"],
                 "output": ["CLS", "MECH", "UPDCANOAMPRDS"]
             },
-            "UPDCANOAMRTXS_MECH_TO_UPDCANOAMPRDS": {
-                "input": ["UPDCANOAMRTXS", "MECH"],
+            "UPDCANOAMRXTS_MECH_TO_UPDCANOAMPRDS": {
+                "input": ["UPDCANOAMRXTS", "MECH"],
                 "output": ["UPDCANOAMPRDS"]
             },
-            "UPDCANOAMRTXS_CLS_TO_UPDCANOAMPRDS": {
-                "input": ["UPDCANOAMRTXS", "CLS"],
+            "UPDCANOAMRXTS_CLS_TO_UPDCANOAMPRDS": {
+                "input": ["UPDCANOAMRXTS", "CLS"],
                 "output": ["UPDCANOAMPRDS"]
             },
-            "UPDCANOAMRTXS_MECH_CLS_TO_UPDCANOAMPRDS": {
-                "input": ["UPDCANOAMRTXS", "MECH", "CLS"],
+            "UPDCANOAMRXTS_MECH_CLS_TO_UPDCANOAMPRDS": {
+                "input": ["UPDCANOAMRXTS", "MECH", "CLS"],
                 "output": ["UPDCANOAMPRDS"]
             },
-            "UPDCANOAMRTXS_CLS_TO_MECH_UPDCANOAMPRDS": {
-                "input": ["UPDCANOAMRTXS", "CLS"],
+            "UPDCANOAMRXTS_CLS_TO_MECH_UPDCANOAMPRDS": {
+                "input": ["UPDCANOAMRXTS", "CLS"],
                 "output": ["MECH", "UPDCANOAMPRDS"]
             },
-            "UPDCANOAMRTXS_MECH_TO_CLS_UPDCANOAMPRDS": {
-                "input": ["UPDCANOAMRTXS", "MECH"],
+            "UPDCANOAMRXTS_MECH_TO_CLS_UPDCANOAMPRDS": {
+                "input": ["UPDCANOAMRXTS", "MECH"],
                 "output": ["CLS", "UPDCANOAMPRDS"]
             }
         }
 
         # 字段映射
         self.field_mapping = {
-            "UPDCANOAMRTXS": "amrxts_cano_in_upd",
+            "UPDCANOAMRXTS": "amrxts_cano_in_upd",
             "UPDCANOAMPRDS": "amprds_cano_in_upd",
             "CLS": "mechanistic_class",
             "MECH": "mechanistic_label"
@@ -72,7 +72,7 @@ class ChemicalMechanismDataProcessor:
 
         # 标识符显示格式映射
         self.display_mapping = {
-            "UPDCANOAMRTXS": "UPD.CANO.AM.RTXS",
+            "UPDCANOAMRXTS": "UPD.CANO.AM.RXTS",
             "UPDCANOAMPRDS": "UPD.CANO.AM.PRDS",
             "CLS": "CLS",
             "MECH": "MECH"
@@ -80,8 +80,25 @@ class ChemicalMechanismDataProcessor:
 
     def format_task_id(self, task_id: str) -> str:
         """格式化任务ID为显示格式"""
-        # 将_TO_替换为->，其余_替换为+
-        formatted = task_id.replace("_TO_", "->").replace("_", "+")
+        # 分割任务ID为输入和输出部分
+        if "_TO_" in task_id:
+            input_part, output_part = task_id.split("_TO_")
+        else:
+            raise ValueError("无效的任务ID")
+
+        input_fields = input_part.split("_")
+        input_display = []
+        for field in input_fields:
+            if field in self.display_mapping:
+                input_display.append(self.display_mapping[field])
+
+        output_fields = output_part.split("_")
+        output_display = []
+        for field in output_fields:
+            if field in self.display_mapping:
+                output_display.append(self.display_mapping[field])
+
+        formatted = "+".join(input_display) + "->" + "+".join(output_display)
         return formatted
 
     def get_field_value(self, data: Dict, field_key: str) -> str:
@@ -206,15 +223,15 @@ def main():
     parser.add_argument("--splits", type=str, nargs="+", default=["train", "val", "test"],
                         help="要处理的数据分割")
     parser.add_argument("--tasks", type=str, nargs="+",
-                        default=["UPDCANOAMRTXS_TO_UPDCANOAMPRDS",
-                                 "UPDCANOAMRTXS_TO_MECH_UPDCANOAMPRDS",
-                                 "UPDCANOAMRTXS_TO_CLS_UPDCANOAMPRDS",
-                                 "UPDCANOAMRTXS_TO_CLS_MECH_UPDCANOAMPRDS",
-                                 "UPDCANOAMRTXS_MECH_TO_UPDCANOAMPRDS",
-                                 "UPDCANOAMRTXS_CLS_TO_UPDCANOAMPRDS",
-                                 "UPDCANOAMRTXS_MECH_CLS_TO_UPDCANOAMPRDS",
-                                 "UPDCANOAMRTXS_CLS_TO_MECH_UPDCANOAMPRDS",
-                                 "UPDCANOAMRTXS_MECH_TO_CLS_UPDCANOAMPRDS"],
+                        default=["UPDCANOAMRXTS_TO_UPDCANOAMPRDS",
+                                 "UPDCANOAMRXTS_TO_MECH_UPDCANOAMPRDS",
+                                 "UPDCANOAMRXTS_TO_CLS_UPDCANOAMPRDS",
+                                 "UPDCANOAMRXTS_TO_CLS_MECH_UPDCANOAMPRDS",
+                                 "UPDCANOAMRXTS_MECH_TO_UPDCANOAMPRDS",
+                                 "UPDCANOAMRXTS_CLS_TO_UPDCANOAMPRDS",
+                                 "UPDCANOAMRXTS_MECH_CLS_TO_UPDCANOAMPRDS",
+                                 "UPDCANOAMRXTS_CLS_TO_MECH_UPDCANOAMPRDS",
+                                 "UPDCANOAMRXTS_MECH_TO_CLS_UPDCANOAMPRDS"],
                         help="要处理的任务列表")
 
     args = parser.parse_args()

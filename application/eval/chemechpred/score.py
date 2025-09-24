@@ -12,64 +12,62 @@ import json
 import argparse
 import logging
 from typing import Dict, List, Any
-from pathlib import Path
 from collections import defaultdict
 from tqdm import tqdm
-import numpy as np
 
 # 任务定义
 TASKS = {
-    "UPDCANOAMRTXS_CLS_TO_MECH_UPDCANOAMPRDS": {
-        "task_tag": "UPDCANOAMRTXS+CLS->MECH+UPDCANOAMPRDS",
-        "input_fields": ["UPDCANOAMRTXS"],
+    "UPDCANOAMRXTS_CLS_TO_MECH_UPDCANOAMPRDS": {
+        "task_tag": "UPD.CANO.AM.RXTS+CLS->MECH+UPD.CANO.AM.PRDS",
+        "input_fields": ["UPDCANOAMRXTS"],
         "output_fields": ["MECH", "UPDCANOAMPRDS"],
         "metrics": ["mech",  "upd_cano_am_prds",  "upd_am_prds", "totally", "resolved", "matched"]
     },
-    "UPDCANOAMRTXS_CLS_TO_UPDCANOAMPRDS": {
-        "task_tag": "UPDCANOAMRTXS+CLS->UPDCANOAMPRDS",
-        "input_fields": ["UPDCANOAMRTXS", "CLS"],
+    "UPDCANOAMRXTS_CLS_TO_UPDCANOAMPRDS": {
+        "task_tag": "UPD.CANO.AM.RXTS+CLS->UPD.CANO.AM.PRDS",
+        "input_fields": ["UPDCANOAMRXTS", "CLS"],
         "output_fields": ["UPDCANOAMPRDS"],
         "metrics": [ "upd_cano_am_prds",  "upd_am_prds", "totally", "resolved", "matched"]
     },
-    "UPDCANOAMRTXS_MECH_CLS_TO_UPDCANOAMPRDS": {
-        "task_tag": "UPDCANOAMRTXS+MECH+CLS->UPDCANOAMPRDS",
-        "input_fields": ["UPDCANOAMRTXS", "MECH", "CLS"],
+    "UPDCANOAMRXTS_MECH_CLS_TO_UPDCANOAMPRDS": {
+        "task_tag": "UPD.CANO.AM.RXTS+MECH+CLS->UPD.CANO.AM.PRDS",
+        "input_fields": ["UPDCANOAMRXTS", "MECH", "CLS"],
         "output_fields": ["UPDCANOAMPRDS"],
         "metrics": [ "upd_cano_am_prds",  "upd_am_prds", "totally", "resolved", "matched"]
     },
-    "UPDCANOAMRTXS_MECH_TO_CLS_UPDCANOAMPRDS": {
-        "task_tag": "UPDCANOAMRTXS+MECH->CLS+UPDCANOAMPRDS",
-        "input_fields": ["UPDCANOAMRTXS", "MECH"],
+    "UPDCANOAMRXTS_MECH_TO_CLS_UPDCANOAMPRDS": {
+        "task_tag": "UPD.CANO.AM.RXTS+MECH->CLS+UPD.CANO.AM.PRDS",
+        "input_fields": ["UPDCANOAMRXTS", "MECH"],
         "output_fields": ["CLS", "UPDCANOAMPRDS"],
         "metrics": ["cls",  "upd_cano_am_prds",  "upd_am_prds", "totally", "resolved", "matched"]
     },
-    "UPDCANOAMRTXS_TO_UPDCANOAMPRDS": {
-        "task_tag": "UPDCANOAMRTXS->UPDCANOAMPRDS",
-        "input_fields": ["UPDCANOAMRTXS"],
+    "UPDCANOAMRXTS_TO_UPDCANOAMPRDS": {
+        "task_tag": "UPD.CANO.AM.RXTS->UPD.CANO.AM.PRDS",
+        "input_fields": ["UPDCANOAMRXTS"],
         "output_fields": ["UPDCANOAMPRDS"],
         "metrics": [ "upd_cano_am_prds",  "upd_am_prds", "totally", "resolved", "matched"]
     },
-    "UPDCANOAMRTXS_TO_MECH_UPDCANOAMPRDS": {
-        "task_tag": "UPDCANOAMRTXS->MECH+UPDCANOAMPRDS",
-        "input_fields": ["UPDCANOAMRTXS"],
+    "UPDCANOAMRXTS_TO_MECH_UPDCANOAMPRDS": {
+        "task_tag": "UPD.CANO.AM.RXTS->MECH+UPD.CANO.AM.PRDS",
+        "input_fields": ["UPDCANOAMRXTS"],
         "output_fields": ["MECH", "UPDCANOAMPRDS"],
         "metrics": ["mech",  "upd_cano_am_prds",  "upd_am_prds", "totally", "resolved", "matched"]
     },
-    "UPDCANOAMRTXS_TO_CLS_UPDCANOAMPRDS": {
-        "task_tag": "UPDCANOAMRTXS->CLS+UPDCANOAMPRDS",
-        "input_fields": ["UPDCANOAMRTXS"],
+    "UPDCANOAMRXTS_TO_CLS_UPDCANOAMPRDS": {
+        "task_tag": "UPD.CANO.AM.RXTS->CLS+UPD.CANO.AM.PRDS",
+        "input_fields": ["UPDCANOAMRXTS"],
         "output_fields": ["CLS", "UPDCANOAMPRDS"],
         "metrics": ["cls",  "upd_cano_am_prds",  "upd_am_prds", "totally", "resolved", "matched"]
     },
-    "UPDCANOAMRTXS_TO_CLS_MECH_UPDCANOAMPRDS": {
-        "task_tag": "UPDCANOAMRTXS->CLS+MECH+UPDCANOAMPRDS",
-        "input_fields": ["UPDCANOAMRTXS"],
+    "UPDCANOAMRXTS_TO_CLS_MECH_UPDCANOAMPRDS": {
+        "task_tag": "UPD.CANO.AM.RXTS->CLS+MECH+UPD.CANO.AM.PRDS",
+        "input_fields": ["UPDCANOAMRXTS"],
         "output_fields": ["CLS", "MECH", "UPDCANOAMPRDS"],
         "metrics": ["cls", "mech",  "upd_cano_am_prds",  "upd_am_prds", "totally", "resolved", "matched"]
     },
-    "UPDCANOAMRTXS_MECH_TO_UPDCANOAMPRDS": {
-        "task_tag": "UPDCANOAMRTXS+MECH->UPDCANOAMPRDS",
-        "input_fields": ["UPDCANOAMRTXS", "MECH"],
+    "UPDCANOAMRXTS_MECH_TO_UPDCANOAMPRDS": {
+        "task_tag": "UPD.CANO.AM.RXTS+MECH->UPD.CANO.AM.PRDS",
+        "input_fields": ["UPDCANOAMRXTS", "MECH"],
         "output_fields": ["UPDCANOAMPRDS"],
         "metrics": [ "upd_cano_am_prds",  "upd_am_prds", "totally", "resolved", "matched"]
     }
@@ -296,12 +294,12 @@ if __name__ == "__main__":
 
     # 文件路径参数
     parser.add_argument("--prediction_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction/random100/updcanoamrtxs_cls_to_mech_updcanoamprds")
+                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction/random100/updcanoamrxts_cls_to_mech_updcanoamprds")
     parser.add_argument("--prediction_file", type=str,
-                        default="updcanoamrtxs_cls_to_mech_updcanoamprds_para02",
+                        default="updcanoamrxts_cls_to_mech_updcanoamprds_para02",
                         help="Name of the prediction file (without .json extension)")
     parser.add_argument("--output_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/scores/random100/updcanoamrtxs_cls_to_mech_updcanoamprds")
+                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/scores/random100/updcanoamrxts_cls_to_mech_updcanoamprds")
 
     args = parser.parse_args()
     main(args)

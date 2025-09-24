@@ -88,63 +88,63 @@ class TaskConfig:
 
     # 任务标识符映射
     TASK_MAPPING = {
-        "UPDCANOAMRTXS_TO_UPDCANOAMPRDS": {
-            "input_fields": ["UPDCANOAMRTXS"],
+        "UPDCANOAMRXTS_TO_UPDCANOAMPRDS": {
+            "input_fields": ["UPDCANOAMRXTS"],
             "output_fields": ["UPDCANOAMPRDS"],
-            "instruction_template": "UPD.CANO.AM.RTXS->UPD.CANO.AM.PRDS"
+            "instruction_template": "UPD.CANO.AM.RXTS->UPD.CANO.AM.PRDS"
         },
-        "UPDCANOAMRTXS_TO_MECH_UPDCANOAMPRDS": {
-            "input_fields": ["UPDCANOAMRTXS"],
+        "UPDCANOAMRXTS_TO_MECH_UPDCANOAMPRDS": {
+            "input_fields": ["UPDCANOAMRXTS"],
             "output_fields": ["MECH", "UPDCANOAMPRDS"],
-            "instruction_template": "UPD.CANO.AM.RTXS->MECH+UPD.CANO.AM.PRDS"
+            "instruction_template": "UPD.CANO.AM.RXTS->MECH+UPD.CANO.AM.PRDS"
         },
-        "UPDCANOAMRTXS_TO_CLS_UPDCANOAMPRDS": {
-            "input_fields": ["UPDCANOAMRTXS"],
+        "UPDCANOAMRXTS_TO_CLS_UPDCANOAMPRDS": {
+            "input_fields": ["UPDCANOAMRXTS"],
             "output_fields": ["CLS", "UPDCANOAMPRDS"],
-            "instruction_template": "UPD.CANO.AM.RTXS->CLS+UPD.CANO.AM.PRDS"
+            "instruction_template": "UPD.CANO.AM.RXTS->CLS+UPD.CANO.AM.PRDS"
         },
-        "UPDCANOAMRTXS_TO_CLS_MECH_UPDCANOAMPRDS": {
-            "input_fields": ["UPDCANOAMRTXS"],
+        "UPDCANOAMRXTS_TO_CLS_MECH_UPDCANOAMPRDS": {
+            "input_fields": ["UPDCANOAMRXTS"],
             "output_fields": ["CLS", "MECH", "UPDCANOAMPRDS"],
-            "instruction_template": "UPD.CANO.AM.RTXS->CLS+MECH+UPD.CANO.AM.PRDS"
+            "instruction_template": "UPD.CANO.AM.RXTS->CLS+MECH+UPD.CANO.AM.PRDS"
         },
-        "UPDCANOAMRTXS_MECH_TO_UPDCANOAMPRDS": {
-            "input_fields": ["UPDCANOAMRTXS", "MECH"],
+        "UPDCANOAMRXTS_MECH_TO_UPDCANOAMPRDS": {
+            "input_fields": ["UPDCANOAMRXTS", "MECH"],
             "output_fields": ["UPDCANOAMPRDS"],
-            "instruction_template": "UPD.CANO.AM.RTXS+MECH->UPD.CANO.AM.PRDS"
+            "instruction_template": "UPD.CANO.AM.RXTS+MECH->UPD.CANO.AM.PRDS"
         },
-        "UPDCANOAMRTXS_CLS_TO_UPDCANOAMPRDS": {
-            "input_fields": ["UPDCANOAMRTXS", "CLS"],
+        "UPDCANOAMRXTS_CLS_TO_UPDCANOAMPRDS": {
+            "input_fields": ["UPDCANOAMRXTS", "CLS"],
             "output_fields": ["UPDCANOAMPRDS"],
-            "instruction_template": "UPD.CANO.AM.RTXS+CLS->UPD.CANO.AM.PRDS"
+            "instruction_template": "UPD.CANO.AM.RXTS+CLS->UPD.CANO.AM.PRDS"
         },
-        "UPDCANOAMRTXS_MECH_CLS_TO_UPDCANOAMPRDS": {
-            "input_fields": ["UPDCANOAMRTXS", "MECH", "CLS"],
+        "UPDCANOAMRXTS_MECH_CLS_TO_UPDCANOAMPRDS": {
+            "input_fields": ["UPDCANOAMRXTS", "MECH", "CLS"],
             "output_fields": ["UPDCANOAMPRDS"],
-            "instruction_template": "UPD.CANO.AM.RTXS+MECH+CLS->UPD.CANO.AM.PRDS"
+            "instruction_template": "UPD.CANO.AM.RXTS+MECH+CLS->UPD.CANO.AM.PRDS"
         },
-        "UPDCANOAMRTXS_CLS_TO_MECH_UPDCANOAMPRDS": {
-            "input_fields": ["UPDCANOAMRTXS", "CLS"],
+        "UPDCANOAMRXTS_CLS_TO_MECH_UPDCANOAMPRDS": {
+            "input_fields": ["UPDCANOAMRXTS", "CLS"],
             "output_fields": ["MECH", "UPDCANOAMPRDS"],
-            "instruction_template": "UPD.CANO.AM.RTXS+CLS->MECH+UPD.CANO.AM.PRDS"
+            "instruction_template": "UPD.CANO.AM.RXTS+CLS->MECH+UPD.CANO.AM.PRDS"
         },
-        "UPDCANOAMRTXS_MECH_TO_CLS_UPDCANOAMPRDS": {
-            "input_fields": ["UPDCANOAMRTXS", "MECH"],
+        "UPDCANOAMRXTS_MECH_TO_CLS_UPDCANOAMPRDS": {
+            "input_fields": ["UPDCANOAMRXTS", "MECH"],
             "output_fields": ["CLS", "UPDCANOAMPRDS"],
-            "instruction_template": "UPD.CANO.AM.RTXS+MECH->CLS+UPD.CANO.AM.PRDS"
+            "instruction_template": "UPD.CANO.AM.RXTS+MECH->CLS+UPD.CANO.AM.PRDS"
         }
     }
 
     # 字段显示名称映射
     FIELD_DISPLAY_NAMES = {
-        "UPDCANOAMRTXS": "UPD.CANO.AM.RTXS",
+        "UPDCANOAMRXTS": "UPD.CANO.AM.RXTS",
         "UPDCANOAMPRDS": "UPD.CANO.AM.PRDS",
         "MECH": "MECH",
         "CLS": "CLS"
     }
 
     INFOID_MTRFRG_MAPPING = {
-        "UPDCANOAMRTXS": "upd_cano_am_rtxs",
+        "UPDCANOAMRXTS": "upd_cano_am_rxts",
         "UPDCANOAMPRDS": "upd_cano_am_prds",
         "MECH": "mech",
         "CLS": "cls"
@@ -584,14 +584,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="化学机制预测评估脚本")
 
     # 必需参数
-    parser.add_argument("--task_id", type=str, default="UPDCANOAMRTXS_CLS_TO_MECH_UPDCANOAMPRDS",
+    parser.add_argument("--task_id", type=str, default="UPDCANOAMRXTS_CLS_TO_MECH_UPDCANOAMPRDS",
                         choices=list(TaskConfig.TASK_MAPPING.keys()),
                         help="任务标识符")
 
     # 模型参数
     parser.add_argument("--model_path", type=str,
-                        default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/chemechpred/")
-    parser.add_argument("--model_name", type=str, default="updcanoamrtxs_cls_to_mech_updcanoamprds_para02",
+                        default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/chemechpred/_legacy")
+    parser.add_argument("--model_name", type=str, default="updcanoamrxts_cls_to_mech_updcanoamprds_para02",
                         help="模型名称")
 
     # 数据参数
@@ -619,7 +619,7 @@ if __name__ == "__main__":
                         help="批次内允许的最大长度差异")
 
     # 系统参数
-    parser.add_argument("--gpu_threshold", type=float, default=3.0,
+    parser.add_argument("--gpu_threshold", type=float, default=10.0,
                         help="GPU内存阈值(GB)")
     parser.add_argument("--log_dir", type=str, default="./logs/chemechpred",
                         help="日志目录")
