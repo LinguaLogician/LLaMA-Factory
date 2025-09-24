@@ -122,6 +122,44 @@
   "amrxts_to_mech_amprds": {
     "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/amrxts_to_mech_amprds.json"
   },
+
+  "updcanoamrtxs_cls_to_mech_updcanoamprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/updcanoamrtxs_cls_to_mech_updcanoamprds.json"
+  },
+  "updcanoamrtxs_cls_to_updcanoamprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/updcanoamrtxs_cls_to_updcanoamprds.json"
+  },
+  "updcanoamrtxs_mech_cls_to_updcanoamprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/updcanoamrtxs_mech_cls_to_updcanoamprds.json"
+  },
+  "updcanoamrtxs_mech_to_cls_updcanoamprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/updcanoamrtxs_mech_to_cls_updcanoamprds.json"
+  },
+  "updcanoamrtxs_mech_to_updcanoamprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/updcanoamrtxs_mech_to_updcanoamprds.json"
+  },
+  "updcanoamrtxs_to_cls_mech_updcanoamprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/updcanoamrtxs_to_cls_mech_updcanoamprds.json"
+  },
+  "updcanoamrtxs_to_cls_updcanoamprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/updcanoamrtxs_to_cls_updcanoamprds.json"
+  },
+  "updcanoamrtxs_to_cls_updcanoamprds_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/updcanoamrtxs_to_cls_updcanoamprds.json"
+  },
+  "updcanoamrtxs_to_mech_updcanoamprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/updcanoamrtxs_to_mech_updcanoamprds.json"
+  },
+  "updcanoamrtxs_to_mech_updcanoamprds_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/updcanoamrtxs_to_mech_updcanoamprds.json"
+  },
+  "updcanoamrtxs_to_updcanoamprds": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/updcanoamrtxs_to_updcanoamprds.json"
+  },
+  "updcanoamrtxs_to_updcanoamprds_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/updcanoamrtxs_to_updcanoamprds.json"
+  },
+
   "qwen205_moltrans_mit_mixed_augm_dpo_lora_para1_data": {
     "file_name": "/mnt/e/DataSets/Chemistry/ForwardPrediction/DPO/qwen205_moltrans_mit_mixed_augm_dpo_lora_para1_data.json",
     "ranking": true,

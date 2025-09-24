@@ -230,14 +230,14 @@ class ResponseParser:
 
     def parse_model_output(self, text: str) -> Dict[str, Any]:
         """解析模型输出"""
-        result = {"text": text, "parsed_fields": {}, "parsing_errors": []}
+        result = {"text": text, "parsed_fields": {}}
 
         # 按行分割
         lines = text.strip().split('\n')
         current_field = None
         current_content = []
 
-        for i, line in enumerate(lines):
+        for line in lines:
             line = line.strip()
             if not line:
                 continue
@@ -248,30 +248,16 @@ class ResponseParser:
                 # 保存前一个字段的内容
                 if current_field and current_content:
                     result["parsed_fields"][current_field] = '\n'.join(current_content).strip()
-                    current_content = []
 
                 current_field = field_match
-
-                # 检查字段标识符后是否有内容（语法错误：字段标识符和内容在同一行）
-                remaining_content = line.replace(TaskConfig.get_field_display_name(field_match), "").strip()
-                if remaining_content and not remaining_content.endswith(':'):
-                    result["parsing_errors"].append(f"字段'{field_match}'标识符后直接跟内容，缺少分隔符")
-                    current_content.append(remaining_content)
+                current_content = []
             else:
                 if current_field:
                     current_content.append(line)
-                else:
-                    # 没有当前字段但遇到内容行，说明有解析错误
-                    result["parsing_errors"].append(f"第{i + 1}行内容没有对应的字段标识符: '{line}'")
 
         # 处理最后一个字段
         if current_field and current_content:
             result["parsed_fields"][current_field] = '\n'.join(current_content).strip()
-
-        # 检查是否缺少必需的输出字段
-        missing_fields = set(self.output_fields) - set(result["parsed_fields"].keys())
-        for field in missing_fields:
-            result["parsing_errors"].append(f"缺少必需的输出字段: {field}")
 
         return result
 
@@ -281,8 +267,7 @@ class ResponseParser:
 
         for field in self.output_fields:
             display_name = TaskConfig.get_field_display_name(field)
-            # 检查字段标识符（带或不带冒号）
-            if display_name.upper() in line_upper or f"{display_name.upper()}:" in line_upper:
+            if display_name.upper() in line_upper:
                 return field
 
         return None
@@ -308,9 +293,8 @@ class ChemMechPredictionEvaluator:
         eval_result = {
             "text": response_text,
             "parsed_fields": parsed_output["parsed_fields"],
-            "parsing_errors": parsed_output["parsing_errors"],
             "is_task_matched": self._check_task_matching(parsed_output["parsed_fields"]),
-            "is_resolved_correct": len(parsed_output["parsing_errors"]) == 0  # 没有解析错误即为正确解析
+            "is_resolved_correct": True  # 初始假设解析正确
         }
 
         # 对每个输出字段进行评估
@@ -325,8 +309,13 @@ class ChemMechPredictionEvaluator:
                 eval_result.update(self._evaluate_upd_cano_am_prds(pred_value, true_value))
             else:
                 eval_result.update(self._evaluate_general_field(field, pred_value, true_value))
-            # 更新总体正确性
             is_correct_key = f"is_correct_{TaskConfig.INFOID_MTRFRG_MAPPING[field]}"
+            # 检查是否有解析错误
+            # if field in parsed_output["parsed_fields"] and not eval_result[is_correct_key]:
+            if field in parsed_output["parsed_fields"]:
+                eval_result["is_resolved_correct"] = False
+
+            # 更新总体正确性
             if field in self.response_parser.output_fields and not eval_result[is_correct_key]:
                 total_correct = False
 
@@ -339,7 +328,6 @@ class ChemMechPredictionEvaluator:
         parsed = {}
         lines = label_text.strip().split('\n')
         current_field = None
-        current_content = []
 
         for line in lines:
             line = line.strip()
@@ -348,28 +336,13 @@ class ChemMechPredictionEvaluator:
 
             field_match = self._identify_label_field(line)
             if field_match:
-                # 保存前一个字段的内容
-                if current_field and current_content:
-                    parsed[current_field] = '\n'.join(current_content).strip()
-                    current_content = []
-
                 current_field = field_match
-
-                # 处理字段标识符后的内容
-                remaining_content = line.replace(TaskConfig.get_field_display_name(field_match), "").strip()
-                if remaining_content:
-                    # 移除可能的冒号
-                    if remaining_content.startswith(':'):
-                        remaining_content = remaining_content[1:].strip()
-                    if remaining_content:
-                        current_content.append(remaining_content)
-            else:
-                if current_field:
-                    current_content.append(line)
-
-        # 处理最后一个字段
-        if current_field and current_content:
-            parsed[current_field] = '\n'.join(current_content).strip()
+                parsed[current_field] = ""
+            elif current_field:
+                if parsed[current_field]:
+                    parsed[current_field] += "\n" + line
+                else:
+                    parsed[current_field] = line
 
         return parsed
 
@@ -379,8 +352,7 @@ class ChemMechPredictionEvaluator:
 
         for field in self.response_parser.output_fields:
             display_name = TaskConfig.get_field_display_name(field)
-            # 检查字段标识符（带或不带冒号）
-            if display_name.upper() in line_upper or f"{display_name.upper()}:" in line_upper:
+            if display_name.upper() in line_upper:
                 return field
 
         return None
@@ -409,14 +381,13 @@ class ChemMechPredictionEvaluator:
             pred_molecules = pred_value.split('.')
             true_molecules = true_value.split('.')
             is_correct_canonical = sorted(pred_molecules) == sorted(true_molecules)
-            if not is_correct_canonical:
+            if len(pred_molecules) == len(true_molecules):
                 # 对每个分子进行标准化比较
                 pred_canon = [self.molecular_evaluator.canonicalize_smiles(mol) for mol in pred_molecules]
                 true_canon = [self.molecular_evaluator.canonicalize_smiles(mol) for mol in true_molecules]
+
                 # 排序后比较（忽略顺序）
                 is_correct = sorted(pred_canon) == sorted(true_canon)
-            else:
-                is_correct = True
 
         result.update({
             "upd_cano_am_prds": pred_value,
@@ -611,7 +582,7 @@ if __name__ == "__main__":
     parser.add_argument("--return_dict_in_generate", action="store_true", default=True)
 
     # 动态批处理参数
-    parser.add_argument("--batch_limit", type=int, default=1,
+    parser.add_argument("--batch_limit", type=int, default=2,
                         help="每个批次的最大序列数")
     parser.add_argument("--batch_token_size", type=int, default=2000,
                         help="每个批次的最大token数")
