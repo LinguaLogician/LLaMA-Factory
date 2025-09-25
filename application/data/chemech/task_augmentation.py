@@ -13,7 +13,14 @@ import json
 import argparse
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
+
+from rdkit import Chem
 from tqdm import tqdm
+from rdkit import rdBase
+
+# 禁用 RDKit 日志
+rdBase.DisableLog('rdApp.error')
+rdBase.DisableLog('rdApp.warning')
 import random
 
 # ============================
@@ -28,7 +35,7 @@ DATA_FILE_NAME = "mech_USPTO_ext.json"
 
 # 任务配置
 TASK_GROUPS = {
-    "RXN-to-Mech": [
+    "RXN_TO_MECH": [
         "ORI.CANO.STD.RXN->CLS",
         "ORI.CANO.AM.RXN->CLS",
         "UPD.CANO.AM.RXN->CLS",
@@ -36,68 +43,56 @@ TASK_GROUPS = {
         "UPD.CANO.AM.RXN->CLS+MECH"
     ],
 
-    "RXN-to-RXN": [
+    "RXN_TO_RXN": [
+        "ORI.AM.RXN->UPD.AM.RXN",
         "ORI.CANO.AM.RXN->UPD.CANO.AM.RXN",
         "ORI.CANO.STD.RXN->UPD.CANO.STD.RXN",
         "ORI.CANO.STD.RXN->ORI.CANO.AM.RXN",
         "UPD.CANO.STD.RXN->UPD.CANO.AM.RXN",
         "ORI.CANO.AM.RXN->ORI.CANO.STD.RXN",
         "UPD.CANO.AM.RXN->UPD.CANO.STD.RXN",
-        "ORI.AM.RXN->UPD.AM.RXN",
-        "UPD.ARBI.AM.RXN->UPD.ARBI.STD.RXN",
-        "ARBI.AM.RXN->ARBI.STD.RXN"
     ],
 
-    "Rxts-to-Rxts": [
+    "RXTS_TO_RXTS": [
+        "AM.RXTS->AM.RXTS",
+        "STD.RXTS->STD.RXTS",
+        "CANO.STD.RXTS->ARBI.STD.RXTS",
+        "ARBI.STD.RXTS->CANO.STD.RXTS",
+
         "UPD.CANO.STD.RXTS->UPD.CANO.AM.RXTS",
         "UPD.CANO.AM.RXTS->UPD.CANO.STD.RXTS",
         "ORI.CANO.STD.RXTS->ORI.CANO.AM.RXTS",
         "ORI.CANO.AM.RXTS->ORI.CANO.STD.RXTS",
-        "AM.RXTS->AM.RXTS",
-        "STD.RXTS->STD.RXTS",
-        "CANO.AM.RXTS->ARBI.AM.RXTS",
-        "ARBI.AM.RXTS->CANO.AM.RXTS",
-        "CANO.STD.RXTS->ARBI.STD.RXTS",
-        "ARBI.STD.RXTS->CANO.STD.RXTS",
-        "ORI.CANO.AM.RXTS->ORI.ARBI.AM.RXTS",
-        "ORI.ARBI.AM.RXTS->ORI.CANO.AM.RXTS",
         "ORI.CANO.STD.RXTS->ORI.ARBI.STD.RXTS",
         "ORI.ARBI.STD.RXTS->ORI.CANO.STD.RXTS",
-        "UPD.CANO.AM.RXTS->UPD.ARBI.AM.RXTS",
-        "UPD.ARBI.AM.RXTS->UPD.CANO.AM.RXTS",
         "UPD.CANO.STD.RXTS->UPD.ARBI.STD.RXTS",
         "UPD.ARBI.STD.RXTS->UPD.CANO.STD.RXTS"
     ],
 
-    "Prds-to-Prds": [
-        "UPD.CANO.AM.PRDS->UPD.CANO.STD.PRDS",
-        "ORI.CANO.AM.PRDS->ORI.CANO.STD.PRDS",
+    "PRDS_TO_PRDS": [
         "AM.PRDS->AM.PRDS",
         "STD.PRDS->STD.PRDS",
-        "CANO.AM.PRDS->ARBI.AM.PRDS",
-        "ARBI.AM.PRDS->CANO.AM.PRDS",
         "CANO.STD.PRDS->ARBI.STD.PRDS",
         "ARBI.STD.PRDS->CANO.STD.PRDS",
-        "ORI.CANO.AM.PRDS->ORI.ARBI.AM.PRDS",
-        "ORI.ARBI.AM.PRDS->ORI.CANO.AM.PRDS",
+
+        "UPD.CANO.AM.PRDS->UPD.CANO.STD.PRDS",
+        "ORI.CANO.AM.PRDS->ORI.CANO.STD.PRDS",
         "ORI.CANO.STD.PRDS->ORI.ARBI.STD.PRDS",
         "ORI.ARBI.STD.PRDS->ORI.CANO.STD.PRDS",
-        "UPD.CANO.AM.PRDS->UPD.ARBI.AM.PRDS",
-        "UPD.ARBI.AM.PRDS->UPD.CANO.AM.PRDS",
         "UPD.CANO.STD.PRDS->UPD.ARBI.STD.PRDS",
         "UPD.ARBI.STD.PRDS->UPD.CANO.STD.PRDS"
     ],
 
-    "Rxts-to-Prds": [
+    "RXTS_TO_PRDS": [
+        "ARBI.STD.RXTS->ARBI.STD.PRDS",
+
         "UPD.CANO.AM.RXTS->UPD.CANO.AM.PRDS",
         "UPD.CANO.STD.RXTS->UPD.CANO.STD.PRDS",
         "ORI.CANO.AM.RXTS->ORI.CANO.AM.PRDS",
         "ORI.CANO.STD.RXTS->ORI.CANO.STD.PRDS",
-        "ARBI.AM.RXTS->ARBI.AM.PRDS",
-        "ARBI.STD.RXTS->ARBI.STD.PRDS"
     ],
 
-    "Prds-to-Rxts": [
+    "PRDS_TO_RXTS": [
         "UPD.CANO.STD.PRDS->UPD.CANO.STD.RXTS",
         "UPD.CANO.AM.PRDS->UPD.CANO.AM.RXTS",
         "ORI.CANO.STD.PRDS->ORI.CANO.STD.RXTS",
@@ -179,7 +174,7 @@ class ChemicalMechanismDataProcessor:
         input_part, output_part = task_tag.split('->')
         return input_part.strip(), output_part.strip()
 
-    def _get_field_key(self, data_type: str, field_type: str) -> str:
+    def _get_field_key(self, data_type: str, field_type: str) -> tuple[str, str]:
         """根据数据类型和字段类型获取字段键"""
         # 解析数据类型 (如 "UPD.CANO.AM.RXTS")
         parts = data_type.split('.')
@@ -226,28 +221,37 @@ class ChemicalMechanismDataProcessor:
         else:
             return data.get(field_config, "")
 
-    def _needs_augmentation(self, input_type: str, output_type: str) -> bool:
+    def _needs_augmentation(self, input_type: str, output_type: str) -> (bool, bool):
         """判断任务是否需要数据增强"""
-        input_has_arbi = "ARBI" in input_type or ("CANO" not in input_type and "ARBI" not in input_type)
-        output_has_arbi = "ARBI" in output_type or ("CANO" not in output_type and "ARBI" not in output_type)
+        ignores = ["CLS", "MECH", "CLS+MECH"]
+        input_has_arbi = ("ARBI" in input_type or
+                          (input_type not in  ignores
+                           and "AM" not in input_type
+                           and "CANO" not in input_type
+                           and "ARBI" not in input_type))
+        output_has_arbi = ("ARBI" in output_type or
+                           (output_type not in ignores
+                            and "CANO" not in output_type
+                            and "AM" not in output_type
+                            and "ARBI" not in output_type))
 
         if self.to_be_augmented:
-            return input_has_arbi or output_has_arbi
+            return (input_has_arbi or output_has_arbi), (input_has_arbi or output_has_arbi)
         else:
-            return False
+            return False, input_has_arbi or output_has_arbi
 
-    def _augment_smiles(self, smiles: str, num_variants: int = 1) -> List[str]:
-        """对SMILES进行数据增强（生成随机SMILES）"""
-        # 这里应该使用化学信息学库如RDKit来生成随机SMILES
-        # 由于环境限制，这里使用简单的占位实现
-        # 实际应用中应该替换为真正的随机SMILES生成
-
-        augmented = []
-        for i in range(num_variants):
-            # 模拟随机SMILES生成 - 实际应该使用RDKit等
-            augmented.append(f"{smiles}_augmented_{i + 1}")
-
-        return augmented
+    def _augment_smiles(self, smiles: str, num_variants=1) -> List[str]:
+        try:
+            mol = Chem.MolFromSmiles(smiles)
+            if mol is None:
+                return [smiles] * num_variants
+            results = []
+            for _ in range(num_variants):
+                random_smiles = Chem.MolToSmiles(mol, doRandom=True, canonical=False)
+                results.append(random_smiles)
+            return results
+        except:
+            return [smiles] * num_variants
 
     def _format_instruction(self, input_type: str, output_type: str) -> str:
         """格式化指令"""
@@ -277,8 +281,9 @@ class ChemicalMechanismDataProcessor:
         input_type, output_type = self._parse_task_tag(task_tag)
 
         # 检查是否需要增强
-        needs_aug = self._needs_augmentation(input_type, output_type)
-        multiplier = self.multiple if needs_aug else 1
+        needs_aug, has_arbi = self._needs_augmentation(input_type, output_type)
+
+        multiplier = self.multiple if needs_aug else 0
 
         results = []
 
@@ -297,9 +302,11 @@ class ChemicalMechanismDataProcessor:
             return results
 
         # 数据增强处理
-        if needs_aug:
+        if needs_aug and 'ARBI.AM' not in task_tag:
             augmented_inputs = self._augment_smiles(input_data, multiplier)
             augmented_outputs = self._augment_smiles(output_data, multiplier)
+        elif 'ARBI.AM' in task_tag:
+            raise NotImplementedError("ARBI.AM 数据增强处理未实现")
         else:
             augmented_inputs = [input_data]
             augmented_outputs = [output_data]
@@ -318,7 +325,7 @@ class ChemicalMechanismDataProcessor:
 
         return results
 
-    def process_split(self, split: str) -> Dict[str, List[Dict]]:
+    def process_split(self, split: str) -> Dict[str, Dict[str, List[Dict]]]:
         """处理单个split的数据"""
         print(f"处理 {split} 数据...")
 
@@ -336,14 +343,17 @@ class ChemicalMechanismDataProcessor:
         task_results = {}
 
         for group_name, task_tags in TASK_GROUPS.items():
+            grouped_results = {}
             for task_tag in task_tags:
                 task_id = self._get_task_id(task_tag)
 
                 # 检查任务是否需要处理
                 input_type, output_type = self._parse_task_tag(task_tag)
-                needs_aug = self._needs_augmentation(input_type, output_type)
+                needs_aug, has_arbi = self._needs_augmentation(input_type, output_type)
 
                 if (self.to_be_augmented and not needs_aug) or (not self.to_be_augmented and needs_aug):
+                    continue
+                elif not needs_aug or not has_arbi:
                     continue
 
                 print(f"  处理任务: {task_tag}")
@@ -354,40 +364,44 @@ class ChemicalMechanismDataProcessor:
                     task_data.extend(results)
 
                 if task_data:
-                    task_results[task_id] = task_data
+                    grouped_results[task_id] = task_data
                     print(f"    生成 {len(task_data)} 条数据")
-
+            task_results[group_name] = grouped_results
         return task_results
 
-    def save_results(self, split: str, task_results: Dict[str, List[Dict]]):
+    def save_results(self, split: str, task_results: Dict[str, Dict[str, List[Dict]]]):
         """保存处理结果"""
-        output_base_dir = self.data_dir / self.version / split / "tasks"
+        output_base_dir = self.data_dir / self.version / split
 
-        for task_id, data in task_results.items():
-            # 确定输出目录
-            if any(self._needs_augmentation(*self._parse_task_tag(tag))
-                   for group in TASK_GROUPS.values() for tag in group
-                   if self._get_task_id(tag) == task_id):
-                output_dir = output_base_dir / f"augm_x{self.multiple}"
-            else:
-                output_dir = output_base_dir
+        for group_name, task_data in task_results.items():
+            group_dir = output_base_dir / group_name.lower()
+            group_dir.mkdir(parents=True, exist_ok=True)
 
-            output_dir.mkdir(parents=True, exist_ok=True)
+            for task_id, data in task_data.items():
+                # 确定输出目录
+                if any(self._needs_augmentation(*self._parse_task_tag(tag))[0]
+                       for group in TASK_GROUPS.values() for tag in group
+                       if self._get_task_id(tag) == task_id):
+                    output_dir = group_dir / f"augm_x{self.multiple}"
+                else:
+                    output_dir = group_dir
 
-            # 保存数据
-            output_file = output_dir / f"{task_id.lower()}.json"
-            with open(output_file, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+                output_dir.mkdir(parents=True, exist_ok=True)
 
-            print(f"保存 {len(data)} 条数据到: {output_file}")
+                # 保存数据
+                output_file = output_dir / f"{task_id.lower()}.json"
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False)
 
-    def update_summary(self, split: str, task_results: Dict[str, List[Dict]]):
+                print(f"保存 {len(data)} 条数据到: {output_file}")
+
+    def update_summary(self, split: str, task_results: Dict[str, Dict[str, List[Dict]]]):
         """更新摘要信息"""
         if split not in self.summary:
             self.summary[split] = {}
 
-        for task_id, data in task_results.items():
-            self.summary[split][task_id] = len(data)
+        for group_tag, tasks in task_results.items():
+            self.summary[split][group_tag] = len(tasks)
 
     def save_summary(self):
         """保存摘要信息"""
@@ -442,7 +456,7 @@ def main():
                         help="数据版本")
     parser.add_argument("--splits", type=str, nargs='+', default=DEFAULT_SPLITS,
                         help="要处理的数据分割")
-    parser.add_argument("--to_be_augmented", default=False,
+    parser.add_argument("--to_be_augmented", default=True,
                         help="是否进行数据增强")
     parser.add_argument("--multiple", type=int, default=1,
                         help="数据增强倍数")
