@@ -32,10 +32,11 @@ CHECKPOINT_NAMES = {
     WEIGHTS_INDEX_NAME,
     WEIGHTS_NAME,
 }
-
+IMG_CONTEXT_TOKEN='<IMG_CONTEXT>'
 CHOICES = ["A", "B", "C", "D"]
 
-DATA_CONFIG = "dataset_info_cloud.json"
+# DATA_CONFIG = "dataset_info_cloud.json"
+DATA_CONFIG = "dataset_info.json"
 
 DEFAULT_TEMPLATE = defaultdict(str)
 

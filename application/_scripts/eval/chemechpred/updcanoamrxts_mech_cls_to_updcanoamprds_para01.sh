@@ -6,8 +6,8 @@
 
 # 模型和任务参数
 MODEL_PATH="/mnt/e/Development/LLMSpace/LLaMA-Factory/chemechpred/"
-MODEL_NAME="updcanoamrxts_cls_to_updcanoamprds_para01"
-TASK_ID="UPDCANOAMRXTS_CLS_TO_UPDCANOAMPRDS"
+MODEL_NAME="updcanoamrxts_mech_cls_to_updcanoamprds_para01"
+TASK_ID="UPDCANOAMRXTS_MECH_CLS_TO_UPDCANOAMPRDS"
 
 # 数据路径参数
 DATA_DIR="/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/test/"
