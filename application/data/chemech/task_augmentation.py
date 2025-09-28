@@ -28,41 +28,84 @@ import random
 # ============================
 
 # 基础路径配置
-DEFAULT_DATA_DIR = "/mnt/e/DataSets/Chemistry/ChemicalMechanism/demo"
+DEFAULT_DATA_DIR = "/mnt/e/DataSets/Chemistry/ChemicalMechanism/"
 DEFAULT_VERSION = "via_random"
 DEFAULT_SPLITS = ["train", "val", "test"]
+# DEFAULT_SPLITS = ["val"]
 DATA_FILE_NAME = "mech_USPTO_ext.json"
+
+TASK_GROUPS0 = {
+    "RXN_TO_MECH": [
+
+        # "RXN->CLS",
+        # "RXN->MECH",
+        # "RXN->CLS+MECH",
+        # --------------------------------------
+        # "ORI.CANO.STD.RXN->CLS",
+        # "ORI.CANO.AM.RXN->CLS",
+        # "UPD.CANO.AM.RXN->CLS",
+        # "UPD.CANO.AM.RXN->MECH",
+        # "UPD.CANO.AM.RXN->CLS+MECH",
+        # --------------------------------------
+        "ORI.ARBI.STD.RXN->CLS",
+        "UPD.ARBI.STD.RXN->CLS",
+    ]
+}
 
 # 任务配置
 TASK_GROUPS = {
     "RXN_TO_MECH": [
+
+        # "RXN->CLS",
+        # "RXN->MECH",
+        # "RXN->CLS+MECH",
+        # --------------------------------------
         "ORI.CANO.STD.RXN->CLS",
         "ORI.CANO.AM.RXN->CLS",
         "UPD.CANO.AM.RXN->CLS",
         "UPD.CANO.AM.RXN->MECH",
-        "UPD.CANO.AM.RXN->CLS+MECH"
+        "UPD.CANO.AM.RXN->CLS+MECH",
+        # --------------------------------------
+        "ORI.ARBI.STD.RXN->CLS",
+        "UPD.ARBI.STD.RXN->CLS",
     ],
 
     "RXN_TO_RXN": [
-        "ORI.AM.RXN->UPD.AM.RXN",
+
+        # "ORI.RXN->UPD.RXN",
+        # "STD.RXN->AM.RXN",
+        # "AM.RXN->STD.RXN",
+        # "ARBI.RXN->CANO.RXN",
+        # "CANO.RXN->ARBI.RXN",
+
         "ORI.CANO.AM.RXN->UPD.CANO.AM.RXN",
         "ORI.CANO.STD.RXN->UPD.CANO.STD.RXN",
+
         "ORI.CANO.STD.RXN->ORI.CANO.AM.RXN",
         "UPD.CANO.STD.RXN->UPD.CANO.AM.RXN",
+
         "ORI.CANO.AM.RXN->ORI.CANO.STD.RXN",
         "UPD.CANO.AM.RXN->UPD.CANO.STD.RXN",
+    # --------------------------------------
+        "ORI.ARBI.STD.RXN->ORI.CANO.STD.RXN",
+        "UPD.ARBI.STD.RXN->UPD.CANO.STD.RXN",
+
+        "ORI.CANO.STD.RXN->ORI.ARBI.STD.RXN",
+        "UPD.CANO.STD.RXN->UPD.ARBI.STD.RXN",
     ],
 
     "RXTS_TO_RXTS": [
-        "AM.RXTS->AM.RXTS",
-        "STD.RXTS->STD.RXTS",
-        "CANO.STD.RXTS->ARBI.STD.RXTS",
-        "ARBI.STD.RXTS->CANO.STD.RXTS",
+
+        # "STD.RXTS->AM.RXTS",
+        # "AM.RXTS->STD.RXTS",
+        # "ARBI.RXTS->CANO.RXTS",
+        # "CANO.RXTS->ARBI.RXTS",
 
         "UPD.CANO.STD.RXTS->UPD.CANO.AM.RXTS",
         "UPD.CANO.AM.RXTS->UPD.CANO.STD.RXTS",
         "ORI.CANO.STD.RXTS->ORI.CANO.AM.RXTS",
         "ORI.CANO.AM.RXTS->ORI.CANO.STD.RXTS",
+        # --------------------------------------
         "ORI.CANO.STD.RXTS->ORI.ARBI.STD.RXTS",
         "ORI.ARBI.STD.RXTS->ORI.CANO.STD.RXTS",
         "UPD.CANO.STD.RXTS->UPD.ARBI.STD.RXTS",
@@ -70,70 +113,71 @@ TASK_GROUPS = {
     ],
 
     "PRDS_TO_PRDS": [
-        "AM.PRDS->AM.PRDS",
-        "STD.PRDS->STD.PRDS",
-        "CANO.STD.PRDS->ARBI.STD.PRDS",
-        "ARBI.STD.PRDS->CANO.STD.PRDS",
+
+        # "AM.PRDS->STD.PRDS",
+        # "ARBI.PRDS->CANO.PRDS",
+        # "CANO.PRDS->ARBI.PRDS",
 
         "UPD.CANO.AM.PRDS->UPD.CANO.STD.PRDS",
         "ORI.CANO.AM.PRDS->ORI.CANO.STD.PRDS",
+        # --------------------------------------
         "ORI.CANO.STD.PRDS->ORI.ARBI.STD.PRDS",
         "ORI.ARBI.STD.PRDS->ORI.CANO.STD.PRDS",
         "UPD.CANO.STD.PRDS->UPD.ARBI.STD.PRDS",
         "UPD.ARBI.STD.PRDS->UPD.CANO.STD.PRDS"
     ],
-
     "RXTS_TO_PRDS": [
-        "ARBI.STD.RXTS->ARBI.STD.PRDS",
-
+        # "RXTS->PRDS",
         "UPD.CANO.AM.RXTS->UPD.CANO.AM.PRDS",
         "UPD.CANO.STD.RXTS->UPD.CANO.STD.PRDS",
         "ORI.CANO.AM.RXTS->ORI.CANO.AM.PRDS",
         "ORI.CANO.STD.RXTS->ORI.CANO.STD.PRDS",
     ],
-
     "PRDS_TO_RXTS": [
+        # "PRDS->RXTS",
         "UPD.CANO.STD.PRDS->UPD.CANO.STD.RXTS",
-        "UPD.CANO.AM.PRDS->UPD.CANO.AM.RXTS",
         "ORI.CANO.STD.PRDS->ORI.CANO.STD.RXTS",
-        "ORI.CANO.AM.PRDS->ORI.CANO.AM.RXTS",
-        "ORI.ARBI.STD.PRDS->ORI.ARBI.STD.RXTS",
-        "UPD.ARBI.STD.PRDS->UPD.ARBI.STD.RXTS"
-    ]
+    ],
+    # "OTHERS": [
+    #   "CANO->ARBI",
+    #   "ARBI->CANO",
+    #   "STD->AM",
+    #   "AM->STD",
+    # ]
 }
 
 # 字段映射配置
 FIELD_MAPPINGS = {
     "ORI": {
-        "AM_RXTS": "amrxts_in_ori",
-        "AM_PRDS": "amprds_in_ori",
-        "AM_RXN": lambda data: f"{data['amrxts_in_ori']}>>{data['amprds_in_ori']}",
+        # "AM_RXTS": "amrxts_in_ori",
+        # "AM_PRDS": "amprds_in_ori",
+        # "AM_RXN": lambda data: f"{data['amrxts_in_ori']}>>{data['amprds_in_ori']}",
         "STD_RXTS": "rxts_cano_in_ori",
         "STD_PRDS": "prds_cano_in_ori",
         "STD_RXN": lambda data: f"{data['rxts_cano_in_ori']}>>{data['prds_cano_in_ori']}",
         "CANO_AM_RXTS": "amrxts_cano_in_ori",
         "CANO_AM_PRDS": "amprds_cano_in_ori",
         "CANO_AM_RXN": lambda data: f"{data['amrxts_cano_in_ori']}>>{data['amprds_cano_in_ori']}",
-        "ARBI_AM_RXTS": "amrxts_cano_in_ori",  # 需要增强
-        "ARBI_AM_PRDS": "amprds_cano_in_ori",  # 需要增强
-        "ARBI_AM_RXN": lambda data: f"{data['amrxts_cano_in_ori']}>>{data['amprds_cano_in_ori']}",  # 需要增强
+        # "ARBI_AM_RXTS": "amrxts_cano_in_ori",  # 需要增强
+        # "ARBI_AM_PRDS": "amprds_cano_in_ori",  # 需要增强
+        # "ARBI_AM_RXN": lambda data: f"{data['amrxts_cano_in_ori']}>>{data['amprds_cano_in_ori']}",  # 需要增强
         "ARBI_STD_RXTS": "rxts_cano_in_ori",  # 需要增强
         "ARBI_STD_PRDS": "prds_cano_in_ori",  # 需要增强
         "ARBI_STD_RXN": lambda data: f"{data['rxts_cano_in_ori']}>>{data['prds_cano_in_ori']}"  # 需要增强
     },
     "UPD": {
-        "AM_RXTS": "amrxts_in_upd",
-        "AM_PRDS": "amprds_in_upd",
-        "AM_RXN": lambda data: f"{data['amrxts_in_upd']}>>{data['amprds_in_upd']}",
+        # "AM_RXTS": "amrxts_in_upd",
+        # "AM_PRDS": "amprds_in_upd",
+        # "AM_RXN": lambda data: f"{data['amrxts_in_upd']}>>{data['amprds_in_upd']}",
         "STD_RXTS": "rxts_cano_in_upd",
         "STD_PRDS": "prds_cano_in_upd",
         "STD_RXN": lambda data: f"{data['rxts_cano_in_upd']}>>{data['prds_cano_in_upd']}",
         "CANO_AM_RXTS": "amrxts_cano_in_upd",
         "CANO_AM_PRDS": "amprds_cano_in_upd",
         "CANO_AM_RXN": lambda data: f"{data['amrxts_cano_in_upd']}>>{data['amprds_cano_in_upd']}",
-        "ARBI_AM_RXTS": "amrxts_cano_in_upd",  # 需要增强
-        "ARBI_AM_PRDS": "amprds_cano_in_upd",  # 需要增强
-        "ARBI_AM_RXN": lambda data: f"{data['amrxts_cano_in_upd']}>>{data['amprds_cano_in_upd']}",  # 需要增强
+        # "ARBI_AM_RXTS": "amrxts_cano_in_upd",  # 需要增强
+        # "ARBI_AM_PRDS": "amprds_cano_in_upd",  # 需要增强
+        # "ARBI_AM_RXN": lambda data: f"{data['amrxts_cano_in_upd']}>>{data['amprds_cano_in_upd']}",  # 需要增强
         "ARBI_STD_RXTS": "rxts_cano_in_upd",  # 需要增强
         "ARBI_STD_PRDS": "prds_cano_in_upd",  # 需要增强
         "ARBI_STD_RXN": lambda data: f"{data['rxts_cano_in_upd']}>>{data['prds_cano_in_upd']}"  # 需要增强
@@ -227,13 +271,11 @@ class ChemicalMechanismDataProcessor:
         input_has_arbi = ("ARBI" in input_type or
                           (input_type not in  ignores
                            and "AM" not in input_type
-                           and "CANO" not in input_type
-                           and "ARBI" not in input_type))
+                           and "CANO" not in input_type))
         output_has_arbi = ("ARBI" in output_type or
                            (output_type not in ignores
                             and "CANO" not in output_type
-                            and "AM" not in output_type
-                            and "ARBI" not in output_type))
+                            and "AM" not in output_type))
 
         if self.to_be_augmented:
             return (input_has_arbi or output_has_arbi), (input_has_arbi or output_has_arbi)
@@ -252,6 +294,20 @@ class ChemicalMechanismDataProcessor:
             return results
         except:
             return [smiles] * num_variants
+
+    def _augment_data(self, in_out_data: str, data_type: str, multiplier=1) -> List[str]:
+        if "ARBI" not in data_type:
+            return [in_out_data] * multiplier
+        if "RXN" in data_type:
+            rxts_and_prds = in_out_data.split(">>",1)
+            augmented_reactants = self._augment_smiles(rxts_and_prds[0], multiplier)
+            augmented_products = self._augment_smiles(rxts_and_prds[1], multiplier)
+            return [f"{rxt}>>{prd}" for rxt, prd in zip(augmented_reactants, augmented_products)]
+
+        elif "RXTS" in data_type or "PRDS" in data_type:
+            return self._augment_smiles(in_out_data, multiplier)
+        else:
+            raise ValueError(f"无效的数据类型: {data_type}")
 
     def _format_instruction(self, input_type: str, output_type: str) -> str:
         """格式化指令"""
@@ -301,12 +357,12 @@ class ChemicalMechanismDataProcessor:
         if not input_data or not output_data:
             return results
 
-        # 数据增强处理
-        if needs_aug and 'ARBI.AM' not in task_tag:
-            augmented_inputs = self._augment_smiles(input_data, multiplier)
-            augmented_outputs = self._augment_smiles(output_data, multiplier)
-        elif 'ARBI.AM' in task_tag:
+        if 'ARBI.AM' in task_tag:
             raise NotImplementedError("ARBI.AM 数据增强处理未实现")
+
+        if needs_aug:
+            augmented_inputs = self._augment_data(input_data, input_type, multiplier)
+            augmented_outputs = self._augment_data(output_data, output_type, multiplier)
         else:
             augmented_inputs = [input_data]
             augmented_outputs = [output_data]
@@ -316,7 +372,7 @@ class ChemicalMechanismDataProcessor:
             input_str, output_str = self._format_input_output(inp, out, input_type, output_type)
 
             result = {
-                "id": f"{task_id.lower()}_{data['id'].split('_')[-1]}_{i if needs_aug else 0}",
+                "id": f"{task_id.lower()}_{i if needs_aug else 0}_{data['id'].split('_')[-1]}",
                 "instruction": self._format_instruction(input_type, output_type),
                 "input": input_str,
                 "output": output_str
@@ -351,14 +407,13 @@ class ChemicalMechanismDataProcessor:
                 input_type, output_type = self._parse_task_tag(task_tag)
                 needs_aug, has_arbi = self._needs_augmentation(input_type, output_type)
 
-                if (self.to_be_augmented and not needs_aug) or (not self.to_be_augmented and needs_aug):
-                    continue
-                elif not needs_aug or not has_arbi:
+                if (self.to_be_augmented and not has_arbi) or (not self.to_be_augmented and has_arbi):
                     continue
 
                 print(f"  处理任务: {task_tag}")
                 task_data = []
 
+                input_source, input_field_key = self._get_field_key(input_type, "input")
                 for data_point in tqdm(raw_data, desc=f"  {task_id}"):
                     results = self.process_single_data_point(data_point, task_tag)
                     task_data.extend(results)

@@ -1,0 +1,49 @@
+### model
+model_name_or_path: /home/liangtao/Models/Qwen/Qwen2-0.5B
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: full
+deepspeed: examples/deepspeed/ds_z2_config.json
+
+### dataset
+dataset: updcanoamrxn_to_updcanostdrxn
+template: qwen
+cutoff_len: 2048
+max_samples: 100000000000
+overwrite_cache: true
+preprocessing_num_workers: 1
+dataloader_num_workers: 4
+
+### output
+output_dir: chemechpred/rxn_to_rxn/updcanoamrxn_to_updcanostdrxn
+logging_steps: 100
+save_steps: 200000000
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: tensorboard  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+
+### train
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 1
+learning_rate: 1.0e-5
+num_train_epochs: 4.0
+lr_scheduler_type: warmup_stable_decay
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+eval_dataset: updcanoamrxn_to_updcanostdrxn_val
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 1000
+
+
+run_name: updcanoamrxn_to_updcanostdrxn
+
+# FORCE_TORCHRUN=1 llamafactory-cli train examples/train_full/chemechpred/rxn_to_rxn/updcanoamrxn_to_updcanostdrxn.yaml 2>&1 | tee -a logs/updcanoamrxn_to_updcanostdrxn.log
