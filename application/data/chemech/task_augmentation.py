@@ -80,6 +80,8 @@ TASK_GROUPS = {
 
         "ORI.CANO.AM.RXN->UPD.CANO.AM.RXN",
         "ORI.CANO.STD.RXN->UPD.CANO.STD.RXN",
+        "UPD.CANO.AM.RXN->ORI.CANO.AM.RXN",
+        "UPD.CANO.STD.RXN->ORI.CANO.STD.RXN",
 
         "ORI.CANO.STD.RXN->ORI.CANO.AM.RXN",
         "UPD.CANO.STD.RXN->UPD.CANO.AM.RXN",
@@ -511,7 +513,7 @@ def main():
                         help="数据版本")
     parser.add_argument("--splits", type=str, nargs='+', default=DEFAULT_SPLITS,
                         help="要处理的数据分割")
-    parser.add_argument("--to_be_augmented", default=True,
+    parser.add_argument("--to_be_augmented", default=False,
                         help="是否进行数据增强")
     parser.add_argument("--multiple", type=int, default=1,
                         help="数据增强倍数")

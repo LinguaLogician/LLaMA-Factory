@@ -20,7 +20,7 @@ from datetime import datetime
 
 # ============================ 配置常量 ============================
 
-DEFAULT_MAX_K = 5  # 默认计算前5个结果
+DEFAULT_MAX_K = 10  # 默认计算前5个结果
 
 TASKS_CONFIG = {
     "RXN_TO_MECH": [
@@ -132,14 +132,14 @@ class ChemMechScoreCalculator:
         self.task_id = self.args.task_id
 
         # 设置预测文件路径
-        prediction_dir = Path(self.args.prediction_base_dir) / self.group /self.task_id
+        prediction_dir = Path(self.args.prediction_base_dir) / self.args.subset / self.group /self.task_id
         self.prediction_file = prediction_dir / f"{self.args.model_name}.json"
 
         if not self.prediction_file.exists():
             raise FileNotFoundError(f"预测文件不存在: {self.prediction_file}")
 
         # 设置输出路径
-        self.output_dir = Path(self.args.output_base_dir) / self.group / self.task_id
+        self.output_dir = Path(self.args.output_base_dir) / self.args.subset / self.group / self.task_id
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.output_file = self.output_dir / f"{self.args.model_name}.json"
 
@@ -324,11 +324,16 @@ class ChemMechScoreCalculator:
             for metric_type in global_metrics[category]:
                 for k in range(1, max_k + 1):
                     key = f"K={k}"
-                    total_possible = total_samples * k
+                    total_possible = total_samples
+                    if metric_type=="PrecTopK":
+                        total_possible = total_samples * k
+                    elif metric_type == "PrecKth":
+                        total_possible = total_samples
                     global_metrics[category][metric_type][key] = (
                         global_metrics[category][metric_type][key] / total_possible
                         if total_possible > 0 else 0.0
                     )
+
 
         return global_metrics
 
@@ -423,14 +428,14 @@ def main():
                         help="task_id")
     parser.add_argument("--model_name", type=str, default="updcanoamprds_to_updcanostdprds",
                         help="模型名称")
-
     # 路径参数
     parser.add_argument("--prediction_base_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction",
+                        default="results/chemechpred/prediction",
                         help="预测结果基础目录")
     parser.add_argument("--output_base_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/scores",
+                        default="results/chemechpred/scores",
                         help="评分结果输出基础目录")
+    parser.add_argument("--subset", type=str, default="_random313")
 
     # 计算参数
     parser.add_argument("--max_k", type=int, default=5,

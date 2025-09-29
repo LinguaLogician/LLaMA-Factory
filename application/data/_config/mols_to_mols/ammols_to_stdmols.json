@@ -1,0 +1,63 @@
+{
+  "data_recipe": {
+    "train": [
+      ["", "rxts_to_rxts", "updcanoamrxts_to_updcanostdrxts", "", 0.5, {
+        "UPD.CANO.AM.RXTS": "MOLS",
+        "UPD.CANO.STD.RXTS": "MOLS"
+      }],
+      ["", "rxts_to_rxts", "oricanoamrxts_to_oricanostdrxts", "", 0.5, {
+        "ORI.CANO.AM.RXTS": "MOLS",
+        "ORI.CANO.STD.RXTS": "MOLS"
+      }],
+      ["", "prds_to_prds", "updcanoamprds_to_updcanostdprds", "", 0.5, {
+        "UPD.CANO.AM.PRDS": "MOLS",
+        "UPD.CANO.STD.PRDS": "MOLS"
+      }],
+      ["", "prds_to_prds", "oricanoamprds_to_oricanostdprds", "", 0.5, {
+        "ORI.CANO.AM.PRDS": "MOLS",
+        "ORI.CANO.STD.PRDS": "MOLS"
+      }]
+    ],
+    "val": [
+      ["", "rxts_to_rxts", "updcanoamrxts_to_updcanostdrxts", "", 0.5, {
+        "UPD.CANO.AM.RXTS": "MOLS",
+        "UPD.CANO.STD.RXTS": "MOLS"
+      }],
+      ["", "rxts_to_rxts", "oricanoamrxts_to_oricanostdrxts", "", 0.5, {
+        "ORI.CANO.AM.RXTS": "MOLS",
+        "ORI.CANO.STD.RXTS": "MOLS"
+      }],
+      ["", "prds_to_prds", "updcanoamprds_to_updcanostdprds", "", 0.5, {
+        "UPD.CANO.AM.PRDS": "MOLS",
+        "UPD.CANO.STD.PRDS": "MOLS"
+      }],
+      ["", "prds_to_prds", "oricanoamprds_to_oricanostdprds", "", 0.5, {
+        "ORI.CANO.AM.PRDS": "MOLS",
+        "ORI.CANO.STD.PRDS": "MOLS"
+      }]
+    ],
+    "test": [
+      ["", "rxts_to_rxts", "updcanoamrxts_to_updcanostdrxts", "", 0.5, {
+        "UPD.CANO.AM.RXTS": "MOLS",
+        "UPD.CANO.STD.RXTS": "MOLS"
+      }],
+      ["", "rxts_to_rxts", "oricanoamrxts_to_oricanostdrxts", "", 0.5, {
+        "ORI.CANO.AM.RXTS": "MOLS",
+        "ORI.CANO.STD.RXTS": "MOLS"
+      }],
+      ["", "prds_to_prds", "updcanoamprds_to_updcanostdprds", "", 0.5, {
+        "UPD.CANO.AM.PRDS": "MOLS",
+        "UPD.CANO.STD.PRDS": "MOLS"
+      }],
+      ["", "prds_to_prds", "oricanoamprds_to_oricanostdprds", "", 0.5, {
+        "ORI.CANO.AM.PRDS": "MOLS",
+        "ORI.CANO.STD.PRDS": "MOLS"
+      }]
+    ]
+  },
+  "data_output": {
+    "train": ["", "mols_to_mols", "ammols_to_stdmols"],
+    "val": ["", "mols_to_mols", "ammols_to_stdmols"],
+    "test": ["", "mols_to_mols", "ammols_to_stdmols"]
+  }
+}

@@ -1,0 +1,351 @@
+# -*- coding: utf-8 -*-
+# @project: LLaMA-Factory
+# @filename: batch_predict_score.py
+# @author: Karl Wu
+# @contact: wlt1990@outlook.com
+# @time: 2025/9/28 16:46
+# https://chat.deepseek.com/a/chat/s/59ced693-1ead-42ca-aee4-0a9189614201
+import json
+# -*- coding: utf-8 -*-
+# @filename: batch_predict_score.py
+# @author: Assistant
+# @contact:
+# @time: 2025/9/28
+
+import os
+import sys
+import subprocess
+import argparse
+import time
+import logging
+from pathlib import Path
+from typing import List, Tuple, Dict, Any
+from datetime import datetime
+
+# 添加当前目录到Python路径，以便导入predict2和score2
+current_dir = Path(__file__).parent
+sys.path.insert(0, str(current_dir))
+
+# 导入预测和评分模块
+try:
+    from predict2 import main as predict_main, GPU_MEMORY_THRESHOLD
+    from score2 import main as score_main
+except ImportError as e:
+    print(f"导入模块失败: {e}")
+    print("请确保predict2.py和score2.py在当前目录下")
+    sys.exit(1)
+
+
+class BatchChemMechProcessor:
+    """批量化学机制预测和评分处理器"""
+
+    def __init__(self, args):
+        self.args = args
+        self.setup_logging()
+        self.tasks = self.parse_tasks()
+
+    def setup_logging(self):
+        """设置日志"""
+        log_dir = Path("./logs/chemechpred/batch")
+        log_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_file = log_dir / f"batch_processing_{timestamp}.log"
+
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(log_file),
+                logging.StreamHandler()
+            ]
+        )
+        self.logger = logging.getLogger(__name__)
+
+    def parse_tasks(self) -> List[Tuple[str, str, str]]:
+        """解析任务列表"""
+        tasks = []
+        if self.args.tasks:
+            # 从命令行参数解析任务
+            for task_str in self.args.tasks:
+                try:
+                    section, model_name, task_id = task_str.split(',')
+                    tasks.append((section.strip(), model_name.strip(), task_id.strip()))
+                except ValueError:
+                    self.logger.error(f"任务格式错误: {task_str}，应为 'section,model_name,task_id'")
+        else:
+            # 使用默认任务列表
+            # tasks = DEFAULT_TASKS
+            tasks = [(section, model_name, model_name) for section, model_name in DEFAULT_TASKS]
+
+        return tasks
+
+    def run_predict(self, section: str, model_name: str, task_id: str) -> bool:
+        """运行单个预测任务"""
+        self.logger.info(f"开始预测任务 - section: {section}, model: {model_name}, task: {task_id}")
+
+        try:
+            # 构建预测参数
+            predict_args = [
+                "--task_id", task_id,
+                "--section", section,
+                "--model_name", model_name,
+                "--data_base_dir", self.args.data_base_dir,
+                "--subset", self.args.subset,
+                "--output_base_dir", self.args.output_base_dir,
+                "--model_path", self.args.model_path,
+                "--finetuning_type", self.args.finetuning_type,
+                "--template", self.args.template,
+                "--num_beams", str(self.args.num_beams),
+                "--do_sample" if self.args.do_sample else "",
+                "--max_new_tokens", str(self.args.max_new_tokens),
+                "--num_return_sequences", str(self.args.num_return_sequences),
+                "--output_scores" if self.args.output_scores else "",
+                "--return_dict_in_generate" if self.args.return_dict_in_generate else "",
+                "--batch_limit", str(self.args.batch_limit),
+                "--batch_token_size", str(self.args.batch_token_size),
+                "--minmax_gap", str(self.args.minmax_gap),
+                "--wait_for_gpu" if self.args.wait_for_gpu else "",
+                "--gpu_threshold", str(self.args.gpu_threshold)
+            ]
+
+            # 过滤空参数
+            predict_args = [arg for arg in predict_args if arg]
+
+            # 设置sys.argv并调用predict_main
+            original_argv = sys.argv
+            sys.argv = ['predict2.py'] + predict_args
+
+            predict_main()
+
+            # 恢复原始argv
+            sys.argv = original_argv
+
+            self.logger.info(f"预测任务完成 - section: {section}, model: {model_name}, task: {task_id}")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"预测任务失败 - section: {section}, model: {model_name}, task: {task_id}: {e}")
+            return False
+
+    def run_score(self, section: str, model_name: str, task_id: str) -> bool:
+        """运行单个评分任务"""
+        self.logger.info(f"开始评分任务 - section: {section}, model: {model_name}, task: {task_id}")
+
+        try:
+            # 构建评分参数
+            score_args = [
+                "--group", section,
+                "--task_id", task_id.lower(),
+                "--model_name", model_name,
+                "--prediction_base_dir", self.args.output_base_dir,
+                "--output_base_dir", self.args.score_base_dir,
+                "--subset", self.args.subset,
+                "--max_k", str(self.args.max_k)
+            ]
+
+            # 设置sys.argv并调用score_main
+            original_argv = sys.argv
+            sys.argv = ['score2.py'] + score_args
+
+            score_main()
+
+            # 恢复原始argv
+            sys.argv = original_argv
+
+            self.logger.info(f"评分任务完成 - section: {section}, model: {model_name}, task: {task_id}")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"评分任务失败 - section: {section}, model: {model_name}, task: {task_id}: {e}")
+            return False
+
+    def process_single_task(self, section: str, model_name: str, task_id: str) -> bool:
+        """处理单个任务（预测+评分）"""
+        self.logger.info(f"处理任务: section={section}, model={model_name}, task={task_id}")
+
+        # 运行预测
+        predict_success = self.run_predict(section, model_name, task_id)
+        if not predict_success:
+            return False
+
+        # 等待一段时间，确保文件写入完成
+        time.sleep(2)
+
+        # 运行评分
+        score_success = self.run_score(section, model_name, task_id)
+
+        return score_success
+
+    def process_all_tasks(self):
+        """处理所有任务"""
+        self.logger.info(f"开始批量处理，共 {len(self.tasks)} 个任务")
+
+        success_count = 0
+        failed_tasks = []
+
+        for i, (section, model_name, task_id) in enumerate(self.tasks, 1):
+            self.logger.info(f"处理任务 {i}/{len(self.tasks)}")
+
+            success = self.process_single_task(section, model_name, task_id)
+
+            if success:
+                success_count += 1
+                self.logger.info(f"任务 {i} 处理成功")
+            else:
+                failed_tasks.append((section, model_name, task_id))
+                self.logger.error(f"任务 {i} 处理失败")
+
+            # 任务间延迟，避免资源冲突
+            if i < len(self.tasks):
+                self.logger.info("等待10秒后处理下一个任务...")
+                time.sleep(10)
+
+        # 输出总结
+        self.logger.info("=" * 50)
+        self.logger.info("批量处理完成")
+        self.logger.info(f"成功: {success_count}/{len(self.tasks)}")
+
+        if failed_tasks:
+            self.logger.info("失败的任务:")
+            for task in failed_tasks:
+                self.logger.info(f"  - section: {task[0]}, model: {task[1]}, task: {task[2]}")
+        else:
+            self.logger.info("所有任务都成功完成！")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="批量化学机制预测和评分脚本")
+
+    # 任务参数
+    parser.add_argument("--tasks", nargs='+', type=str,
+                        help="任务列表，格式: 'section,model_name,task_id'，例如: 'prds_to_prds,model1,task1'")
+
+    # 路径参数
+    parser.add_argument("--data_base_dir", type=str,
+                        default="DataSets/Chemistry/ChemicalMechanism/via_random/test/",
+                        help="数据基础目录")
+    parser.add_argument("--subset", type=str, default=DEFAULT_SUBSET,
+                        help="数据子集")
+    parser.add_argument("--output_base_dir", type=str,
+                        default="results/chemechpred/prediction",
+                        help="预测结果输出基础目录")
+    parser.add_argument("--score_base_dir", type=str,
+                        default="results/chemechpred/scores",
+                        help="评分结果输出基础目录")
+    parser.add_argument("--model_path", type=str,
+                        default="chemechpred/",
+                        help="模型路径")
+
+    # 预测参数
+    parser.add_argument("--finetuning_type", type=str, default="full",
+                        help="微调类型")
+    parser.add_argument("--template", type=str, default="qwen",
+                        help="模板")
+    parser.add_argument("--num_beams", type=int, default=5,
+                        help="beam数量")
+    parser.add_argument("--do_sample", action="store_true", default=True,
+                        help="是否采样")
+    parser.add_argument("--max_new_tokens", type=int, default=2048,
+                        help="最大新生成token数")
+    parser.add_argument("--num_return_sequences", type=int, default=5,
+                        help="返回序列数量")
+    parser.add_argument("--output_scores", action="store_true", default=True,
+                        help="是否输出分数")
+    parser.add_argument("--return_dict_in_generate", action="store_true", default=True,
+                        help="是否在生成时返回字典")
+
+    # 批处理参数
+    parser.add_argument("--batch_limit", type=int, default=2,
+                        help="批量大小限制")
+    parser.add_argument("--batch_token_size", type=int, default=2000,
+                        help="批量token大小")
+    parser.add_argument("--minmax_gap", type=int, default=40,
+                        help="最小最大长度差距")
+
+    # GPU参数
+    parser.add_argument("--wait_for_gpu", action="store_true", default=True,
+                        help="是否等待GPU内存")
+    parser.add_argument("--gpu_threshold", type=int, default=GPU_MEMORY_THRESHOLD,
+                        help="GPU内存阈值(MB)")
+
+    # 评分参数
+    parser.add_argument("--max_k", type=int, default=5,
+                        help="最大K值")
+
+    args = parser.parse_args()
+
+    try:
+        processor = BatchChemMechProcessor(args)
+        processor.process_all_tasks()
+
+    except Exception as e:
+        logging.error(f"批量处理失败: {str(e)}")
+        raise
+
+def load_config_from_file(config_path: str, is_single: bool = True) -> Tuple[Dict, Dict]:
+    """从文件加载配置"""
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+
+    data_recipe = config.get("data_recipe")
+    data_output = config.get("data_output")
+
+    return data_recipe, data_output
+
+
+if __name__ == "__main__":
+
+    DEFAULT_SUBSET="_random313"
+
+    # DEFAULT_TASKS = [
+    #     ("prds_to_prds", "updcanoamprds_to_updcanostdprds", "UPDCANOAMPRDS_TO_UPDCANOSTDPRDS"),
+    #     ("rxts_to_prds", "updcanostdrxts_to_updcanostdprds", "UPDCANOSTDRXTS_TO_UPDCANOSTDPRDS"),
+    #     # 可以添加更多默认任务
+    # ]
+
+    DEFAULT_TASKS = [
+        ("prds_to_prds", "updcanoamprds_to_updcanostdprds"),
+        ("prds_to_prds", "oriarbistdprds_to_oricanostdprds_x1"),
+        ("prds_to_prds", "oricanostdprds_to_oriarbistdprds_x1"),
+        ("prds_to_prds", "updarbistdprds_to_updcanostdprds_x1"),
+        ("prds_to_prds", "updcanostdprds_to_updarbistdprds_x1"),
+
+        ("prds_to_rxts", "oricanostdprds_to_oricanostdrxts"),
+        ("prds_to_rxts", "updcanostdprds_to_updcanostdrxts"),
+
+        ("rxn_to_mech", "oriarbistdrxn_to_cls_x1"),
+        ("rxn_to_mech", "oricanoamrxn_to_cls"),
+        ("rxn_to_mech", "oricanostdrxn_to_cls"),
+        ("rxn_to_mech", "updarbistdrxn_to_cls_x1"),
+        ("rxn_to_mech", "updcanoamrxn_to_cls"),
+        ("rxn_to_mech", "updcanoamrxn_to_cls_mech"),
+        ("rxn_to_mech", "updcanoamrxn_to_mech"),
+
+        ("rxn_to_rxn", "oriarbistdrxn_to_oricanostdrxn_x1"),
+        ("rxn_to_rxn", "oricanoamrxn_to_oricanostdrxn"),
+        ("rxn_to_rxn", "oricanoamrxn_to_updcanoamrxn"),
+        ("rxn_to_rxn", "oricanostdrxn_to_oriarbistdrxn_x1"),
+        ("rxn_to_rxn", "oricanostdrxn_to_oricanoamrxn"),
+        ("rxn_to_rxn", "oricanostdrxn_to_updcanostdrxn"),
+        ("rxn_to_rxn", "updarbistdrxn_to_updcanostdrxn_x1"),
+        ("rxn_to_rxn", "updcanoamrxn_to_updcanostdrxn"),
+        ("rxn_to_rxn", "updcanostdrxn_to_updarbistdrxn_x1"),
+        ("rxn_to_rxn", "updcanostdrxn_to_updcanoamrxn"),
+
+        ("rxts_to_prds", "oricanostdrxts_to_oricanostdprds"),
+        ("rxts_to_prds", "updcanostdrxts_to_updcanostdprds"),
+
+        ("rxts_to_rxts", "oriarbistdrxts_to_oricanostdrxts_x1"),
+        ("rxts_to_rxts", "oricanoamrxts_to_oricanostdrxts"),
+        ("rxts_to_rxts", "oricanostdrxts_to_oriarbistdrxts_x1"),
+        ("rxts_to_rxts", "oricanostdrxts_to_oricanoamrxts"),
+        ("rxts_to_rxts", "updarbistdrxts_to_updcanostdrxts_x1"),
+        ("rxts_to_rxts", "updcanoamrxts_to_updcanostdrxts"),
+        ("rxts_to_rxts", "updcanostdrxts_to_updarbistdrxts_x1"),
+        ("rxts_to_rxts", "updcanostdrxts_to_updcanoamrxts"),
+    ]
+
+    predict_tasks_file="application/eval/_config/single_task/tasks.json"
+    load_config_from_file(predict_tasks_file, True)
+    main()

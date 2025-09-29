@@ -1,0 +1,24 @@
+{
+    "data_recipe": {
+        "recipe": [
+            ["updcanoamrxn_to_mech", "augmentation1", 0.3, {
+                "UPD.CANO.AM.RXN": "RXN",
+                "CLS": "CLASS",
+                "MECH": "MECHANISM"
+            }],
+            ["oricanoamrxn_to_cls", "augmentation2", 0.4, {
+                "ORI.CANO.AM.RXN": "RXN",
+                "CLS": "CLASS"
+            }],
+            ["updcanoamrxn_to_cls", "augmentation1", 0.3, {
+                "UPD.CANO.AM.RXN": "RXN",
+                "CLS": "CLASS"
+            }]
+        ],
+        "splits": ["train", "val", "test"]
+    },
+    "data_output": {
+        "output": ["mixed_group_v1", "chemical_tasks_v1"],
+        "splits": ["train", "val", "test"]
+    }
+}

@@ -514,7 +514,7 @@ class ChemMechPredictor:
             raise FileNotFoundError(f"数据文件不存在: {self.data_file}")
 
         # 设置输出路径
-        self.output_dir = Path(self.args.output_base_dir) / self.args.subset / f"{group}_{self.task_id}"
+        self.output_dir = Path(self.args.output_base_dir) / self.args.subset / group /self.task_id
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.output_file = self.output_dir / f"{self.args.model_name}.json"
 
@@ -666,7 +666,7 @@ class ChemMechPredictor:
 
         # 加载模型
         infer_args = {
-            "model_name_or_path": str(Path(self.args.model_path) / self.args.model_name),
+            "model_name_or_path": str(Path(self.args.model_path) / self.args.section / self.args.model_name),
             "finetuning_type": self.args.finetuning_type,
             "template": self.args.template,
             "num_beams": self.args.num_beams,
@@ -735,17 +735,18 @@ def main():
                         help="任务ID，如ORICANOAMRXN_TO_UPDCANOAMRXN")
     # 模型参数
     parser.add_argument("--model_path", type=str,
-                        default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/chemechpred/prds_to_prds")
+                        default="/home/liangtao/Development/LLMSpace/LLaMA-Factory/chemechpred/")
+    parser.add_argument("--section", type=str,
+                        default="prds_to_prds")
     parser.add_argument("--model_name", type=str, default="updcanoamprds_to_updcanostdprds",
                         help="模型名称")
 
     # 数据路径参数
     parser.add_argument("--data_base_dir", type=str,
-                        default="/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/test/")
-    parser.add_argument("--subset", type=str,
-                        default="_random313")
+                        default="DataSets/Chemistry/ChemicalMechanism/via_random/test/")
+    parser.add_argument("--subset", type=str, default="_random313")
     parser.add_argument("--output_base_dir", type=str,
-                        default="/mnt/e/Development/LLMSpace/LLaMA-Factory/results/chemechpred/prediction")
+                        default="results/chemechpred/prediction")
 
     # 推理参数
     parser.add_argument("--finetuning_type", type=str, default="full")
