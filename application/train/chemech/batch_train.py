@@ -323,8 +323,19 @@ if __name__ == "__main__":
         # ("rxts_to_prds", "oricanostdrxts_to_oricanostdprds", "oricanostdrxts_to_oricanostdprds", {}),
         # ("prds_to_rxts", "oricanostdprds_to_oricanostdrxts", "oricanostdprds_to_oricanostdrxts", {}),
         # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v1", "enhc_rxts_to_prds_v1", {}),
-        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v2", "enhc_rxts_to_prds_v2", {}),
-        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v3", "enhc_rxts_to_prds_v3", {}),
+        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v2", "enhc_rxts_to_prds_v2",
+            {
+                "per_device_train_batch_size": 8,
+                "gradient_accumulation_steps": 1
+            }
+         ),
+        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v3", "enhc_rxts_to_prds_v3",
+            {
+                "per_device_train_batch_size": 8,
+                "gradient_accumulation_steps": 1
+            }),
+    # per_device_train_batch_size: 4
+    # gradient_accumulation_steps: 1
     ]
     # 基础参数文件路径
     BASE_PARA_FILE = "examples/train_full/chemechpred/base_para.yaml"
