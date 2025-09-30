@@ -312,15 +312,15 @@
     "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v1_1.json"
   },
   "enhc_rxts_to_prds_v2_1": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_rxts_to_prds/enhc_rxts_to_prds_v2_1.json"
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_rxts_to_prds/enhc_rxts_to_prds_v2_1.json"
   },
   "enhc_rxts_to_prds_v3_1": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_rxts_to_prds/enhc_rxts_to_prds_v3_1.json"
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_rxts_to_prds/enhc_rxts_to_prds_v3_1.json"
   },
   "enhc_rxts_to_prds_v2_1_val": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v2_1.json"
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v2_1.json"
   },
   "enhc_rxts_to_prds_v3_1_val": {
-    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v3_1.json"
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v3_1.json"
   }
 }
