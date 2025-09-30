@@ -315,9 +315,9 @@ def main():
 if __name__ == "__main__":
     # 默认训练配置 - 可以根据需要修改
     DEFAULT_TRAINING_CONFIGS = [
-        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v1_1", "enhc_rxts_to_prds_v1_1", {}),
-        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v2_1", "enhc_rxts_to_prds_v2_1", {}),
-        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v3_1", "enhc_rxts_to_prds_v3_1", {}),
+        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v1_1", "enhc_rxts_to_prds_v1_1", {}),
+        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v2_1", "enhc_rxts_to_prds_v2_1", {}),
+        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v3_1", "enhc_rxts_to_prds_v3_1", {}),
     # per_device_train_batch_size: 4
     # gradient_accumulation_steps: 1
     ]
