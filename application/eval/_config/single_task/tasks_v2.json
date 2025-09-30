@@ -1,0 +1,38 @@
+{
+  "tasks": [
+    {
+      "section": "prds_to_prds",
+      "models": [
+        "oriarbistdprds_to_oricanostdprds_x1",
+        "oricanostdprds_to_oriarbistdprds_x1",
+        "updarbistdprds_to_updcanostdprds_x1",
+        "updcanostdprds_to_updarbistdprds_x1"
+      ]
+    },
+    {
+      "section": "rxn_to_mech",
+      "models": [
+        "oriarbistdrxn_to_cls_x1",
+        "updarbistdrxn_to_cls_x1"
+      ]
+    },
+    {
+      "section": "rxn_to_rxn",
+      "models": [
+        "oriarbistdrxn_to_oricanostdrxn_x1",
+        "oricanostdrxn_to_oriarbistdrxn_x1",
+        "updarbistdrxn_to_updcanostdrxn_x1",
+        "updcanostdrxn_to_updarbistdrxn_x1"
+      ]
+    },
+    {
+      "section": "rxts_to_rxts",
+      "models": [
+        "oriarbistdrxts_to_oricanostdrxts_x1",
+        "oricanostdrxts_to_oriarbistdrxts_x1",
+        "updarbistdrxts_to_updcanostdrxts_x1",
+        "updcanostdrxts_to_updarbistdrxts_x1"
+      ]
+    }
+  ]
+}

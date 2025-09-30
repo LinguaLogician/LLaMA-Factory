@@ -29,101 +29,6 @@ from llamafactory.chat import ChatModel
 GPU_MEMORY_THRESHOLD = 8000  # MB，GPU显存阈值
 LOG_DIR = "./logs/chemechpred"
 
-TASKS_CONFIG = {
-    "RXN_TO_MECH": [
-
-        "RXN->CLS",
-        "RXN->MECH",
-        "RXN->CLS+MECH",
-
-        "ORI.CANO.STD.RXN->CLS",
-        "ORI.CANO.AM.RXN->CLS",
-        "UPD.CANO.AM.RXN->CLS", ##
-        "UPD.CANO.AM.RXN->MECH", ##
-        "UPD.CANO.AM.RXN->CLS+MECH",
-
-        "ORI.ARBI.STD.RXN->CLS",
-        "UPD.ARBI.STD.RXN->CLS",
-    ],
-
-    "RXN_TO_RXN": [
-
-        "ORI.RXN->UPD.RXN",
-        "STD.RXN->AM.RXN",
-        "AM.RXN->STD.RXN",
-
-        "ARBI.RXN->CANO.RXN",
-        "CANO.RXN->ARBI.RXN",
-
-        "ORI.CANO.AM.RXN->UPD.CANO.AM.RXN",   ##
-        "ORI.CANO.STD.RXN->UPD.CANO.STD.RXN", ##
-
-        "ORI.CANO.STD.RXN->ORI.CANO.AM.RXN", ##
-        "UPD.CANO.STD.RXN->UPD.CANO.AM.RXN",
-
-        "ORI.CANO.AM.RXN->ORI.CANO.STD.RXN",
-        "UPD.CANO.AM.RXN->UPD.CANO.STD.RXN",
-
-        "ORI.ARBI.STD.RXN->ORI.CANO.STD.RXN",
-        "UPD.ARBI.STD.RXN->UPD.CANO.STD.RXN",
-
-        "ORI.CANO.STD.RXN->ORI.ARBI.STD.RXN",
-        "UPD.CANO.STD.RXN->UPD.ARBI.STD.RXN",
-    ],
-
-    "RXTS_TO_RXTS": [
-
-        "STD.RXTS->AM.RXTS",
-        "AM.RXTS->STD.RXTS",
-        "ARBI.RXTS->CANO.RXTS",
-        "CANO.RXTS->ARBI.RXTS",
-
-        "UPD.CANO.STD.RXTS->UPD.CANO.AM.RXTS", ##
-        "UPD.CANO.AM.RXTS->UPD.CANO.STD.RXTS",
-        "ORI.CANO.STD.RXTS->ORI.CANO.AM.RXTS", ##
-        "ORI.CANO.AM.RXTS->ORI.CANO.STD.RXTS", ##
-
-        "ORI.CANO.STD.RXTS->ORI.ARBI.STD.RXTS",
-        "ORI.ARBI.STD.RXTS->ORI.CANO.STD.RXTS",
-        "UPD.CANO.STD.RXTS->UPD.ARBI.STD.RXTS",
-        "UPD.ARBI.STD.RXTS->UPD.CANO.STD.RXTS"
-    ],
-
-    "PRDS_TO_PRDS": [
-
-        "AM.PRDS->STD.PRDS",
-        "ARBI.PRDS->CANO.PRDS",
-        "CANO.PRDS->ARBI.PRDS",
-
-        "UPD.CANO.AM.PRDS->UPD.CANO.STD.PRDS", ##
-        "ORI.CANO.AM.PRDS->ORI.CANO.STD.PRDS",
-
-        "ORI.CANO.STD.PRDS->ORI.ARBI.STD.PRDS",
-        "ORI.ARBI.STD.PRDS->ORI.CANO.STD.PRDS",
-        "UPD.CANO.STD.PRDS->UPD.ARBI.STD.PRDS",
-        "UPD.ARBI.STD.PRDS->UPD.CANO.STD.PRDS"
-    ],
-    "RXTS_TO_PRDS": [
-        "RXTS->PRDS",
-        "UPD.CANO.AM.RXTS->UPD.CANO.AM.PRDS",
-        "UPD.CANO.STD.RXTS->UPD.CANO.STD.PRDS", ##
-        "ORI.CANO.AM.RXTS->ORI.CANO.AM.PRDS", ##
-        "ORI.CANO.STD.RXTS->ORI.CANO.STD.PRDS",
-    ],
-    "PRDS_TO_RXTS": [
-        "PRDS->RXTS",
-        "UPD.CANO.STD.PRDS->UPD.CANO.STD.RXTS", ##
-        "ORI.CANO.STD.PRDS->ORI.CANO.STD.RXTS",
-    ],
-
-    "STYLE_TO_STYLE": [
-      "CANO->ARBI",
-      "ARBI->CANO",
-      "STD->AM",
-      "AM->STD",
-    ]
-}
-
 # Vaguely Defined 任务标识符
 VAGUELY_DEFINED_TASKS = {
     # RXN_TO_MECH
@@ -488,39 +393,29 @@ class ChemMechPredictor:
         """设置文件路径"""
         # 解析task_id获取group信息
         task_id = self.args.task_id.upper()
-        group = None
-
-        for grp, tasks in TASKS_CONFIG.items():
-            for task_tag in tasks:
-                # 转换task_tag为task_id格式进行比较
-                task_tag_id = task_tag.replace('->', '_TO_').replace('.', '').upper()
-                if task_tag_id == task_id:
-                    group = grp.lower()
-                    break
-            if group:
-                break
-
-        if not group:
-            raise ValueError(f"无法找到task_id {self.args.task_id} 对应的group")
-
-        self.group = group
+        self.group = self.args.group
         self.task_id = task_id.lower()
 
+        if "arbi" in task_id.lower():
+            augm = "augm_x1"
+        else:
+            augm = "augm_x1"
+
         # 设置数据路径
-        self.data_dir = Path(self.args.data_base_dir) / self.args.subset / group.lower()
+        self.data_dir = Path(self.args.data_base_dir) / self.args.subset / self.group.lower() / augm
         self.data_file = self.data_dir / f"{self.task_id}.json"
 
         if not self.data_file.exists():
             raise FileNotFoundError(f"数据文件不存在: {self.data_file}")
 
         # 设置输出路径
-        self.output_dir = Path(self.args.output_base_dir) / self.args.subset / group /self.task_id
+        self.output_dir = Path(self.args.output_base_dir) / self.args.subset / self.group.lower() /self.task_id
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.output_file = self.output_dir / f"{self.args.model_name}.json"
 
     def setup_logging(self):
         """设置日志"""
-        log_dir = Path(LOG_DIR) / self.group
+        log_dir = Path(LOG_DIR) / self.group.lower()
         log_dir.mkdir(parents=True, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -731,6 +626,8 @@ def main():
     parser = argparse.ArgumentParser(description="化学机制预测脚本")
 
     # 必需参数
+    parser.add_argument("--group", type=str, default="",
+                        help="group")
     parser.add_argument("--task_id", type=str, default="UPDCANOAMPRDS_TO_UPDCANOSTDPRDS",
                         help="任务ID，如ORICANOAMRXN_TO_UPDCANOAMRXN")
     # 模型参数

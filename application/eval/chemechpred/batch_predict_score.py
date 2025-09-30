@@ -35,6 +35,117 @@ except ImportError as e:
     print("请确保predict2.py和score2.py在当前目录下")
     sys.exit(1)
 
+TASKS_CONFIG = {
+    "RXN_TO_MECH": [
+
+        "RXN->CLS",
+        "RXN->MECH",
+        "RXN->CLS+MECH",
+
+        "ORI.CANO.STD.RXN->CLS",
+        "ORI.CANO.AM.RXN->CLS",
+        "UPD.CANO.AM.RXN->CLS", ##
+        "UPD.CANO.AM.RXN->MECH", ##
+        "UPD.CANO.AM.RXN->CLS+MECH",
+
+        "ORI.ARBI.STD.RXN->CLS",
+        "UPD.ARBI.STD.RXN->CLS",
+    ],
+
+    "RXN_TO_RXN": [
+
+        "ORI.RXN->UPD.RXN",
+        "STD.RXN->AM.RXN",
+        "AM.RXN->STD.RXN",
+
+        "ARBI.RXN->CANO.RXN",
+        "CANO.RXN->ARBI.RXN",
+
+        "ORI.CANO.AM.RXN->UPD.CANO.AM.RXN",   ##
+        "ORI.CANO.STD.RXN->UPD.CANO.STD.RXN", ##
+
+        "ORI.CANO.STD.RXN->ORI.CANO.AM.RXN", ##
+        "UPD.CANO.STD.RXN->UPD.CANO.AM.RXN",
+
+        "ORI.CANO.AM.RXN->ORI.CANO.STD.RXN",
+        "UPD.CANO.AM.RXN->UPD.CANO.STD.RXN",
+
+        "ORI.ARBI.STD.RXN->ORI.CANO.STD.RXN",
+        "UPD.ARBI.STD.RXN->UPD.CANO.STD.RXN",
+
+        "ORI.CANO.STD.RXN->ORI.ARBI.STD.RXN",
+        "UPD.CANO.STD.RXN->UPD.ARBI.STD.RXN",
+    ],
+
+    "RXTS_TO_RXTS": [
+
+        "STD.RXTS->AM.RXTS",
+        "AM.RXTS->STD.RXTS",
+        "ARBI.RXTS->CANO.RXTS",
+        "CANO.RXTS->ARBI.RXTS",
+
+        "UPD.CANO.STD.RXTS->UPD.CANO.AM.RXTS", ##
+        "UPD.CANO.AM.RXTS->UPD.CANO.STD.RXTS",
+        "ORI.CANO.STD.RXTS->ORI.CANO.AM.RXTS", ##
+        "ORI.CANO.AM.RXTS->ORI.CANO.STD.RXTS", ##
+
+        "ORI.CANO.STD.RXTS->ORI.ARBI.STD.RXTS",
+        "ORI.ARBI.STD.RXTS->ORI.CANO.STD.RXTS",
+        "UPD.CANO.STD.RXTS->UPD.ARBI.STD.RXTS",
+        "UPD.ARBI.STD.RXTS->UPD.CANO.STD.RXTS"
+    ],
+
+    "PRDS_TO_PRDS": [
+
+        "AM.PRDS->STD.PRDS",
+        "ARBI.PRDS->CANO.PRDS",
+        "CANO.PRDS->ARBI.PRDS",
+
+        "UPD.CANO.AM.PRDS->UPD.CANO.STD.PRDS", ##
+        "ORI.CANO.AM.PRDS->ORI.CANO.STD.PRDS",
+
+        "ORI.CANO.STD.PRDS->ORI.ARBI.STD.PRDS",
+        "ORI.ARBI.STD.PRDS->ORI.CANO.STD.PRDS",
+        "UPD.CANO.STD.PRDS->UPD.ARBI.STD.PRDS",
+        "UPD.ARBI.STD.PRDS->UPD.CANO.STD.PRDS"
+    ],
+    "RXTS_TO_PRDS": [
+        "RXTS->PRDS",
+        "UPD.CANO.AM.RXTS->UPD.CANO.AM.PRDS",
+        "UPD.CANO.STD.RXTS->UPD.CANO.STD.PRDS", ##
+        "ORI.CANO.AM.RXTS->ORI.CANO.AM.PRDS", ##
+        "ORI.CANO.STD.RXTS->ORI.CANO.STD.PRDS",
+    ],
+    "PRDS_TO_RXTS": [
+        "PRDS->RXTS",
+        "UPD.CANO.STD.PRDS->UPD.CANO.STD.RXTS", ##
+        "ORI.CANO.STD.PRDS->ORI.CANO.STD.RXTS",
+    ],
+
+    "STYLE_TO_STYLE": [
+      "CANO->ARBI",
+      "ARBI->CANO",
+      "STD->AM",
+      "AM->STD",
+    ]
+}
+
+def search_group(task_id):
+    group = None
+    task_id = task_id.lower()
+    for grp, tasks in TASKS_CONFIG.items():
+        for task_tag in tasks:
+            # 转换task_tag为task_id格式进行比较
+            task_tag_id = task_tag.replace('->', '_TO_').replace('.', '').lower()
+            if task_tag_id == task_id:
+                group = grp.lower()
+                break
+        if group:
+            break
+
+    if not group:
+        raise ValueError(f"无法找到task_id {task_id} 对应的group")
+    return group
 
 class BatchChemMechProcessor:
     """批量化学机制预测和评分处理器"""
@@ -76,7 +187,7 @@ class BatchChemMechProcessor:
         else:
             # 使用默认任务列表
             # tasks = DEFAULT_TASKS
-            tasks = [(section, model_name, model_name) for section, model_name in DEFAULT_TASKS]
+            tasks = predict_tasks
 
         return tasks
 
@@ -90,6 +201,7 @@ class BatchChemMechProcessor:
                 "--task_id", task_id,
                 "--section", section,
                 "--model_name", model_name,
+                "--group", search_group(task_id),
                 "--data_base_dir", self.args.data_base_dir,
                 "--subset", self.args.subset,
                 "--output_base_dir", self.args.output_base_dir,
@@ -135,7 +247,7 @@ class BatchChemMechProcessor:
         try:
             # 构建评分参数
             score_args = [
-                "--group", section,
+                "--group", search_group(task_id),
                 "--task_id", task_id.lower(),
                 "--model_name", model_name,
                 "--prediction_base_dir", self.args.output_base_dir,
@@ -214,6 +326,25 @@ class BatchChemMechProcessor:
             self.logger.info("所有任务都成功完成！")
 
 
+def load_config_from_file(config_path: str, is_single: bool = True) -> List[Tuple[str, str, str]]:
+    """从文件加载配置"""
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+
+    result = []
+    if is_single:
+        for section_data in config.get("tasks", []):
+            section = section_data.get("section", "")
+            models = section_data.get("models", [])
+            for model_name in models:
+                if "_x" in model_name:
+                    task_id = model_name.split("_x")[0]
+                else:
+                    task_id = model_name
+                result.append((section, model_name, task_id))
+
+    return result
+
 def main():
     parser = argparse.ArgumentParser(description="批量化学机制预测和评分脚本")
 
@@ -283,16 +414,6 @@ def main():
         logging.error(f"批量处理失败: {str(e)}")
         raise
 
-def load_config_from_file(config_path: str, is_single: bool = True) -> Tuple[Dict, Dict]:
-    """从文件加载配置"""
-    with open(config_path, 'r', encoding='utf-8') as f:
-        config = json.load(f)
-
-    data_recipe = config.get("data_recipe")
-    data_output = config.get("data_output")
-
-    return data_recipe, data_output
-
 
 if __name__ == "__main__":
 
@@ -304,48 +425,6 @@ if __name__ == "__main__":
     #     # 可以添加更多默认任务
     # ]
 
-    DEFAULT_TASKS = [
-        ("prds_to_prds", "updcanoamprds_to_updcanostdprds"),
-        ("prds_to_prds", "oriarbistdprds_to_oricanostdprds_x1"),
-        ("prds_to_prds", "oricanostdprds_to_oriarbistdprds_x1"),
-        ("prds_to_prds", "updarbistdprds_to_updcanostdprds_x1"),
-        ("prds_to_prds", "updcanostdprds_to_updarbistdprds_x1"),
-
-        ("prds_to_rxts", "oricanostdprds_to_oricanostdrxts"),
-        ("prds_to_rxts", "updcanostdprds_to_updcanostdrxts"),
-
-        ("rxn_to_mech", "oriarbistdrxn_to_cls_x1"),
-        ("rxn_to_mech", "oricanoamrxn_to_cls"),
-        ("rxn_to_mech", "oricanostdrxn_to_cls"),
-        ("rxn_to_mech", "updarbistdrxn_to_cls_x1"),
-        ("rxn_to_mech", "updcanoamrxn_to_cls"),
-        ("rxn_to_mech", "updcanoamrxn_to_cls_mech"),
-        ("rxn_to_mech", "updcanoamrxn_to_mech"),
-
-        ("rxn_to_rxn", "oriarbistdrxn_to_oricanostdrxn_x1"),
-        ("rxn_to_rxn", "oricanoamrxn_to_oricanostdrxn"),
-        ("rxn_to_rxn", "oricanoamrxn_to_updcanoamrxn"),
-        ("rxn_to_rxn", "oricanostdrxn_to_oriarbistdrxn_x1"),
-        ("rxn_to_rxn", "oricanostdrxn_to_oricanoamrxn"),
-        ("rxn_to_rxn", "oricanostdrxn_to_updcanostdrxn"),
-        ("rxn_to_rxn", "updarbistdrxn_to_updcanostdrxn_x1"),
-        ("rxn_to_rxn", "updcanoamrxn_to_updcanostdrxn"),
-        ("rxn_to_rxn", "updcanostdrxn_to_updarbistdrxn_x1"),
-        ("rxn_to_rxn", "updcanostdrxn_to_updcanoamrxn"),
-
-        ("rxts_to_prds", "oricanostdrxts_to_oricanostdprds"),
-        ("rxts_to_prds", "updcanostdrxts_to_updcanostdprds"),
-
-        ("rxts_to_rxts", "oriarbistdrxts_to_oricanostdrxts_x1"),
-        ("rxts_to_rxts", "oricanoamrxts_to_oricanostdrxts"),
-        ("rxts_to_rxts", "oricanostdrxts_to_oriarbistdrxts_x1"),
-        ("rxts_to_rxts", "oricanostdrxts_to_oricanoamrxts"),
-        ("rxts_to_rxts", "updarbistdrxts_to_updcanostdrxts_x1"),
-        ("rxts_to_rxts", "updcanoamrxts_to_updcanostdrxts"),
-        ("rxts_to_rxts", "updcanostdrxts_to_updarbistdrxts_x1"),
-        ("rxts_to_rxts", "updcanostdrxts_to_updcanoamrxts"),
-    ]
-
-    predict_tasks_file="application/eval/_config/single_task/tasks.json"
-    load_config_from_file(predict_tasks_file, True)
+    predict_tasks_file="application/eval/_config/single_task/tasks_v2.json"
+    predict_tasks = load_config_from_file(predict_tasks_file, True)
     main()

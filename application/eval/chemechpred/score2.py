@@ -11,9 +11,7 @@
 import json
 import argparse
 from pathlib import Path
-from typing import Dict, List, Any, Tuple
-from collections import defaultdict
-import numpy as np
+from typing import Dict, List, Any
 from tqdm import tqdm
 import logging
 from datetime import datetime
@@ -21,101 +19,6 @@ from datetime import datetime
 # ============================ 配置常量 ============================
 
 DEFAULT_MAX_K = 10  # 默认计算前5个结果
-
-TASKS_CONFIG = {
-    "RXN_TO_MECH": [
-
-        "RXN->CLS",
-        "RXN->MECH",
-        "RXN->CLS+MECH",
-
-        "ORI.CANO.STD.RXN->CLS",
-        "ORI.CANO.AM.RXN->CLS",
-        "UPD.CANO.AM.RXN->CLS", ##
-        "UPD.CANO.AM.RXN->MECH", ##
-        "UPD.CANO.AM.RXN->CLS+MECH",
-
-        "ORI.ARBI.STD.RXN->CLS",
-        "UPD.ARBI.STD.RXN->CLS",
-    ],
-
-    "RXN_TO_RXN": [
-
-        "ORI.RXN->UPD.RXN",
-        "STD.RXN->AM.RXN",
-        "AM.RXN->STD.RXN",
-
-        "ARBI.RXN->CANO.RXN",
-        "CANO.RXN->ARBI.RXN",
-
-        "ORI.CANO.AM.RXN->UPD.CANO.AM.RXN",   ##
-        "ORI.CANO.STD.RXN->UPD.CANO.STD.RXN", ##
-
-        "ORI.CANO.STD.RXN->ORI.CANO.AM.RXN", ##
-        "UPD.CANO.STD.RXN->UPD.CANO.AM.RXN",
-
-        "ORI.CANO.AM.RXN->ORI.CANO.STD.RXN",
-        "UPD.CANO.AM.RXN->UPD.CANO.STD.RXN",
-
-        "ORI.ARBI.STD.RXN->ORI.CANO.STD.RXN",
-        "UPD.ARBI.STD.RXN->UPD.CANO.STD.RXN",
-
-        "ORI.CANO.STD.RXN->ORI.ARBI.STD.RXN",
-        "UPD.CANO.STD.RXN->UPD.ARBI.STD.RXN",
-    ],
-
-    "RXTS_TO_RXTS": [
-
-        "STD.RXTS->AM.RXTS",
-        "AM.RXTS->STD.RXTS",
-        "ARBI.RXTS->CANO.RXTS",
-        "CANO.RXTS->ARBI.RXTS",
-
-        "UPD.CANO.STD.RXTS->UPD.CANO.AM.RXTS", ##
-        "UPD.CANO.AM.RXTS->UPD.CANO.STD.RXTS",
-        "ORI.CANO.STD.RXTS->ORI.CANO.AM.RXTS", ##
-        "ORI.CANO.AM.RXTS->ORI.CANO.STD.RXTS", ##
-
-        "ORI.CANO.STD.RXTS->ORI.ARBI.STD.RXTS",
-        "ORI.ARBI.STD.RXTS->ORI.CANO.STD.RXTS",
-        "UPD.CANO.STD.RXTS->UPD.ARBI.STD.RXTS",
-        "UPD.ARBI.STD.RXTS->UPD.CANO.STD.RXTS"
-    ],
-
-    "PRDS_TO_PRDS": [
-
-        "AM.PRDS->STD.PRDS",
-        "ARBI.PRDS->CANO.PRDS",
-        "CANO.PRDS->ARBI.PRDS",
-
-        "UPD.CANO.AM.PRDS->UPD.CANO.STD.PRDS", ##
-        "ORI.CANO.AM.PRDS->ORI.CANO.STD.PRDS",
-
-        "ORI.CANO.STD.PRDS->ORI.ARBI.STD.PRDS",
-        "ORI.ARBI.STD.PRDS->ORI.CANO.STD.PRDS",
-        "UPD.CANO.STD.PRDS->UPD.ARBI.STD.PRDS",
-        "UPD.ARBI.STD.PRDS->UPD.CANO.STD.PRDS"
-    ],
-    "RXTS_TO_PRDS": [
-        "RXTS->PRDS",
-        "UPD.CANO.AM.RXTS->UPD.CANO.AM.PRDS",
-        "UPD.CANO.STD.RXTS->UPD.CANO.STD.PRDS", ##
-        "ORI.CANO.AM.RXTS->ORI.CANO.AM.PRDS", ##
-        "ORI.CANO.STD.RXTS->ORI.CANO.STD.PRDS",
-    ],
-    "PRDS_TO_RXTS": [
-        "PRDS->RXTS",
-        "UPD.CANO.STD.PRDS->UPD.CANO.STD.RXTS", ##
-        "ORI.CANO.STD.PRDS->ORI.CANO.STD.RXTS",
-    ],
-
-    "STYLE_TO_STYLE": [
-      "CANO->ARBI",
-      "ARBI->CANO",
-      "STD->AM",
-      "AM->STD",
-    ]
-}
 
 # ============================ 评分计算器类 ============================
 class ChemMechScoreCalculator:

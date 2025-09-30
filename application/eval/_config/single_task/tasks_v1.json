@@ -1,0 +1,68 @@
+{
+  "tasks": [
+    {
+      "section": "prds_to_prds",
+      "models": [
+        "updcanoamprds_to_updcanostdprds",
+        "oriarbistdprds_to_oricanostdprds_x1",
+        "oricanostdprds_to_oriarbistdprds_x1",
+        "updarbistdprds_to_updcanostdprds_x1",
+        "updcanostdprds_to_updarbistdprds_x1"
+      ]
+    },
+    {
+      "section": "prds_to_rxts",
+      "models": [
+        "oricanostdprds_to_oricanostdrxts",
+        "updcanostdprds_to_updcanostdrxts"
+      ]
+    },
+    {
+      "section": "rxn_to_mech",
+      "models": [
+        "oriarbistdrxn_to_cls_x1",
+        "oricanoamrxn_to_cls",
+        "oricanostdrxn_to_cls",
+        "updarbistdrxn_to_cls_x1",
+        "updcanoamrxn_to_cls",
+        "updcanoamrxn_to_cls_mech",
+        "updcanoamrxn_to_mech"
+      ]
+    },
+    {
+      "section": "rxn_to_rxn",
+      "models": [
+        "oriarbistdrxn_to_oricanostdrxn_x1",
+        "oricanoamrxn_to_oricanostdrxn",
+        "oricanoamrxn_to_updcanoamrxn",
+        "oricanostdrxn_to_oriarbistdrxn_x1",
+        "oricanostdrxn_to_oricanoamrxn",
+        "oricanostdrxn_to_updcanostdrxn",
+        "updarbistdrxn_to_updcanostdrxn_x1",
+        "updcanoamrxn_to_updcanostdrxn",
+        "updcanostdrxn_to_updarbistdrxn_x1",
+        "updcanostdrxn_to_updcanoamrxn"
+      ]
+    },
+    {
+      "section": "rxts_to_prds",
+      "models": [
+        "oricanostdrxts_to_oricanostdprds",
+        "updcanostdrxts_to_updcanostdprds"
+      ]
+    },
+    {
+      "section": "rxts_to_rxts",
+      "models": [
+        "oriarbistdrxts_to_oricanostdrxts_x1",
+        "oricanoamrxts_to_oricanostdrxts",
+        "oricanostdrxts_to_oriarbistdrxts_x1",
+        "oricanostdrxts_to_oricanoamrxts",
+        "updarbistdrxts_to_updcanostdrxts_x1",
+        "updcanoamrxts_to_updcanostdrxts",
+        "updcanostdrxts_to_updarbistdrxts_x1",
+        "updcanostdrxts_to_updcanoamrxts"
+      ]
+    }
+  ]
+}
