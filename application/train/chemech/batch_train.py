@@ -315,25 +315,9 @@ def main():
 if __name__ == "__main__":
     # 默认训练配置 - 可以根据需要修改
     DEFAULT_TRAINING_CONFIGS = [
-        # ("rxn_to_mech", "updcanoamrxn_to_cls_mech", "updcanoamrxn_to_cls_mech", {}),
-        # ("rxn_to_mech", "updarbistdrxn_to_cls_x1", "updarbistdrxn_to_cls_x1", {}),
-        # ("prds_to_prds", "updcanostdprds_to_updarbistdprds_x1", "updcanostdprds_to_updarbistdprds_x1", {}),
-        # ("prds_to_prds", "updarbistdprds_to_updcanostdprds_x1", "updarbistdprds_to_updcanostdprds_x1", {}),
-        # ("rxts_to_prds", "updcanoamrxts_to_updcanoamprds", "updcanoamrxts_to_updcanoamprds", {}),
-        # ("rxts_to_prds", "oricanostdrxts_to_oricanostdprds", "oricanostdrxts_to_oricanostdprds", {}),
-        # ("prds_to_rxts", "oricanostdprds_to_oricanostdrxts", "oricanostdprds_to_oricanostdrxts", {}),
-        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v1", "enhc_rxts_to_prds_v1", {}),
-        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v2", "enhc_rxts_to_prds_v2",
-            {
-                "per_device_train_batch_size": 8,
-                "gradient_accumulation_steps": 1
-            }
-         ),
-        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v3", "enhc_rxts_to_prds_v3",
-            {
-                "per_device_train_batch_size": 8,
-                "gradient_accumulation_steps": 1
-            }),
+        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v1_1", "enhc_rxts_to_prds_v1_1", {}),
+        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v2_1", "enhc_rxts_to_prds_v2_1", {}),
+        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v3_1", "enhc_rxts_to_prds_v3_1", {}),
     # per_device_train_batch_size: 4
     # gradient_accumulation_steps: 1
     ]

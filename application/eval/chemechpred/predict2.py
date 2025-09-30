@@ -399,7 +399,7 @@ class ChemMechPredictor:
         if "arbi" in task_id.lower():
             augm = "augm_x1"
         else:
-            augm = "augm_x1"
+            augm = ""
 
         # 设置数据路径
         self.data_dir = Path(self.args.data_base_dir) / self.args.subset / self.group.lower() / augm

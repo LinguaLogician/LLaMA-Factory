@@ -304,5 +304,11 @@
   },
   "enhc_rxts_to_prds_v3_val": {
     "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v3.json"
+  },
+  "enhc_rxts_to_prds_v1_1": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_rxts_to_prds/enhc_rxts_to_prds_v1_1.json"
+  },
+  "enhc_rxts_to_prds_v1_1_val": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v1_1.json"
   }
 }

@@ -273,5 +273,5 @@ def main():
 
 
 if __name__ == "__main__":
-    DEFAULT_CONFIG_FILE = "application/data/_config/enhc_rxts_to_prds/enhc_rxts_to_prds_v3.json"
+    DEFAULT_CONFIG_FILE = "application/data/_config/enhc_rxts_to_prds/enhc_rxts_to_prds_v2_1.json"
     main()

@@ -1,4 +1,5 @@
 {
+  "task_type": "single_task",
   "tasks": [
     {
       "section": "prds_to_prds",

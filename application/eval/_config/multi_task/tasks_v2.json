@@ -1,0 +1,19 @@
+{
+  "task_type": "multi_task",
+  "tasks": [
+    {
+      "section": "enhc_rxts_to_prds",
+      "model": "enhc_rxts_to_prds_v2",
+      "tasks": [
+          "oricanostdrxts_to_oricanostdprds",
+          "oricanostdrxts_to_oricanoamrxts",
+          "oricanoamrxts_to_oricanoamprds",
+          "oricanoamrxn_to_updcanoamrxn",
+          "updcanoamrxn_to_cls_mech",
+          "updcanoamrxts_mech_cls_to_updcanoamprds",
+          "updcanoamrxn_to_oricanoamrxn",
+          "oricanoamprds_to_oricanostdprds"
+      ]
+    }
+  ]
+}

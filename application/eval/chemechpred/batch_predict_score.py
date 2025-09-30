@@ -122,6 +122,17 @@ TASKS_CONFIG = {
         "ORI.CANO.STD.PRDS->ORI.CANO.STD.RXTS",
     ],
 
+    "RXTS_TO_PRDS_PLUS": [
+        "UPD.CANO.AM.RXTS->MECH+UPD.CANO.AM.PRDS",
+        "UPD.CANO.AM.RXTS->CLS+UPD.CANO.AM.PRDS",
+        "UPD.CANO.AM.RXTS->CLS+MECH+UPD.CANO.AM.PRDS",
+        "UPD.CANO.AM.RXTS+MECH->UPD.CANO.AM.PRDS",
+        "UPD.CANO.AM.RXTS+CLS->UPD.CANO.AM.PRDS",
+        "UPD.CANO.AM.RXTS+CLS->MECH+UPD.CANO.AM.PRDS",
+        "UPD.CANO.AM.RXTS+MECH->CLS+UPD.CANO.AM.PRDS",
+        "UPD.CANO.AM.RXTS+MECH+CLS->UPD.CANO.AM.PRDS"
+    ],
+
     "STYLE_TO_STYLE": [
       "CANO->ARBI",
       "ARBI->CANO",
@@ -136,7 +147,7 @@ def search_group(task_id):
     for grp, tasks in TASKS_CONFIG.items():
         for task_tag in tasks:
             # 转换task_tag为task_id格式进行比较
-            task_tag_id = task_tag.replace('->', '_TO_').replace('.', '').lower()
+            task_tag_id = task_tag.replace('->', '_TO_').replace('+', '_').replace('.', '').lower()
             if task_tag_id == task_id:
                 group = grp.lower()
                 break
@@ -326,13 +337,22 @@ class BatchChemMechProcessor:
             self.logger.info("所有任务都成功完成！")
 
 
-def load_config_from_file(config_path: str, is_single: bool = True) -> List[Tuple[str, str, str]]:
+def load_config_from_file(config_path: str) -> List[Tuple[str, str, str]]:
     """从文件加载配置"""
     with open(config_path, 'r', encoding='utf-8') as f:
         config = json.load(f)
 
     result = []
-    if is_single:
+    task_type = config.get("task_type", )
+
+    if task_type == "multi_task":
+        for model_data in config.get("tasks", []):
+            section = model_data["section"]
+            model = model_data["model"]
+            tasks = model_data["tasks"]
+            for task in tasks:
+                result.append((section, model, task))
+    else:
         for section_data in config.get("tasks", []):
             section = section_data.get("section", "")
             models = section_data.get("models", [])
@@ -425,6 +445,6 @@ if __name__ == "__main__":
     #     # 可以添加更多默认任务
     # ]
 
-    predict_tasks_file="application/eval/_config/single_task/tasks_v2.json"
-    predict_tasks = load_config_from_file(predict_tasks_file, True)
+    predict_tasks_file="application/eval/_config/multi_task/enhc_rxts_to_prds_v1_1.json"
+    predict_tasks = load_config_from_file(predict_tasks_file)
     main()

@@ -372,10 +372,10 @@ if __name__ == "__main__":
     # Inference parameters
     parser.add_argument("--finetuning_type", type=str, default="full")
     parser.add_argument("--template", type=str, default="qwen")
-    parser.add_argument("--num_beams", type=int, default=3)
+    parser.add_argument("--num_beams", type=int, default=5)
     parser.add_argument("--do_sample", action="store_true", default=True)
     parser.add_argument("--max_new_tokens", type=int, default=2048)
-    parser.add_argument("--num_return_sequences", type=int, default=3)
+    parser.add_argument("--num_return_sequences", type=int, default=5)
     parser.add_argument("--output_scores", action="store_true", default=True)
     parser.add_argument("--return_dict_in_generate", action="store_true", default=True)
 
