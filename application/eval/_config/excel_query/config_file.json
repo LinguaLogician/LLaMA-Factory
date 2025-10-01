@@ -1,10 +1,10 @@
 {
   "k_value_aliases": {
-    "k_1": "Top-1",
-    "k_2": "Top-2",
-    "k_3": "Top-3",
-    "k_4": "Top-4",
-    "k_5": "Top-5"
+    "k_1": "K=1",
+    "k_2": "K=2",
+    "k_3": "K=3",
+    "k_4": "K=4",
+    "k_5": "K=5"
   },
   "k_values_to_export": ["k_1", "k_2", "k_3"],
   "multiply_by_100": true,
@@ -38,10 +38,22 @@
       "accKth": "Target Accuracy@Kth",
       "accTopKMols": "Molecules Accuracy@TopK",
       "accKthMols": "Molecules Accuracy@Kth",
+      "precTopKFormat": "Format Accuracy@TopK",
+      "precKthFormat": "Format Accuracy@Kth",
+      "precTopKManner": "Manner Accuracy@TopK",
+      "precKthManner": "Manner Accuracy@Kth",
       "precTopKValid": "Valid Precision@TopK",
       "precKthValid": "Valid Precision@Kth"
     },
     "matched": {
+      "precTopK": "Matched Precision@TopK",
+      "precKth": "Matched Precision@Kth"
+    },
+    "resolved": {
+      "precTopK": "Matched Precision@TopK",
+      "precKth": "Matched Precision@Kth"
+    },
+    "totally": {
       "precTopK": "Matched Precision@TopK",
       "precKth": "Matched Precision@Kth"
     }
