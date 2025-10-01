@@ -1,32 +1,47 @@
 {
-  "basic_info": {
-    "group": "组别",
-    "task": "任务",
-    "model": "模型"
+  "k_value_aliases": {
+    "k_1": "Top-1",
+    "k_2": "Top-2",
+    "k_3": "Top-3",
+    "k_4": "Top-4",
+    "k_5": "Top-5"
   },
-  "mols": {
-    "accTopK": "AccTopK",
-    "accKth": "AccKth",
-    "accTopKMols": "AccTopKMols",
-    "accKthMols": "AccKthMols",
-    "precTopKFormat": "格式正确率",
-    "precKthFormat": "格式正确率(Kth)",
-    "precTopKManner": "方式正确率",
-    "precKthManner": "方式正确率(Kth)",
-    "precTopKValid": "有效正确率",
-    "precKthValid": "有效正确率(Kth)"
+  "k_values_to_export": ["k_1", "k_2", "k_3"],
+  "multiply_by_100": true,
+  "decimal_places": 2,
+  "query_filters": {
+    "group": [],
+    "task": [],
+    "model": []
   },
-  "cls": {
-    "accTopK": "AccTopK",
-    "accKth": "AccKth"
+  "query_patterns": {
+    "group": ".*",
+    "task": ".*",
+    "model": ".*"
   },
-  "mech": {
-    "accTopK": "AccTopK",
-    "accKth": "AccKth"
-  },
-  "overall": {
-    "matched": "匹配正确率",
-    "resolved": "解析正确率",
-    "totally": "总体正确率"
+  "export_fields": {
+    "basic_info": {
+      "group": "Group",
+      "task": "Task",
+      "model": "Model"
+    },
+    "cls": {
+      "accTopK": "Accuracy@TopK",
+      "accKth": "Accuracy@Kth"
+    },
+    "mech": {
+      "accTopK": "Mechanism Accuracy@TopK",
+      "accKth": "Mechanism Accuracy@Kth"
+    },
+    "mols": {
+      "accTopK": "Molecules Accuracy@TopK",
+      "accKth": "Molecules Accuracy@Kth",
+      "accTopKMols": "Molecules Count@TopK",
+      "precTopKValid": "Valid Precision@TopK"
+    },
+    "matched": {
+      "precTopK": "Matched Precision@TopK",
+      "precKth": "Matched Precision@Kth"
+    }
   }
 }

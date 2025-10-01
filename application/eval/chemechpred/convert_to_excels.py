@@ -183,13 +183,10 @@ def save_to_excel_with_merged_headers(df: pd.DataFrame, output_path: str, fields
         for col_idx, col_name in enumerate(headers[1], 1):
             worksheet.cell(row=2, column=col_idx, value=col_name)
 
-        # 设置列宽
-        for column in worksheet.columns:
-            max_length = 0
-            column_letter = column[0].column_letter
-            for cell in column:
-                if cell.value:
-                    max_length = max(max_length, len(str(cell.value)))
+        # 设置列宽 - 简化修复
+        for i, column in enumerate(df.columns, 1):
+            column_letter = worksheet.cell(row=3, column=i).column_letter
+            max_length = max(len(str(column)), df[column].astype(str).map(len).max())
             adjusted_width = min(max_length + 2, 20)
             worksheet.column_dimensions[column_letter].width = adjusted_width
 
