@@ -163,17 +163,20 @@ class MongoToExcelExporter:
         k_values = config.get('k_values_to_export', [])
         k_aliases = config.get('k_value_aliases', {})
 
-        new_columns = basic_columns.copy()
+        # new_columns = basic_columns.copy()
+        new_columns = []
         header_rows = []
+        first_row, second_row, third_row = [], [], []
 
-        # 第一行表头：基础信息 + 预测类型
-        first_row = [''] * len(basic_columns)
-
-        # 第二行表头：基础信息 + 指标名称
-        second_row = [''] * len(basic_columns)
-
-        # 第三行表头：基础信息 + k值
-        third_row = basic_columns.copy()
+        basic_info = export_fields.get('basic_info', {})
+        for field, alias in basic_info.items():
+            new_columns.append(alias)
+            # 第一行表头：基础信息 + 预测类型
+            first_row.append('')
+            # 第二行表头：基础信息 + 指标名称
+            second_row.append('')
+            # 第三行表头：基础信息 + k值
+            third_row.append(alias)
 
         # 按预测类型组织指标
         for pred_type in ['cls', 'mech', 'mols', 'matched', 'resolved', 'totally']:
@@ -233,9 +236,11 @@ class MongoToExcelExporter:
             worksheet = writer.sheets['Model Scores']
 
             # 设置列宽
-            for column in worksheet.columns:
+            # for column in worksheet.columns:
+            for i, column in enumerate(df.columns, 1):
                 max_length = 0
-                column_letter = column[0].column_letter
+                # column_letter = column[0].column_letter
+                column_letter = worksheet.cell(row=3, column=i).column_letter
                 for cell in column:
                     try:
                         if len(str(cell.value)) > max_length:

@@ -26,18 +26,20 @@
       "model": "Model"
     },
     "cls": {
-      "accTopK": "Accuracy@TopK",
-      "accKth": "Accuracy@Kth"
+      "accTopK": "CLS Accuracy@TopK",
+      "accKth": "CLS Accuracy@Kth"
     },
     "mech": {
       "accTopK": "Mechanism Accuracy@TopK",
       "accKth": "Mechanism Accuracy@Kth"
     },
     "mols": {
-      "accTopK": "Molecules Accuracy@TopK",
-      "accKth": "Molecules Accuracy@Kth",
-      "accTopKMols": "Molecules Count@TopK",
-      "precTopKValid": "Valid Precision@TopK"
+      "accTopK": "Target Accuracy@TopK",
+      "accKth": "Target Accuracy@Kth",
+      "accTopKMols": "Molecules Accuracy@TopK",
+      "accKthMols": "Molecules Accuracy@Kth",
+      "precTopKValid": "Valid Precision@TopK",
+      "precKthValid": "Valid Precision@Kth"
     },
     "matched": {
       "precTopK": "Matched Precision@TopK",
