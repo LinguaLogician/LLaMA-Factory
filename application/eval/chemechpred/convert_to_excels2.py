@@ -237,16 +237,30 @@ class MongoToExcelExporter:
 
             # 设置列宽
             # for column in worksheet.columns:
-            for i, column in enumerate(df.columns, 1):
+            # 在 export_to_excel 方法中，替换设置列宽的部分：
+
+            # 设置列宽
+            for i, column in enumerate(df_with_headers.columns, 1):
                 max_length = 0
-                # column_letter = column[0].column_letter
                 column_letter = worksheet.cell(row=3, column=i).column_letter
-                for cell in column:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(str(cell.value))
-                    except:
-                        pass
+
+                # 检查表头长度（多级表头有3行）
+                for row in range(1, 4):  # 遍历3行表头
+                    cell_value = worksheet.cell(row=row, column=i).value
+                    if cell_value:
+                        header_length = len(str(cell_value))
+                        if header_length > max_length:
+                            max_length = header_length
+
+                # 检查数据单元格长度
+                for row in range(5, len(df_with_headers) + 5):  # 数据从第5行开始（第4行是列名）
+                    cell_value = worksheet.cell(row=row, column=i).value
+                    if cell_value:
+                        cell_length = len(str(cell_value))
+                        if cell_length > max_length:
+                            max_length = cell_length
+
+                # 设置列宽，限制最大宽度
                 adjusted_width = min(max_length + 2, 50)
                 worksheet.column_dimensions[column_letter].width = adjusted_width
 
