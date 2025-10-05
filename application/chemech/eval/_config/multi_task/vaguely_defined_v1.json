@@ -1,0 +1,31 @@
+{
+  "task_type": "multi_task",
+  "tasks": [
+    {
+      "section": "prds_to_rxts",
+      "model": "prds_to_rxts_v1",
+      "tasks": [
+          "updcanostdprds_to_updcanostdrxts",
+          "oricanostdprds_to_oricanostdrxts"
+      ]
+    },
+    {
+      "section": "rxts_to_prds",
+      "model": "rxts_to_prds_v1",
+      "tasks": [
+          "updcanoamrxts_to_updcanoamprds",
+          "updcanostdrxts_to_updcanostdprds",
+          "oricanoamrxts_to_oricanoamprds",
+          "oricanostdrxts_to_oricanostdprds"
+      ]
+    },
+    {
+      "section": "rxn_to_rxn",
+      "model": "rxn_to_rxn_v1",
+      "tasks": [
+          "oricanostdrxn_to_oricanoamrxn",
+          "updcanostdrxn_to_updcanoamrxn"
+      ]
+    }
+  ]
+}

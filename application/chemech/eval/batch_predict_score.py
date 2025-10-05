@@ -462,10 +462,11 @@ if __name__ == "__main__":
     # DEFAULT_SUBSET="_random313"
     DEFAULT_SUBSET=""
     GPU_MEMORY_THRESHOLD = 22000  # MB，GPU显存阈值
-    WAIT_FOR_GPU= True
+    WAIT_FOR_GPU= False
     # predict_tasks_file="application/eval/_config/single_task/tasks_v3.json"
-    predict_tasks_file="application/eval/_config/single_task/tasks_v4.json"
+    # predict_tasks_file="application/eval/_config/single_task/tasks_v4.json"
     # predict_tasks_file="application/eval/_config/single_task/tasks_v5.json"
     # predict_tasks_file="application/eval/_config/multi_task/enhc_rxts_to_prds_v1_1.json"
+    predict_tasks_file="application/chemech/eval/_config/multi_task/vaguely_defined_v1.json"
     predict_tasks = load_config_from_file(predict_tasks_file)
     main()
