@@ -1,0 +1,21 @@
+{
+  "task_type": "single_task",
+  "tasks": [
+    {
+      "section": "rxn_to_rxn",
+      "models": [
+        "oricanostdrxn_to_oricanoamrxn",
+        "updcanostdrxn_to_updcanoamrxn"
+      ]
+    },
+    {
+      "section": "rxn_to_mech",
+      "models": [
+        "oricanostdrxn_to_cls",
+        "oricanoamrxn_to_cls",
+        "updcanoamrxn_to_cls",
+        "updcanostdrxn_to_cls"
+      ]
+    }
+  ]
+}

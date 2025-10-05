@@ -13,6 +13,8 @@ from typing import Dict, List, Tuple
 import argparse
 from tqdm import tqdm
 import datetime
+from change_data_info import main as change_data_info
+
 
 # 常量定义
 TASKS = {
@@ -268,10 +270,12 @@ def main():
     # 创建处理器并执行
     processor = DatasetProcessor(args.base_data_dir, TASKS)
     processor.process_dataset(data_recipe, data_output, args.output_base_dir)
-
+    change_data_info()
     print("\n数据集处理完成!")
 
 
 if __name__ == "__main__":
-    DEFAULT_CONFIG_FILE = "application/data/_config/enhc_rxts_to_prds/enhc_rxts_to_prds_v2_1.json"
+    # DEFAULT_CONFIG_FILE = "application/data/_config/rxts_to_prds/rxts_to_prds_v1.json"
+    # DEFAULT_CONFIG_FILE = "application/data/_config/prds_to_rxts/prds_to_rxts_v1.json"
+    DEFAULT_CONFIG_FILE = "application/chemech/data/_config/rxn_to_rxn/rxn_to_rxn_v1.json"
     main()

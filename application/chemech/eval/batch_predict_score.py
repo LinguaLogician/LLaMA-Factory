@@ -22,13 +22,15 @@ from pathlib import Path
 from typing import List, Tuple, Dict, Any
 from datetime import datetime
 
+import GPUtil
+
 # 添加当前目录到Python路径，以便导入predict2和score2
 current_dir = Path(__file__).parent
 sys.path.insert(0, str(current_dir))
 
 # 导入预测和评分模块
 try:
-    from predict2 import main as predict_main, GPU_MEMORY_THRESHOLD
+    from predict2 import main as predict_main
     from score2 import main as score_main
 except ImportError as e:
     print(f"导入模块失败: {e}")
@@ -101,7 +103,7 @@ TASKS_CONFIG = {
         "CANO.PRDS->ARBI.PRDS",
 
         "UPD.CANO.AM.PRDS->UPD.CANO.STD.PRDS", ##
-        "ORI.CANO.AM.PRDS->ORI.CANO.STD.PRDS",
+        "ORI.CANO.AM.PRDS->ORI.CANO.STD.PRDS", ## //
 
         "ORI.CANO.STD.PRDS->ORI.ARBI.STD.PRDS", ##
         "ORI.ARBI.STD.PRDS->ORI.CANO.STD.PRDS", ##
@@ -112,7 +114,7 @@ TASKS_CONFIG = {
         "RXTS->PRDS",
         "UPD.CANO.AM.RXTS->UPD.CANO.AM.PRDS",
         "UPD.CANO.STD.RXTS->UPD.CANO.STD.PRDS", ##
-        "ORI.CANO.AM.RXTS->ORI.CANO.AM.PRDS",
+        "ORI.CANO.AM.RXTS->ORI.CANO.AM.PRDS", ## //
         "ORI.CANO.STD.RXTS->ORI.CANO.STD.PRDS", ##
     ],
     "PRDS_TO_RXTS": [
@@ -139,6 +141,25 @@ TASKS_CONFIG = {
       "AM->STD",
     ]
 }
+
+def wait_for_gpu_memory(threshold_mb):
+    """等待GPU显存达到阈值"""
+    count = 3
+    while True and count > 0:
+        gpus = GPUtil.getGPUs()
+        if not gpus:
+            print("No GPU found, proceeding with CPU...")
+            break
+
+        available_memory = min([gpu.memoryFree for gpu in gpus])
+        if available_memory >= threshold_mb:
+            print(f"GPU memory available: {available_memory}MB")
+            time.sleep(60*4)
+            count -= 1
+            continue
+        else:
+            print(f"Waiting for GPU memory... (available: {available_memory}MB, required: {threshold_mb}MB)")
+            time.sleep(60*8)
 
 def search_group(task_id):
     group = None
@@ -227,12 +248,12 @@ class BatchChemMechProcessor:
                 "--batch_limit", str(self.args.batch_limit),
                 "--batch_token_size", str(self.args.batch_token_size),
                 "--minmax_gap", str(self.args.minmax_gap),
-                "--wait_for_gpu" if self.args.wait_for_gpu else "",
+                "--wait_for_gpu", False,
                 "--gpu_threshold", str(self.args.gpu_threshold)
             ]
 
             # 过滤空参数
-            predict_args = [arg for arg in predict_args if arg]
+            # predict_args = [arg for arg in predict_args if arg]
 
             # 设置sys.argv并调用predict_main
             original_argv = sys.argv
@@ -414,7 +435,7 @@ def main():
                         help="最小最大长度差距")
 
     # GPU参数
-    parser.add_argument("--wait_for_gpu", action="store_true", default=True,
+    parser.add_argument("--wait_for_gpu", action="store_true", default=WAIT_FOR_GPU,
                         help="是否等待GPU内存")
     parser.add_argument("--gpu_threshold", type=int, default=GPU_MEMORY_THRESHOLD,
                         help="GPU内存阈值(MB)")
@@ -426,6 +447,8 @@ def main():
     args = parser.parse_args()
 
     try:
+        if args.wait_for_gpu:
+            wait_for_gpu_memory(args.gpu_threshold)
         processor = BatchChemMechProcessor(args)
         processor.process_all_tasks()
 
@@ -436,14 +459,13 @@ def main():
 
 if __name__ == "__main__":
 
-    DEFAULT_SUBSET="_random313"
-
-    # DEFAULT_TASKS = [
-    #     ("prds_to_prds", "updcanoamprds_to_updcanostdprds", "UPDCANOAMPRDS_TO_UPDCANOSTDPRDS"),
-    #     ("rxts_to_prds", "updcanostdrxts_to_updcanostdprds", "UPDCANOSTDRXTS_TO_UPDCANOSTDPRDS"),
-    #     # 可以添加更多默认任务
-    # ]
-
-    predict_tasks_file="application/eval/_config/multi_task/enhc_rxts_to_prds_v1_1.json"
+    # DEFAULT_SUBSET="_random313"
+    DEFAULT_SUBSET=""
+    GPU_MEMORY_THRESHOLD = 22000  # MB，GPU显存阈值
+    WAIT_FOR_GPU= True
+    # predict_tasks_file="application/eval/_config/single_task/tasks_v3.json"
+    predict_tasks_file="application/eval/_config/single_task/tasks_v4.json"
+    # predict_tasks_file="application/eval/_config/single_task/tasks_v5.json"
+    # predict_tasks_file="application/eval/_config/multi_task/enhc_rxts_to_prds_v1_1.json"
     predict_tasks = load_config_from_file(predict_tasks_file)
     main()

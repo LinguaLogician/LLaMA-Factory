@@ -26,9 +26,9 @@ from torch.utils.data import Dataset
 from llamafactory.chat import ChatModel
 
 # ============================ 配置常量 ============================
-GPU_MEMORY_THRESHOLD = 8000  # MB，GPU显存阈值
-LOG_DIR = "./logs/chemechpred"
+GPU_MEMORY_THRESHOLD = 12000  # MB，GPU显存阈值
 
+LOG_DIR = "./logs/chemechpred"
 # Vaguely Defined 任务标识符
 VAGUELY_DEFINED_TASKS = {
     # RXN_TO_MECH
@@ -51,7 +51,7 @@ VAGUELY_DEFINED_TASKS = {
 
 
 # ============================ 工具函数 ============================
-def wait_for_gpu_memory(threshold_mb: int = GPU_MEMORY_THRESHOLD):
+def wait_for_gpu_memory(threshold_mb):
     """等待GPU显存达到阈值"""
     while True:
         gpus = GPUtil.getGPUs()
@@ -664,7 +664,7 @@ def main():
                         help="Maximum allowed length difference within a batch")
 
     # GPU参数
-    parser.add_argument("--wait_for_gpu", action="store_true", default=True,
+    parser.add_argument("--wait_for_gpu", type=bool, default=True,
                         help="是否等待GPU内存达到阈值")
     parser.add_argument("--gpu_threshold", type=int, default=GPU_MEMORY_THRESHOLD,
                         help="GPU内存阈值(MB)")
@@ -677,4 +677,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()

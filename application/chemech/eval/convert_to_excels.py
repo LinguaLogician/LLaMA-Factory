@@ -267,7 +267,7 @@ class MongoToExcelExporter:
 
                 # 设置列宽，限制最大宽度
                 if basic_info_alias:
-                    adjusted_width = max_length
+                    adjusted_width = max_length + 2
                 else:
                     adjusted_width = 8
                 worksheet.column_dimensions[column_letter].width = adjusted_width

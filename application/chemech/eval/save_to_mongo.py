@@ -16,18 +16,20 @@ from tqdm import tqdm
 import argparse
 
 
-def classify_task_type(task_id: str) -> str:
+def classify_task_type(task_id: str) -> List[str]:
     """根据task_id判断任务类型"""
     task_id_lower = task_id.lower()
-
+    pred_types = []
     if 'cls' in task_id_lower:
-        return 'cls'
-    elif 'mech' in task_id_lower:
-        return 'mech'
-    elif any(keyword in task_id_lower for keyword in ['rxts', 'prds', 'rxn']):
-        return 'mols'
-    else:
-        return 'unknown'
+        pred_types.append('cls')
+    if 'mech' in task_id_lower:
+        pred_types.append('mech')
+    if any(keyword in task_id_lower for keyword in ['rxts', 'prds', 'rxn']):
+        pred_types.append('mols')
+    if not pred_types:
+        raise ValueError(f"无法识别任务类型: {task_id}")
+    return pred_types
+
 
 
 def transform_metrics(metrics_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -69,52 +71,53 @@ def process_score_file(file_path: str, group: str, task_id: str, model_name: str
     }
 
     # 处理预测项
-    task_type = classify_task_type(task_id)
+    pred_types = classify_task_type(task_id)
 
-    for key, value in data.items():
-        if key in ['matched', 'resolved', 'totally']:
-            if 'PrecTopK' in value and 'PrecKth' in value:
-                result[key] = transform_metrics(value)
+    for task_type in pred_types:
+        for key, value in data.items():
+            if key in ['matched', 'resolved', 'totally']:
+                if 'PrecTopK' in value and 'PrecKth' in value:
+                    result[key] = transform_metrics(value)
 
-        elif task_type == 'mols' and any(keyword in key for keyword in ['prds', 'rxts', 'rxn']):
-            # 处理MOLS类型的预测项
-            mols_metrics = {}
-            required_metrics = [
-                'AccTopK', 'AccKth', 'AccTopKMols', 'AccKthMols',
-                'PrecTopKFormat', 'PrecKthFormat', 'PrecTopKManner',
-                'PrecKthManner', 'PrecTopKValid', 'PrecKthValid'
-            ]
+            elif task_type == 'mols' and any(keyword in key for keyword in ['prds', 'rxts', 'rxn']):
+                # 处理MOLS类型的预测项
+                mols_metrics = {}
+                required_metrics = [
+                    'AccTopK', 'AccKth', 'AccTopKMols', 'AccKthMols',
+                    'PrecTopKFormat', 'PrecKthFormat', 'PrecTopKManner',
+                    'PrecKthManner', 'PrecTopKValid', 'PrecKthValid'
+                ]
 
-            for metric in required_metrics:
-                if metric in value:
-                    mols_metrics.update(transform_metrics({metric: value[metric]}))
+                for metric in required_metrics:
+                    if metric in value:
+                        mols_metrics.update(transform_metrics({metric: value[metric]}))
 
-            if mols_metrics:
-                result['mols'] = mols_metrics
+                if mols_metrics:
+                    result['mols'] = mols_metrics
 
-        elif task_type == 'cls' and 'cls' in key.lower():
-            # 处理CLS类型的预测项
-            cls_metrics = {}
-            required_metrics = ['AccTopK', 'AccKth']
+            elif task_type == 'cls' and 'cls' in key.lower():
+                # 处理CLS类型的预测项
+                cls_metrics = {}
+                required_metrics = ['AccTopK', 'AccKth']
 
-            for metric in required_metrics:
-                if metric in value:
-                    cls_metrics.update(transform_metrics({metric: value[metric]}))
+                for metric in required_metrics:
+                    if metric in value:
+                        cls_metrics.update(transform_metrics({metric: value[metric]}))
 
-            if cls_metrics:
-                result['cls'] = cls_metrics
+                if cls_metrics:
+                    result['cls'] = cls_metrics
 
-        elif task_type == 'mech' and 'mech' in key.lower():
-            # 处理MECH类型的预测项
-            mech_metrics = {}
-            required_metrics = ['AccTopK', 'AccKth']
+            elif task_type == 'mech' and 'mech' in key.lower():
+                # 处理MECH类型的预测项
+                mech_metrics = {}
+                required_metrics = ['AccTopK', 'AccKth']
 
-            for metric in required_metrics:
-                if metric in value:
-                    mech_metrics.update(transform_metrics({metric: value[metric]}))
+                for metric in required_metrics:
+                    if metric in value:
+                        mech_metrics.update(transform_metrics({metric: value[metric]}))
 
-            if mech_metrics:
-                result['mech'] = mech_metrics
+                if mech_metrics:
+                    result['mech'] = mech_metrics
 
     return result
 
@@ -161,6 +164,7 @@ def parse_args():
                         help='集合名称')
     return parser.parse_args()
 
+
 def main():
     """主函数"""
     args = parse_args()
@@ -170,6 +174,12 @@ def main():
         client = MongoClient(args.mongo_host, args.mongo_port)
         client.admin.command('ping')  # 测试连接
         db = client[args.db_name]
+
+        if args.collection_name in db.list_collection_names():
+            print(f"集合 {args.collection_name} 已存在，正在删除...")
+            db[args.collection_name].drop()
+            print(f"集合 {args.collection_name} 已删除")
+
         collection = db[args.collection_name]
         print(f"成功连接到MongoDB: {args.mongo_host}:{args.mongo_port}")
     except ConnectionFailure as e:
@@ -210,3 +220,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# if __name__ == '__main__':
+#     process_score_file('results/chemechpred/scores/_random313/rxn_to_mech/updcanoamrxn_to_cls_mech/enhc_rxts_to_prds_v2_1.json', 'enhc_rxts_to_prds', 'updcanoamrxn_to_cls_mech', 'enhc_rxts_to_prds_v2_1')

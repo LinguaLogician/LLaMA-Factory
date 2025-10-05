@@ -115,9 +115,8 @@ def update_dataset_info(data_train_dir: str, data_val_dir: str, data_info_file: 
 
         # 如果key不存在，则添加到字典中
         if key not in dataset_info:
-            dataset_info[key] = {"file_name": full_path}
             train_added += 1
-
+        dataset_info[key] = {"file_name": full_path.replace('/mnt/e/', '')}
     print(f"训练文件处理完成，新增 {train_added} 个条目")
 
     # 处理验证文件

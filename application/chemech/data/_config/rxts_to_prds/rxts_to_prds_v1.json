@@ -1,0 +1,15 @@
+{
+   "data_recipe": {
+        "recipe": [
+            ["updcanoamrxts_to_updcanoamprds", "", 1, {}],
+            ["updcanostdrxts_to_updcanostdprds", "", 1, {}],
+            ["oricanoamrxts_to_oricanoamprds", "", 1, {}],
+            ["oricanostdrxts_to_oricanostdprds", "", 1, {}]
+        ],
+        "splits": ["train", "val", "test"]
+    },
+    "data_output": {
+        "output": ["rxts_to_prds", "rxts_to_prds_v1"],
+        "splits": ["train", "val", "test"]
+    }
+}

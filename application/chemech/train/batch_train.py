@@ -314,15 +314,24 @@ def main():
 
 if __name__ == "__main__":
     # 默认训练配置 - 可以根据需要修改
+    mapping1 = {
+        "per_device_train_batch_size": 2,
+        "gradient_accumulation_steps": 2,
+        "eval_steps": 2000
+    }
+    mapping2 = {
+        "eval_steps": 2000
+    }
+    mapping3 = {
+        "eval_steps": 4000
+    }
     DEFAULT_TRAINING_CONFIGS = [
-        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v1_1", "enhc_rxts_to_prds_v1_1", {}),
-        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v2_1", "enhc_rxts_to_prds_v2_1", {}),
-        ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v3_1", "enhc_rxts_to_prds_v3_1", {}),
-    # per_device_train_batch_size: 4
-    # gradient_accumulation_steps: 1
+        # ("prds_to_rxts", "prds_to_rxts_v1", "prds_to_rxts_v1", mapping2),
+        # ("rxts_to_prds", "rxts_to_prds_v1", "rxts_to_prds_v1", mapping3),
+        ("rxn_to_rxn", "rxn_to_rxn_v1", "rxn_to_rxn_v1", mapping1),
     ]
     # 基础参数文件路径
     BASE_PARA_FILE = "examples/train_full/chemechpred/base_para.yaml"
-    wait_for_gpu = True
+    wait_for_gpu = False
     gpu_threshold = 10000
     main()

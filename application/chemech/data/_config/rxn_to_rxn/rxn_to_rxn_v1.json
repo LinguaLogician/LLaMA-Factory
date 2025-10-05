@@ -1,0 +1,13 @@
+{
+   "data_recipe": {
+        "recipe": [
+            ["oricanostdrxn_to_oricanoamrxn", "", 1, {}],
+            ["updcanostdrxn_to_updcanoamrxn", "", 1, {}]
+        ],
+        "splits": ["train", "val", "test"]
+    },
+    "data_output": {
+        "output": ["rxn_to_rxn", "rxn_to_rxn_v1"],
+        "splits": ["train", "val", "test"]
+    }
+}

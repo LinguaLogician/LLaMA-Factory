@@ -1,0 +1,37 @@
+{
+  "task_type": "single_task",
+  "tasks": [
+    {
+      "section": "prds_to_prds",
+      "models": [
+        "oricanoamprds_to_oricanostdprds"
+      ]
+    },
+    {
+      "section": "rxn_to_mech",
+      "models": [
+        "updcanoamrxn_to_cls_mech"
+      ]
+    },
+    {
+      "section": "rxts_to_prds",
+      "models": [
+        "oricanoamrxts_to_oricanoamprds",
+        "updcanoamrxts_to_updcanoamprds"
+      ]
+    },
+    {
+      "section": "rxts_to_prds_plus",
+      "models": [
+        "updcanoamrxts_cls_to_mech_updcanoamprds",
+        "updcanoamrxts_cls_to_updcanoamprds",
+        "updcanoamrxts_mech_cls_to_updcanoamprds",
+        "updcanoamrxts_mech_to_cls_updcanoamprds",
+        "updcanoamrxts_mech_to_updcanoamprds",
+        "updcanoamrxts_to_cls_mech_updcanoamprds",
+        "updcanoamrxts_to_cls_updcanoamprds",
+        "updcanoamrxts_to_mech_updcanoamprds"
+      ]
+    }
+  ]
+}
