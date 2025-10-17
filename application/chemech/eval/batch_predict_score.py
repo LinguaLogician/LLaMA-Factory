@@ -5,6 +5,7 @@
 # @contact: wlt1990@outlook.com
 # @time: 2025/9/28 16:46
 # https://chat.deepseek.com/a/chat/s/59ced693-1ead-42ca-aee4-0a9189614201
+# https://chat.deepseek.com/a/chat/s/b3b2fe88-b95f-4540-aec8-f5666a97faa0
 import json
 # -*- coding: utf-8 -*-
 # @filename: batch_predict_score.py
@@ -37,6 +38,18 @@ except ImportError as e:
     print("请确保predict2.py和score2.py在当前目录下")
     sys.exit(1)
 
+DEFAULT_SUBSET=""
+GPU_MEMORY_THRESHOLD = 22000  # MB，GPU显存阈值
+WAIT_FOR_GPU= False
+
+# "RXTS_TO_MECH": [
+#     "UPD.CANO.STD.RXTS->CLS",
+#     "ORI.CANO.STD.RXTS->CLS",
+# ],
+# "RXN_TO_MECH": [
+#     "UPD.CANO.STD.RXN->CLS",
+# ]
+
 TASKS_CONFIG = {
     "RXN_TO_MECH": [
         "RXN->CLS",
@@ -48,6 +61,8 @@ TASKS_CONFIG = {
         "UPD.CANO.AM.RXN->CLS", ##
         "UPD.CANO.AM.RXN->MECH", ##
         "UPD.CANO.AM.RXN->CLS+MECH", ##
+
+        "UPD.CANO.STD.RXN->CLS",
 
         "ORI.ARBI.STD.RXN->CLS", ##
         "UPD.ARBI.STD.RXN->CLS", ##
@@ -71,6 +86,8 @@ TASKS_CONFIG = {
         "ORI.CANO.AM.RXN->ORI.CANO.STD.RXN", ##
         "UPD.CANO.AM.RXN->UPD.CANO.STD.RXN",  ##
 
+        "UPD.CANO.AM.RXN->ORI.CANO.AM.RXN",
+
         "ORI.ARBI.STD.RXN->ORI.CANO.STD.RXN", ##
         "UPD.ARBI.STD.RXN->UPD.CANO.STD.RXN",  ##
 
@@ -85,6 +102,12 @@ TASKS_CONFIG = {
         "ARBI.RXTS->CANO.RXTS",
         "CANO.RXTS->ARBI.RXTS",
 
+        "ORI.CANO.STD.RXTS->UPD.CANO.STD.RXTS",
+        "UPD.CANO.STD.RXTS->ORI.CANO.STD.RXTS",
+        "UPD.CANO.AM.RXTS->ORI.CANO.AM.RXTS",
+        "ORI.CANO.AM.RXTS->UPD.CANO.AM.RXTS",
+
+
         "UPD.CANO.STD.RXTS->UPD.CANO.AM.RXTS", ##
         "UPD.CANO.AM.RXTS->UPD.CANO.STD.RXTS", ##
         "ORI.CANO.STD.RXTS->ORI.CANO.AM.RXTS", ##
@@ -95,7 +118,16 @@ TASKS_CONFIG = {
         "UPD.CANO.STD.RXTS->UPD.ARBI.STD.RXTS", ##
         "UPD.ARBI.STD.RXTS->UPD.CANO.STD.RXTS" ##
     ],
+    "RXTS_TO_MECH": [
+        "UPD.CANO.AM.RXTS->MECH",
+        "UPD.CANO.AM.RXTS->CLS",
+        "ORI.CANO.AM.RXTS->CLS",
+        "UPD.CANO.AM.RXTS->CLS+MECH",
 
+        "UPD.CANO.STD.RXTS->CLS",
+        "ORI.CANO.STD.RXTS->CLS",
+
+    ],
     "PRDS_TO_PRDS": [
 
         "AM.PRDS->STD.PRDS",
@@ -142,24 +174,22 @@ TASKS_CONFIG = {
     ]
 }
 
-def wait_for_gpu_memory(threshold_mb):
+def wait_for_gpu_memory(threshold_mb: int = 8000):
     """等待GPU显存达到阈值"""
-    count = 3
-    while True and count > 0:
-        gpus = GPUtil.getGPUs()
-        if not gpus:
-            print("No GPU found, proceeding with CPU...")
-            break
-
-        available_memory = min([gpu.memoryFree for gpu in gpus])
-        if available_memory >= threshold_mb:
-            print(f"GPU memory available: {available_memory}MB")
-            time.sleep(60*4)
-            count -= 1
+    while True:
+        available_memory1 = min([gpu.memoryFree for gpu in GPUtil.getGPUs()])
+        if available_memory1 <= threshold_mb:
+            print(f"GPU memory available: {available_memory1}MB")
+            time.sleep(60)
             continue
+        time.sleep(60*10)
+        available_memory2 = min([gpu.memoryFree for gpu in GPUtil.getGPUs()])
+        if available_memory2 >= threshold_mb:
+            print(f"GPU memory available: {available_memory2}MB")
+            break
         else:
-            print(f"Waiting for GPU memory... (available: {available_memory}MB, required: {threshold_mb}MB)")
-            time.sleep(60*8)
+            print(f"Waiting for GPU memory... (available: {available_memory2}MB, required: {threshold_mb}MB)")
+            time.sleep(60)
 
 def search_group(task_id):
     group = None
@@ -204,21 +234,45 @@ class BatchChemMechProcessor:
         )
         self.logger = logging.getLogger(__name__)
 
+
+    # 修改 parse_tasks 方法
     def parse_tasks(self) -> List[Tuple[str, str, str]]:
         """解析任务列表"""
         tasks = []
+
+        # 优先从命令行参数解析任务
         if self.args.tasks:
-            # 从命令行参数解析任务
             for task_str in self.args.tasks:
                 try:
                     section, model_name, task_id = task_str.split(',')
                     tasks.append((section.strip(), model_name.strip(), task_id.strip()))
                 except ValueError:
                     self.logger.error(f"任务格式错误: {task_str}，应为 'section,model_name,task_id'")
+
+        # 从配置文件解析任务
+        elif self.args.config_files:
+            for config_file in self.args.config_files:
+                try:
+                    config_tasks = load_config_from_file(config_file)
+                    tasks.extend(config_tasks)
+                    self.logger.info(f"从配置文件 {config_file} 加载了 {len(config_tasks)} 个任务")
+                except Exception as e:
+                    self.logger.error(f"加载配置文件 {config_file} 失败: {e}")
+
+        # 从单个配置文件解析任务
+        elif self.args.config_file:
+            try:
+                tasks = load_config_from_file(self.args.config_file)
+                self.logger.info(f"从配置文件 {self.args.config_file} 加载了 {len(tasks)} 个任务")
+            except Exception as e:
+                self.logger.error(f"加载配置文件 {self.args.config_file} 失败: {e}")
+
+        # 使用默认任务列表
         else:
-            # 使用默认任务列表
-            # tasks = DEFAULT_TASKS
             tasks = predict_tasks
+
+        if not tasks:
+            self.logger.warning("没有找到任何任务配置")
 
         return tasks
 
@@ -391,7 +445,10 @@ def main():
     # 任务参数
     parser.add_argument("--tasks", nargs='+', type=str,
                         help="任务列表，格式: 'section,model_name,task_id'，例如: 'prds_to_prds,model1,task1'")
-
+    parser.add_argument("--config_files", nargs='+', type=str,
+                        help="配置文件路径列表，可以传入多个JSON文件")
+    parser.add_argument("--config_file", type=str,
+                        help="单个配置文件路径")
     # 路径参数
     parser.add_argument("--data_base_dir", type=str,
                         default="DataSets/Chemistry/ChemicalMechanism/via_random/test/",
@@ -427,7 +484,7 @@ def main():
                         help="是否在生成时返回字典")
 
     # 批处理参数
-    parser.add_argument("--batch_limit", type=int, default=2,
+    parser.add_argument("--batch_limit", type=int, default=3,
                         help="批量大小限制")
     parser.add_argument("--batch_token_size", type=int, default=2000,
                         help="批量token大小")
@@ -435,7 +492,7 @@ def main():
                         help="最小最大长度差距")
 
     # GPU参数
-    parser.add_argument("--wait_for_gpu", action="store_true", default=WAIT_FOR_GPU,
+    parser.add_argument("--wait_for_gpu", type=bool, default=WAIT_FOR_GPU,
                         help="是否等待GPU内存")
     parser.add_argument("--gpu_threshold", type=int, default=GPU_MEMORY_THRESHOLD,
                         help="GPU内存阈值(MB)")
@@ -462,11 +519,16 @@ if __name__ == "__main__":
     # DEFAULT_SUBSET="_random313"
     DEFAULT_SUBSET=""
     GPU_MEMORY_THRESHOLD = 22000  # MB，GPU显存阈值
-    WAIT_FOR_GPU= False
+    WAIT_FOR_GPU= True
     # predict_tasks_file="application/eval/_config/single_task/tasks_v3.json"
     # predict_tasks_file="application/eval/_config/single_task/tasks_v4.json"
     # predict_tasks_file="application/eval/_config/single_task/tasks_v5.json"
     # predict_tasks_file="application/eval/_config/multi_task/enhc_rxts_to_prds_v1_1.json"
-    predict_tasks_file="application/chemech/eval/_config/multi_task/vaguely_defined_v1.json"
+    # predict_tasks_file="application/chemech/eval/_config/multi_task/vaguely_defined_v1.json"
+    # predict_tasks_file="application/chemech/eval/_config/multi_task/enhc_rxts_to_prds_v4_1_and_v5_1.json"
+    # predict_tasks_file="application/chemech/eval/_config/single_task/rxts_to_mech_v1.json"
+    # predict_tasks_file="application/chemech/eval/_config/single_task/rxts_to_mech_v1.json"
+    # predict_tasks_file="application/chemech/eval/_config/single_task/updcanostdrxts_to_updcanoamrxts.json"
+    predict_tasks_file="application/chemech/eval/_config/multi_task/enhc_prds_to_rxts_v1_1.json"
     predict_tasks = load_config_from_file(predict_tasks_file)
     main()

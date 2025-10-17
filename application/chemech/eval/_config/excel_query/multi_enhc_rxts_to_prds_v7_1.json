@@ -1,0 +1,71 @@
+{
+  "k_value_aliases": {
+    "k_1": "K=1",
+    "k_2": "K=2",
+    "k_3": "K=3",
+    "k_4": "K=4",
+    "k_5": "K=5"
+  },
+  "k_values_to_export": ["k_1", "k_2", "k_3", "k_4", "k_5"],
+  "multiply_by_100": true,
+  "decimal_places": 2,
+  "query_filters": {
+    "group": [],
+    "task": [
+    ],
+    "model": [
+      "enhc_rxts_to_prds_v7_1",
+      "oricanostdrxts_to_oricanostdprds",
+      "oricanostdrxts_to_updcanostdrxts",
+      "updcanostdrxts_to_updcanoamrxts",
+      "updcanoamrxts_to_mech",
+      "updcanoamrxts_mech_to_updcanoamprds",
+      "updcanoamprds_to_updcanostdprds",
+      "updcanoamrxn_to_oricanoamrxn"
+    ]
+  },
+  "query_patterns": {
+    "group": ".*",
+    "task": ".*",
+    "model": ".*"
+  },
+  "export_fields": {
+    "basic_info": {
+      "group": "Group",
+      "task": "Task",
+      "model": "Model"
+    },
+    "mols": {
+      "accTopK": "Target Accuracy@TopK",
+      "accKth": "Target Accuracy@Kth",
+      "accTopKMols": "Molecules Accuracy@TopK",
+      "accKthMols": "Molecules Accuracy@Kth",
+      "precTopKFormat": "Format Accuracy@TopK",
+      "precKthFormat": "Format Accuracy@Kth",
+      "precTopKManner": "Manner Accuracy@TopK",
+      "precKthManner": "Manner Accuracy@Kth",
+      "precTopKValid": "Valid Precision@TopK",
+      "precKthValid": "Valid Precision@Kth"
+    },
+    "cls": {
+      "accTopK": "CLS Accuracy@TopK",
+      "accKth": "CLS Accuracy@Kth"
+    },
+    "mech": {
+      "accTopK": "Mechanism Accuracy@TopK",
+      "accKth": "Mechanism Accuracy@Kth"
+    },
+    "matched": {
+      "precTopK": "Matched Precision@TopK",
+      "precKth": "Matched Precision@Kth"
+    },
+    "resolved": {
+      "precTopK": "Resolved Precision@TopK",
+      "precKth": "Resolved Precision@Kth"
+    },
+    "totally": {
+      "precTopK": "Totally Precision@TopK",
+      "precKth": "Totally Precision@Kth"
+    }
+  }
+}

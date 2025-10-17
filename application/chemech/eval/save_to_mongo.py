@@ -127,6 +127,8 @@ def find_all_score_files(scores_dir: str) -> List[tuple]:
     score_files = []
 
     for group in os.listdir(scores_dir):
+        if "_random" in group:
+            continue
         group_path = os.path.join(scores_dir, group)
         if not os.path.isdir(group_path):
             continue
@@ -152,7 +154,8 @@ def parse_args():
     """解析命令行参数"""
     parser = argparse.ArgumentParser(description='处理模型评测结果并存入MongoDB')
     parser.add_argument('--scores_dir', type=str,
-                        default='/mnt/e/Results/chemechpred/scores/_random313',
+                        # default='/mnt/e/Results/chemechpred/scores/_random313',
+                        default='/mnt/e/Results/chemechpred/scores',
                         help='评测结果目录路径')
     parser.add_argument('--mongo_host', type=str, default='100.84.70.2',
                         help='MongoDB主机地址')

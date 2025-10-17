@@ -1,0 +1,14 @@
+{
+  "task_type": "single_task",
+  "tasks": [
+    {
+      "section": "rxts_to_rxts",
+      "models": [
+        "oricanostdrxts_to_updcanostdrxts",
+        "updcanostdrxts_to_oricanostdrxts",
+        "updcanoamrxts_to_oricanoamrxts",
+        "oricanoamrxts_to_updcanoamrxts"
+      ]
+    }
+  ]
+}

@@ -303,9 +303,9 @@ def parse_args():
                         default='/mnt/e/Results/chemechpred/excels/',
                         help='输出目录')
     parser.add_argument('--config_path', type=str,
-                        default='application/eval/_config/excel_query/',
+                        default='application/chemech/eval/_config/excel_query/',
                         help='配置文件目录')
-    parser.add_argument('--config_file', type=str, default='config_file.json',
+    parser.add_argument('--config_file', type=str, default=DEFAULT_CONFIG_FILE,
                         help='配置文件名(不含路径)')
 
     return parser.parse_args()
@@ -353,4 +353,9 @@ def main():
 
 
 if __name__ == '__main__':
+    # DEFAULT_CONFIG_FILE = 'atom_mapping.json'
+    # DEFAULT_CONFIG_FILE = 'multi_enhc_rxts_to_prds_v1_1.json'
+    # DEFAULT_CONFIG_FILE = 'multi_enhc_rxts_to_prds_v7_1.json'
+    DEFAULT_CONFIG_FILE = 'multi_enhc_prds_to_rxts_v1_1.json'
+    # DEFAULT_CONFIG_FILE = 'single_reaction_classification.json'
     main()

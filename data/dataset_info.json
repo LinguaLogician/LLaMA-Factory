@@ -322,5 +322,119 @@
   },
   "enhc_rxts_to_prds_v3_1_val": {
     "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v3_1.json"
+  },
+  "enhc_prds_to_prds_v3_1": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_prds_to_prds/enhc_prds_to_prds_v3_1.json"
+  },
+  "prds_to_rxts_v1": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/prds_to_rxts/prds_to_rxts_v1.json"
+  },
+  "rxn_to_rxn_v1": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxn_to_rxn/rxn_to_rxn_v1.json"
+  },
+  "rxts_to_prds_v1": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_prds/rxts_to_prds_v1.json"
+  },
+  "prds_to_rxts_v1_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/prds_to_rxts/prds_to_rxts_v1.json"
+  },
+  "rxn_to_rxn_v1_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxn_to_rxn/rxn_to_rxn_v1.json"
+  },
+  "rxts_to_prds_v1_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_prds/rxts_to_prds_v1.json"
+  },
+  "enhc_prds_to_prds_v3_1_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_prds_to_prds/enhc_prds_to_prds_v3_1.json"
+  },
+  "oricanoamrxts_to_cls": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_mech/oricanoamrxts_to_cls.json"
+  },
+  "updcanoamrxts_to_cls": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_mech/updcanoamrxts_to_cls.json"
+  },
+  "updcanoamrxts_to_cls_mech": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_mech/updcanoamrxts_to_cls_mech.json"
+  },
+  "updcanoamrxts_to_mech": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_mech/updcanoamrxts_to_mech.json"
+  },
+  "oricanoamrxts_to_cls_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_mech/oricanoamrxts_to_cls.json"
+  },
+  "updcanoamrxts_to_cls_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_mech/updcanoamrxts_to_cls.json"
+  },
+  "updcanoamrxts_to_cls_mech_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_mech/updcanoamrxts_to_cls_mech.json"
+  },
+  "updcanoamrxts_to_mech_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_mech/updcanoamrxts_to_mech.json"
+  },
+  "enhc_rxts_to_prds_v4_1": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_rxts_to_prds/enhc_rxts_to_prds_v4_1.json"
+  },
+  "enhc_rxts_to_prds_v4_1_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v4_1.json"
+  },
+  "enhc_rxts_to_prds_v5_1_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v5_1.json"
+  },
+  "enhc_rxts_to_prds_v5_1": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_rxts_to_prds/enhc_rxts_to_prds_v5_1.json"
+  },
+  "enhc_rxts_to_prds_v6_1": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_rxts_to_prds/enhc_rxts_to_prds_v6_1.json"
+  },
+  "oricanoamrxts_to_updcanoamrxts": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_rxts/oricanoamrxts_to_updcanoamrxts.json"
+  },
+  "oricanostdrxts_to_updcanostdrxts": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_rxts/oricanostdrxts_to_updcanostdrxts.json"
+  },
+  "updcanoamrxts_to_oricanoamrxts": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_rxts/updcanoamrxts_to_oricanoamrxts.json"
+  },
+  "updcanostdrxts_to_oricanostdrxts": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_rxts/updcanostdrxts_to_oricanostdrxts.json"
+  },
+  "oricanoamrxts_to_updcanoamrxts_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_rxts/oricanoamrxts_to_updcanoamrxts.json"
+  },
+  "oricanostdrxts_to_updcanostdrxts_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_rxts/oricanostdrxts_to_updcanostdrxts.json"
+  },
+  "updcanoamrxts_to_oricanoamrxts_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_rxts/updcanoamrxts_to_oricanoamrxts.json"
+  },
+  "updcanostdrxts_to_oricanostdrxts_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_rxts/updcanostdrxts_to_oricanostdrxts.json"
+  },
+  "enhc_rxts_to_prds_v7_1": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/enhc_rxts_to_prds/enhc_rxts_to_prds_v7_1.json"
+  },
+  "enhc_rxts_to_prds_v7_1_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v7_1.json"
+  },
+  "enhc_rxts_to_prds_v6_1_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/enhc_rxts_to_prds/enhc_rxts_to_prds_v6_1.json"
+  },
+  "updcanostdrxn_to_cls": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxn_to_mech/updcanostdrxn_to_cls.json"
+  },
+  "oricanostdrxts_to_cls": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_mech/oricanostdrxts_to_cls.json"
+  },
+  "updcanostdrxts_to_cls": {
+    "file_name": "DataSets/Chemistry/ChemicalMechanism/via_random/train/rxts_to_mech/updcanostdrxts_to_cls.json"
+  },
+  "updcanostdrxn_to_cls_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxn_to_mech/updcanostdrxn_to_cls.json"
+  },
+  "oricanostdrxts_to_cls_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_mech/oricanostdrxts_to_cls.json"
+  },
+  "updcanostdrxts_to_cls_val": {
+    "file_name": "/mnt/e/DataSets/Chemistry/ChemicalMechanism/via_random/val/rxts_to_mech/updcanostdrxts_to_cls.json"
   }
 }

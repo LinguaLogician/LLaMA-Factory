@@ -1,0 +1,11 @@
+{
+  "task_type": "single_task",
+  "tasks": [
+    {
+      "section": "rxts_to_rxts",
+      "models": [
+        "updcanostdrxts_to_updcanoamrxts"
+      ]
+    }
+  ]
+}

@@ -43,6 +43,12 @@ TASKS = {
         "ORI.CANO.STD.RXN->ORI.ARBI.STD.RXN",
         "UPD.CANO.STD.RXN->UPD.ARBI.STD.RXN",
     ],
+    "RXTS_TO_MECH": [
+        "UPD.CANO.AM.RXTS->MECH",
+        "UPD.CANO.AM.RXTS->CLS",
+        "ORI.CANO.AM.RXTS->CLS",
+        "UPD.CANO.AM.RXTS->CLS+MECH",
+    ],
     "RXTS_TO_RXTS": [
         "UPD.CANO.STD.RXTS->UPD.CANO.AM.RXTS",
         "UPD.CANO.AM.RXTS->UPD.CANO.STD.RXTS",
@@ -51,7 +57,12 @@ TASKS = {
         "ORI.CANO.STD.RXTS->ORI.ARBI.STD.RXTS",
         "ORI.ARBI.STD.RXTS->ORI.CANO.STD.RXTS",
         "UPD.CANO.STD.RXTS->UPD.ARBI.STD.RXTS",
-        "UPD.ARBI.STD.RXTS->UPD.CANO.STD.RXTS"
+        "UPD.ARBI.STD.RXTS->UPD.CANO.STD.RXTS",
+
+        "ORI.CANO.STD.RXTS->UPD.CANO.STD.RXTS",
+        "UPD.CANO.STD.RXTS->ORI.CANO.STD.RXTS",
+        "UPD.CANO.AM.RXTS->ORI.CANO.AM.RXTS",
+        "ORI.CANO.AM.RXTS->UPD.CANO.AM.RXTS"
     ],
     "PRDS_TO_PRDS": [
         "UPD.CANO.AM.PRDS->UPD.CANO.STD.PRDS",
@@ -68,7 +79,14 @@ TASKS = {
         "ORI.CANO.STD.RXTS->ORI.CANO.STD.PRDS",
     ],
     "RXTS_TO_PRDS_PLUS": [
-        "UPD.CANO.AM.RXTS+MECH+CLS->UPD.CANO.AM.PRDS"
+        "UPD.CANO.AM.RXTS->MECH+UPD.CANO.AM.PRDS",  ##
+        "UPD.CANO.AM.RXTS->CLS+UPD.CANO.AM.PRDS",  ##
+        "UPD.CANO.AM.RXTS->CLS+MECH+UPD.CANO.AM.PRDS",  ##
+        "UPD.CANO.AM.RXTS+MECH->UPD.CANO.AM.PRDS",  ##
+        "UPD.CANO.AM.RXTS+CLS->UPD.CANO.AM.PRDS",  ##
+        "UPD.CANO.AM.RXTS+CLS->MECH+UPD.CANO.AM.PRDS",  ##
+        "UPD.CANO.AM.RXTS+MECH->CLS+UPD.CANO.AM.PRDS",  ##
+        "UPD.CANO.AM.RXTS+MECH+CLS->UPD.CANO.AM.PRDS"  ##
     ],
     "PRDS_TO_RXTS": [
         "UPD.CANO.STD.PRDS->UPD.CANO.STD.RXTS",
@@ -277,5 +295,8 @@ def main():
 if __name__ == "__main__":
     # DEFAULT_CONFIG_FILE = "application/data/_config/rxts_to_prds/rxts_to_prds_v1.json"
     # DEFAULT_CONFIG_FILE = "application/data/_config/prds_to_rxts/prds_to_rxts_v1.json"
-    DEFAULT_CONFIG_FILE = "application/chemech/data/_config/rxn_to_rxn/rxn_to_rxn_v1.json"
+    # DEFAULT_CONFIG_FILE = "application/chemech/data/_config/rxn_to_rxn/rxn_to_rxn_v1.json"
+    # DEFAULT_CONFIG_FILE = "application/chemech/data/_config/enhc_rxts_to_prds/enhc_prds_to_prds_v3_1_val.json"
+    # DEFAULT_CONFIG_FILE = "application/chemech/data/_config/enhc_rxts_to_prds/enhc_rxts_to_prds_v6_1_val.json"
+    DEFAULT_CONFIG_FILE = "application/chemech/data/_config/enhc_rxts_to_prds/enhc_prds_to_rxts_v1_1_val.json"
     main()

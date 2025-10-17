@@ -20,17 +20,18 @@ GPU_MEMORY_THRESHOLD = 8000  # MB，GPU显存阈值
 def wait_for_gpu_memory(threshold_mb: int = GPU_MEMORY_THRESHOLD):
     """等待GPU显存达到阈值"""
     while True:
-        gpus = GPUtil.getGPUs()
-        if not gpus:
-            print("No GPU found, proceeding with CPU...")
-            break
-
-        available_memory = min([gpu.memoryFree for gpu in gpus])
-        if available_memory >= threshold_mb:
-            print(f"GPU memory available: {available_memory}MB")
+        available_memory1 = min([gpu.memoryFree for gpu in GPUtil.getGPUs()])
+        if available_memory1 <= threshold_mb:
+            print(f"GPU memory available: {available_memory1}MB")
+            time.sleep(60)
+            continue
+        time.sleep(60*5)
+        available_memory2 = min([gpu.memoryFree for gpu in GPUtil.getGPUs()])
+        if available_memory2 >= threshold_mb:
+            print(f"GPU memory available: {available_memory2}MB")
             break
         else:
-            print(f"Waiting for GPU memory... (available: {available_memory}MB, required: {threshold_mb}MB)")
+            print(f"Waiting for GPU memory... (available: {available_memory2}MB, required: {threshold_mb}MB)")
             time.sleep(60)
 
 
@@ -317,10 +318,13 @@ if __name__ == "__main__":
     mapping1 = {
         "per_device_train_batch_size": 2,
         "gradient_accumulation_steps": 2,
-        "eval_steps": 2000
+        "eval_steps": 8000,
+        "save_steps": 30000
     }
     mapping2 = {
-        "eval_steps": 2000
+        "eval_steps": 2000,
+        "per_device_train_batch_size": 2,
+        "gradient_accumulation_steps": 2
     }
     mapping3 = {
         "eval_steps": 4000
@@ -328,10 +332,29 @@ if __name__ == "__main__":
     DEFAULT_TRAINING_CONFIGS = [
         # ("prds_to_rxts", "prds_to_rxts_v1", "prds_to_rxts_v1", mapping2),
         # ("rxts_to_prds", "rxts_to_prds_v1", "rxts_to_prds_v1", mapping3),
-        ("rxn_to_rxn", "rxn_to_rxn_v1", "rxn_to_rxn_v1", mapping1),
+        # ("rxn_to_rxn", "rxn_to_rxn_v1", "rxn_to_rxn_v1", mapping1),
+        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v3_1", "enhc_rxts_to_prds_v3_1", mapping1),
+        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v4_1", "enhc_rxts_to_prds_v4_1", mapping1),
+        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v5_1", "enhc_rxts_to_prds_v5_1", mapping1),
+        # ("rxts_to_mech", "updcanoamrxts_to_mech", "updcanoamrxts_to_mech", mapping2),
+        # ("rxts_to_mech", "updcanoamrxts_to_cls", "updcanoamrxts_to_cls", mapping2),
+        # ("rxts_to_mech", "oricanoamrxts_to_cls", "oricanoamrxts_to_cls", mapping2),
+        # ("rxts_to_mech", "updcanoamrxts_to_cls_mech", "updcanoamrxts_to_cls_mech", mapping2),
+        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v6_1", "enhc_rxts_to_prds_v6_1", mapping1),
+        # ("enhc_rxts_to_prds", "enhc_rxts_to_prds_v7_1", "enhc_rxts_to_prds_v7_1", mapping1),
+        # ("rxts_to_rxts", "oricanostdrxts_to_updcanostdrxts", "oricanostdrxts_to_updcanostdrxts", mapping2),
+        # ("rxts_to_rxts", "updcanostdrxts_to_oricanostdrxts", "updcanostdrxts_to_oricanostdrxts", mapping2),
+        # ("rxts_to_rxts", "updcanoamrxts_to_oricanoamrxts", "updcanoamrxts_to_oricanoamrxts", mapping2),
+        # ("rxts_to_rxts", "oricanoamrxts_to_updcanoamrxts", "oricanoamrxts_to_updcanoamrxts", mapping2),
+        # ("rxts_to_mech", "updcanostdrxts_to_cls", "updcanostdrxts_to_cls", mapping2),
+        # ("rxts_to_mech", "oricanostdrxts_to_cls", "oricanostdrxts_to_cls", mapping2),
+        # ("rxn_to_mech", "updcanostdrxn_to_cls", "updcanostdrxn_to_cls", mapping2)
+        # ("rxn_to_rxn", "updcanoamrxn_to_oricanoamrxn", "updcanoamrxn_to_oricanoamrxn", mapping2)
+        ("enhc_prds_to_rxts", "enhc_prds_to_rxts_v1_1", "enhc_prds_to_rxts_v1_1", mapping1)
     ]
+
     # 基础参数文件路径
     BASE_PARA_FILE = "examples/train_full/chemechpred/base_para.yaml"
     wait_for_gpu = False
-    gpu_threshold = 10000
+    gpu_threshold = 22000
     main()

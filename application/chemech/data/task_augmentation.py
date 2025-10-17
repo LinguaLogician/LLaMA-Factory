@@ -34,26 +34,24 @@ DEFAULT_SPLITS = ["train", "val", "test"]
 # DEFAULT_SPLITS = ["val"]
 DATA_FILE_NAME = "mech_USPTO_ext.json"
 
-TASK_GROUPS0 = {
+TASK_GROUPS = {
+    # "RXTS_TO_RXTS": [
+    #     "ORI.CANO.STD.RXTS->UPD.CANO.STD.RXTS",
+    #     "UPD.CANO.STD.RXTS->ORI.CANO.STD.RXTS",
+    #     "UPD.CANO.AM.RXTS->ORI.CANO.AM.RXTS",
+    #     "ORI.CANO.AM.RXTS->UPD.CANO.AM.RXTS"
+    # ]
+    "RXTS_TO_MECH": [
+        "UPD.CANO.STD.RXTS->CLS",
+        "ORI.CANO.STD.RXTS->CLS",
+    ],
     "RXN_TO_MECH": [
-
-        # "RXN->CLS",
-        # "RXN->MECH",
-        # "RXN->CLS+MECH",
-        # --------------------------------------
-        # "ORI.CANO.STD.RXN->CLS",
-        # "ORI.CANO.AM.RXN->CLS",
-        # "UPD.CANO.AM.RXN->CLS",
-        # "UPD.CANO.AM.RXN->MECH",
-        # "UPD.CANO.AM.RXN->CLS+MECH",
-        # --------------------------------------
-        "ORI.ARBI.STD.RXN->CLS",
-        "UPD.ARBI.STD.RXN->CLS",
+        "UPD.CANO.STD.RXN->CLS",
     ]
 }
 
 # 任务配置
-TASK_GROUPS = {
+TASK_GROUPS0 = {
     "RXN_TO_MECH": [
 
         # "RXN->CLS",
@@ -69,7 +67,12 @@ TASK_GROUPS = {
         "ORI.ARBI.STD.RXN->CLS",
         "UPD.ARBI.STD.RXN->CLS",
     ],
-
+    "RXTS_TO_MECH": [
+        "UPD.CANO.AM.RXTS->MECH",
+        "UPD.CANO.AM.RXTS->CLS",
+        "ORI.CANO.AM.RXTS->CLS",
+        "UPD.CANO.AM.RXTS->CLS+MECH",
+    ],
     "RXN_TO_RXN": [
 
         # "ORI.RXN->UPD.RXN",

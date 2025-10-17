@@ -1,0 +1,17 @@
+{
+   "data_recipe": {
+        "recipe": [
+            ["oricanostdrxts_to_oricanostdprds", "", 1, {}],
+            ["oricanostdrxts_to_updcanostdrxts", "", 1, {}],
+            ["updcanostdrxts_to_updcanoamrxts", "", 1, {}],
+            ["updcanoamrxts_to_updcanoamprds", "", 1, {}],
+            ["updcanoamprds_to_updcanostdprds", "", 1, {}],
+            ["updcanoamrxn_to_oricanoamrxn", "", 1, {}]
+        ],
+        "splits": ["train"]
+    },
+    "data_output": {
+        "output": ["enhc_rxts_to_prds", "enhc_rxts_to_prds_v6_1"],
+        "splits": ["train"]
+    }
+}

@@ -1,0 +1,76 @@
+{
+  "k_value_aliases": {
+    "k_1": "K=1",
+    "k_2": "K=2",
+    "k_3": "K=3",
+    "k_4": "K=4",
+    "k_5": "K=5"
+  },
+  "k_values_to_export": ["k_1", "k_2", "k_3", "k_4", "k_5"],
+  "multiply_by_100": true,
+  "decimal_places": 2,
+  "query_filters": {
+    "group": [],
+    "task": [
+      "updcanoamrxts_to_updcanoamprds",
+      "updcanostdrxts_to_updcanostdprds",
+      "oricanoamrxts_to_oricanoamprds",
+      "oricanostdrxts_to_oricanostdprds",
+
+      "updcanoamrxts_to_mech_updcanoamprds",
+      "updcanoamrxts_to_cls_updcanoamprds",
+      "updcanoamrxts_to_cls_mech_updcanoamprds",
+
+      "updcanoamrxts_mech_to_updcanoamprds",
+      "updcanoamrxts_cls_to_updcanoamprds",
+      "updcanoamrxts_mech_cls_to_updcanoamprds",
+      "updcanoamrxts_cls_to_mech_updcanoamprds",
+      "updcanoamrxts_mech_to_cls_updcanoamprds"
+    ],
+    "model": []
+  },
+  "query_patterns": {
+    "group": ".*",
+    "task": ".*",
+    "model": ".*"
+  },
+  "export_fields": {
+    "basic_info": {
+      "group": "Group",
+      "task": "Task",
+      "model": "Model"
+    },
+    "cls": {
+      "accTopK": "CLS Accuracy@TopK",
+      "accKth": "CLS Accuracy@Kth"
+    },
+    "mech": {
+      "accTopK": "Mechanism Accuracy@TopK",
+      "accKth": "Mechanism Accuracy@Kth"
+    },
+    "mols": {
+      "accTopK": "Target Accuracy@TopK",
+      "accKth": "Target Accuracy@Kth",
+      "accTopKMols": "Molecules Accuracy@TopK",
+      "accKthMols": "Molecules Accuracy@Kth",
+      "precTopKFormat": "Format Accuracy@TopK",
+      "precKthFormat": "Format Accuracy@Kth",
+      "precTopKManner": "Manner Accuracy@TopK",
+      "precKthManner": "Manner Accuracy@Kth",
+      "precTopKValid": "Valid Precision@TopK",
+      "precKthValid": "Valid Precision@Kth"
+    },
+    "matched": {
+      "precTopK": "Matched Precision@TopK",
+      "precKth": "Matched Precision@Kth"
+    },
+    "resolved": {
+      "precTopK": "Resolved Precision@TopK",
+      "precKth": "Resolved Precision@Kth"
+    },
+    "totally": {
+      "precTopK": "Totally Precision@TopK",
+      "precKth": "Totally Precision@Kth"
+    }
+  }
+}

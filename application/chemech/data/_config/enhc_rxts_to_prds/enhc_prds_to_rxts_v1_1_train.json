@@ -9,10 +9,10 @@
             ["updcanoamrxn_to_oricanoamrxn", "", 1, {}],
             ["oricanoamrxts_to_oricanostdrxts", "", 1, {}]
         ],
-        "splits": ["train", "val", "test"]
+        "splits": ["train"]
     },
     "data_output": {
-        "output": ["enhc_rxts_to_prds", "enhc_rxts_to_prds_v3_1"],
-        "splits": ["train", "val", "test"]
+        "output": ["enhc_prds_to_rxts", "enhc_prds_to_rxts_v1_1"],
+        "splits": ["train"]
     }
 }

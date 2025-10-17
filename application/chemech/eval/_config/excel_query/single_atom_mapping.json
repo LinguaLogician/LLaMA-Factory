@@ -1,0 +1,37 @@
+{
+  "k_value_aliases": {
+    "k_1": "K=1",
+    "k_2": "K=2",
+    "k_3": "K=3",
+    "k_4": "K=4",
+    "k_5": "K=5"
+  },
+  "k_values_to_export": ["k_1", "k_2", "k_3", "k_4", "k_5"],
+  "multiply_by_100": true,
+  "decimal_places": 2,
+  "query_filters": {
+    "group": [],
+    "task": [
+    ],
+    "model": [
+      "oricanostdrxn_to_oricanoamrxn",
+      "updcanostdrxn_to_updcanoamrxn"
+    ]
+  },
+  "query_patterns": {
+    "group": ".*",
+    "task": ".*",
+    "model": ".*"
+  },
+  "export_fields": {
+    "basic_info": {
+      "group": "Group",
+      "task": "Task",
+      "model": "Model"
+    },
+    "mols": {
+      "accTopKMols": "Molecules Accuracy@TopK",
+      "accKthMols": "Molecules Accuracy@Kth"
+    }
+  }
+}
